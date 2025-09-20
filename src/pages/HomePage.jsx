@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import React, { useEffect } from "react";
 import Navbar from "../components/navbar";
 import { useState } from "react";
@@ -33,12 +32,15 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen>">
+    <div className="min-h-screen">
       <Navbar />
-      <Tabs defaultValue="all" className="container mx-auto max-w-6xl p-4 mt-2">
+      <Tabs
+        defaultValue="all"
+        className="container w-full mx-auto max-w-7xl p-4 mt-2 justify-center"
+      >
         <div className="hidden md:flex lg:flex justify-center gap-6 flex-1 mb-4">
           <Select>
-            <SelectTrigger className="w-[150px] cursor-pointer">
+            <SelectTrigger className="w-[150px] cursor-pointer bg-white">
               <SelectValue placeholder="Time" />
             </SelectTrigger>
             <SelectContent>
@@ -85,7 +87,7 @@ const HomePage = () => {
           </TabsList>
 
           <Select>
-            <SelectTrigger className="w-[150px] cursor-pointer">
+            <SelectTrigger className="w-[150px] cursor-pointer bg-white">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -107,13 +109,15 @@ const HomePage = () => {
         {/* <div className="container mx-auto max-w-6xl p-4 mt-6"> */}
 
         {/* {loading && <div className="text-center text-primary py-10">Loading...</div>} */}
+        {/* <div className="flex flex-1 justify-center"> */}
         {recipes.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 ">
+          <div className="grid mx-auto w-auto grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {recipes.map((recipe) => (
               <RecipeCard key={recipe._id} recipe={recipe} />
             ))}
           </div>
         )}
+        {/* </div> */}
         {/* </div> */}
       </Tabs>
     </div>

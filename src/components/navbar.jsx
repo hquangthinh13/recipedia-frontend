@@ -8,22 +8,22 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 const Navbar = () => {
   return (
     <header className="border-b border-border bg-white">
-      <div className="mx-auto max-w-6xl p-4">
+      <div className="mx-auto max-w-7xl p-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/">
+          <Link to={"/"}>
             <img src={logo} alt="Recipedia Logo" className="h-14" />
           </Link>
 
           {/* Right section */}
           <div className="flex items-center space-x-2">
             {/* Create Recipe */}
-            <Button variant="ghost" className="cursor-pointer">
-              {/* <Link to="/create" className="flex items-center space-x-2"> */}
-              <Plus className="size=lg" />
-              Post
-              {/* </Link> */}
-            </Button>
+            <Link to={"/create"}>
+              <Button variant="ghost" className="cursor-pointer">
+                <Plus className="size=lg" />
+                Post
+              </Button>
+            </Link>
 
             {/* Notifications */}
             <Button variant="ghost" size="default" className="cursor-pointer">

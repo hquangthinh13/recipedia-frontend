@@ -3,22 +3,8 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  CookingPot,
-  Clock,
-  CakeSlice,
-  Heart,
-  Bookmark,
-  MessageCircle,
-} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Clock, CakeSlice, Heart, Bookmark, MessageCircle } from "lucide-react";
 
 // Helper: format date
 const formatPostedDate = (createdAt) => {
@@ -51,7 +37,7 @@ const RecipeCard = ({ recipe }) => {
       recipe.author?.username || "U"
     )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`;
   return (
-    <Card className="cursor-pointer w-full bg-card border-border shadow-lg hover:shadow-xl transition overflow-hidden delay-150 duration-300 ease-in-out hover:translate-y-0.5 hover:scale-105">
+    <Card className="cursor-pointer mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out hover:translate-y-0.5 hover:scale-105">
       {/* Cover image */}
       <div className=" ">
         <img
@@ -74,7 +60,6 @@ const RecipeCard = ({ recipe }) => {
             <div className="flex flex-col">
               <div className="text-sm flex line-clamp-1 font-medium text-[var(--card-foreground)]">
                 {recipe.author?.username || "Unknown"}
-                {/* Huỳnh Quang Thịnh Nguyễn */}
               </div>
               {/* <div className="flex text-gray-400 font-medium">•</div> */}
               <div className=" text-xs flex text-gray-400 font-light">
@@ -88,7 +73,7 @@ const RecipeCard = ({ recipe }) => {
           </Button>
         </div>
         {/* Title */}
-        <h2 className="text-xl font-bold line-clamp-1 text-[var(--card-foreground)] mb-2 antialiased">
+        <h2 className="text-xl font-bold line-clamp-1 text-[var(--card-foreground)] mt-1 mb-0 antialiased">
           {recipe.title}
         </h2>
 
