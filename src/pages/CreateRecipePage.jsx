@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/navbar";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { toast } from "sonner";
-import { RecipeFormSchema } from "../lib/recipeFormSchema"; // schema
+import { RecipeFormSchema } from "../formSchema/recipeFormSchema"; // schema
 import {
   Form,
   FormControl,
@@ -35,8 +35,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import axios from "axios";
 
 const CreateRecipePage = () => {
+  const [file, setfile] = useState("");
+  const [image, setImage] = useState("");
+  const [loading, setLoading] = useState(false);
+  function previewFiles(file) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onloadend = () => {
+      setImage(reader.result);
+      console.log(image);
+    };
+  }
+
   const form = useForm({
     resolver: zodResolver(RecipeFormSchema),
     defaultValues: {
@@ -46,7 +60,7 @@ const CreateRecipePage = () => {
       dishType: "",
       ingredients: [{ name: "", measurement: "", amount: "" }],
       instructions: "",
-      authorId: "someUserId", // or pass dynamically
+      // authorId: "someUserId", // or pass dynamically
     },
   });
 
@@ -56,11 +70,32 @@ const CreateRecipePage = () => {
     control: form.control,
   });
 
-  const onSubmit = (values) => {
+  const onSubmit = async (values) => {
     console.log("Form submitted:", values);
-    toast.success("Successfully toasted!");
+    // toast.success("Successfully toasted!");
     // TODO: upload coverImage to Cloudinary here
     // then send payload with image URL to backend
+    const result = await axios.post("http://localhost:5001/api/upload", {
+      image: image,
+    });
+    try {
+      console.log(result.data);
+      const uploadedImg = result.data.secure_url; // Đã upload ảnh thành công từ server side lên Cloudinary -> secure_url -> để tạo URL hiển thị ảnh ở FE
+
+      // Build recipe payload with Cloudinary URL
+      const recipePayload = {
+        ...values,
+        coverImage: uploadedImg,
+      };
+      console.log("Final recipe payload:", recipePayload);
+      // Send to your recipe backend
+      await axios.post("http://localhost:5001/api/recipes/", recipePayload);
+
+      toast.success("Your dish is served!");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to create recipe");
+    }
   };
 
   return (
@@ -430,6 +465,8 @@ const CreateRecipePage = () => {
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             field.onChange(file ?? null);
+                            setfile(file);
+                            if (file) previewFiles(file);
                           }}
                         ></Input>
                       </FormControl>
@@ -441,10 +478,17 @@ const CreateRecipePage = () => {
                     </FormItem>
                   )}
                 />
+                <div className="">
+                  {image && <img src={image} alt="Preview Image" />}
+                </div>
                 <div className="flex w-full justify-end">
-                  <Button className="cursor-pointer" type="submit">
+                  <Button
+                    className="cursor-pointer"
+                    type="submit"
+                    disabled={loading}
+                  >
                     {" "}
-                    <CookingPot /> Create Recipe
+                    <CookingPot /> {loading ? "Cooking..." : "Create Recipe"}
                   </Button>
                 </div>
               </form>

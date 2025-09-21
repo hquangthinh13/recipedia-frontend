@@ -38,7 +38,7 @@ export const RecipeFormSchema = z.object({
     .trim()
     .min(10, { message: "Title must be at least 10 characters." }),
 
-  authorId: z.string().min(1, { message: "Author is required." }),
+  // authorId: z.string().min(1, { message: "Author is required." }),
 
   // Cover image can be either a URL string or a File (from input type="file")
   coverImage: z.union([z.string().url(), z.instanceof(File)]),

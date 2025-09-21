@@ -1,8 +1,13 @@
 import React, { useEffect } from "react";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
+
+import LoginCard from "../components/login-card";
 import Navbar from "../components/navbar";
 import { useState } from "react";
 import axios from "axios";
 import RecipeCard from "../components/recipe-card";
+import LogoutButton from "../components/log-out-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -17,9 +22,33 @@ import {
 const HomePage = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState("");
 
+  const navigate = useNavigate();
+  const [cookies] = useCookies(["token"]);
+  const [showLogin, setShowLogin] = useState(false); // control login popup
+  const [user, setUser] = useState(null);
+
+  const handleLogin = async (values) => {
+    try {
+      const { data } = await axios.post(
+        "http://localhost:5001/api/auth/login",
+        values,
+        { withCredentials: true }
+      );
+      if (data.success) {
+        setUser(data.user);
+        navigate("/"); // or close modal if using dialog
+      } else {
+        console.log(data.message);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+    }
+  };
   useEffect(() => {
-    const fetchRecipes = async () => {
+    const verifyAndFetch = async () => {
+      // Verify cookie// Fetch recipes
       try {
         const res = await axios.get("http://localhost:5001/api/recipes");
         console.log(res.data);
@@ -27,13 +56,49 @@ const HomePage = () => {
       } catch (error) {
         console.error("Error fetching recipes:", error);
       }
+      if (!cookies.token) {
+        setShowLogin(true); // show login popup instead of navigate
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data } = await axios.post(
+          "http://localhost:5001/api/auth/",
+          {},
+          { withCredentials: true }
+        );
+        setUsername(data.name);
+        setShowLogin(false);
+      } catch (err) {
+        console.error("Error verifying user:", err);
+        setShowLogin(true);
+        return;
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchRecipes();
-  }, []);
+    verifyAndFetch();
+  }, [cookies]);
 
   return (
     <div className="min-h-screen">
+      {showLogin && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Dark semi-transparent background */}
+          <div
+            className="fixed inset-0 bg-black opacity-50"
+            // onClick={onClose} // Clicking outside closes modal
+          />
+
+          {/* Centered card */}
+          <div className="relative z-10">
+            <LoginCard onSubmit={handleLogin} />
+          </div>
+        </div>
+      )}
       <Navbar />
+      <LogoutButton />
       <Tabs
         defaultValue="all"
         className="container w-full mx-auto max-w-7xl p-4 mt-2 justify-center"

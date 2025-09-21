@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../assets/images/Recipedia-logo-square-0.svg";
+import logo from "../assets/images/Recipedia-logo-square.svg";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus, Bell } from "lucide-react"; // for icons (shadcn uses lucide-react)
