@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
+import { toast } from "sonner";
 
 import LoginCard from "../components/login-card";
 import Navbar from "../components/navbar";
@@ -46,14 +47,19 @@ const HomePage = () => {
 
   const handleLogin = async (values) => {
     try {
-      const { data } = await api.post("/login", values);
+      const { data } = await api.post("/auth/login", values);
       if (data.token) {
         login(data.token); // context will fetch user + update navbar
         setShowLogin(false);
         navigate("/");
       }
     } catch (error) {
-      console.error("Login error:", error);
+      const msg =
+        err.response?.data?.msg || "Unable to log in. Please try again.";
+      toast("Login failed", {
+        description: msg,
+        variant: "destructive",
+      });
     }
   };
   useEffect(() => {

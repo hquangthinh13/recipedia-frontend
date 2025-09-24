@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (token) => {
     localStorage.setItem("token", token);
     try {
-      const { data } = await api.get("/auth/login", {
+      const { data } = await api.get("/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser({

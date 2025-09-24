@@ -50,7 +50,12 @@ const LoginPage = () => {
         navigate("/");
       }
     } catch (error) {
-      console.error("Login error:", error);
+      const msg =
+        err.response?.data?.msg || "Unable to log in. Please try again.";
+      toast("Login failed", {
+        description: msg,
+        variant: "destructive",
+      });
     }
   };
   return (

@@ -74,7 +74,7 @@ const Navbar = () => {
                 <Avatar className="cursor-pointer">
                   <AvatarImage
                     src={
-                      user?.avatarUrl ||
+                      user?.avatar ||
                       getDicebearAvatar(
                         user?.name || user?.email || getGuestSeed()
                       )
