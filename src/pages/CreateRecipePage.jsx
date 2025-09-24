@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import api from "../lib/api";
+
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import { Button } from "@/components/ui/button";
@@ -77,7 +79,7 @@ const CreateRecipePage = () => {
     setLoading(true);
 
     try {
-      const result = await axios.post("http://localhost:5001/api/upload", {
+      const result = await api.post("/upload", {
         image: image,
       });
       console.log(result.data);
@@ -96,7 +98,7 @@ const CreateRecipePage = () => {
         navigate("/login");
         return;
       }
-      await axios.post("http://localhost:5001/api/recipes/", recipePayload, {
+      await api.post("/recipes", recipePayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Your dish is served!");

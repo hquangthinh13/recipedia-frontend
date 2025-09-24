@@ -80,7 +80,7 @@ const RecipeCard = ({ recipe }) => {
                 {recipe.author?.name || "Mysterious Chef"}
               </div>
               {/* <div className="flex text-gray-400 font-medium">•</div> */}
-              <div className=" text-xs flex text-gray-400 font-light">
+              <div className="text-xs flex text-gray-400 font-light">
                 {formatPostedDate(recipe.createdAt)}
               </div>
             </div>
@@ -121,9 +121,9 @@ const RecipeCard = ({ recipe }) => {
             className="group cursor-pointer flex-1 flex"
           >
             <Heart className="" />
-            <div className="font-normal text-gray-300 group-hover:text-current">
+            {/* <div className="font-normal text-gray-300 group-hover:text-current">
               {recipe.likes.length}
-            </div>
+            </div> */}
           </Button>
 
           <Button
@@ -132,9 +132,9 @@ const RecipeCard = ({ recipe }) => {
             className="group cursor-pointer flex-1 flex"
           >
             <MessageCircle className="" />
-            <div className="font-normal text-gray-300 group-hover:text-current">
+            {/* <div className="font-normal text-gray-300 group-hover:text-current">
               {recipe.likes.length}
-            </div>
+            </div> */}
           </Button>
         </div>
       </CardContent>

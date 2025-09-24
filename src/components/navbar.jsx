@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from "react";
-import axios from "axios";
 import logo from "../assets/images/Recipedia-logo-square.svg";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";

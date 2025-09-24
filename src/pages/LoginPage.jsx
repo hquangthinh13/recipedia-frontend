@@ -1,5 +1,7 @@
 import React from "react";
 import axios from "axios";
+import api from "../lib/api";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { LoginFormSchema } from "../formSchema/loginFormSchema"; // schema
@@ -40,10 +42,7 @@ const LoginPage = () => {
   const onSubmit = async (values) => {
     console.log("Content:", values);
     try {
-      const { data } = await axios.post(
-        "http://localhost:5001/api/auth/login",
-        values
-      );
+      const { data } = await api.post("/auth/login", values);
       if (data.token) {
         // Call the AuthContext login, which fetches user and updates Navbar
         await login(data.token);

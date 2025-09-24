@@ -1,5 +1,7 @@
 // src/pages/SignUpPage.jsx
 import React from "react";
+import api from "../lib/api";
+
 import axios from "axios";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -58,14 +60,11 @@ const SignUpPage = () => {
 
   const onSubmit = async (values) => {
     try {
-      const { data } = await axios.post(
-        "http://localhost:5001/api/auth/signup",
-        {
-          name: values.name,
-          email: values.email,
-          password: values.password,
-        }
-      );
+      const { data } = await api.post("/auth/signup", {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      });
 
       if (data.token) {
         await login(data.token); // from AuthContext
@@ -77,13 +76,10 @@ const SignUpPage = () => {
       // If the email is already taken, try logging in with the same credentials
       if (msg.toLowerCase().includes("user already exists")) {
         try {
-          const { data } = await axios.post(
-            "http://localhost:5001/api/auth/login",
-            {
-              email: values.email,
-              password: values.password,
-            }
-          );
+          const { data } = await api.post("/auth/login", {
+            email: values.email,
+            password: values.password,
+          });
           if (data.token) {
             await login(data.token);
             navigate("/");

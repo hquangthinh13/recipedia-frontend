@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import api from "../lib/api";
 
 import LoginCard from "../components/login-card";
 import Navbar from "../components/navbar";
@@ -37,7 +38,7 @@ const HomePage = () => {
       if (dishType) params.dishType = dishType;
       if (sort) params.sort = sort;
 
-      const res = await axios.get("http://localhost:5001/api/recipes", {
+      const res = await api.get("/recipes", {
         params,
       });
       setRecipes(res.data);
@@ -48,10 +49,7 @@ const HomePage = () => {
 
   const handleLogin = async (values) => {
     try {
-      const { data } = await axios.post(
-        "http://localhost:5001/api/auth/login",
-        values
-      );
+      const { data } = await api.post("/login", values);
       if (data.token) {
         login(data.token); // context will fetch user + update navbar
         setShowLogin(false);
@@ -70,9 +68,8 @@ const HomePage = () => {
       setLoading(false);
       return;
     }
-
-    axios
-      .get("http://localhost:5001/api/auth/me", {
+    api
+      .get("/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(({ data }) => {
