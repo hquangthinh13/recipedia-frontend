@@ -54,6 +54,8 @@ const HomePage = () => {
         navigate("/");
       }
     } catch (error) {
+      console.error("Login failed:", error.response?.data);
+
       const msg =
         error.response?.data?.msg || "Unable to log in. Please try again.";
       toast("Login failed", {
