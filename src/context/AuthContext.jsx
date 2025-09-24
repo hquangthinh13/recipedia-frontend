@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
+import api from "../lib/api";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // { id, name, email, avatar }
@@ -20,7 +21,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const { data } = await axios.get("http://localhost:5001/api/auth/me", {
+        const { data } = await api.get("/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser({
@@ -43,7 +44,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (token) => {
     localStorage.setItem("token", token);
     try {
-      const { data } = await axios.get("http://localhost:5001/api/auth/me", {
+      const { data } = await api.get("/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser({

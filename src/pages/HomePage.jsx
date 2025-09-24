@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
@@ -7,9 +6,7 @@ import api from "../lib/api";
 import LoginCard from "../components/login-card";
 import Navbar from "../components/navbar";
 import { useState } from "react";
-import axios from "axios";
 import RecipeCard from "../components/recipe-card";
-// import LogoutButton from "../components/log-out-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
