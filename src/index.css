@@ -1,9 +1,14 @@
-@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+
+@import "tailwindcss";
 
 @config "../tailwind.config.js";
 
 @custom-variant dark (&:is(.dark *));
+
+body {
+  font-family: "Outfit", sans-serif;
+}
 
 @layer base {
   :root {

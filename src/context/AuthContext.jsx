@@ -1,18 +1,16 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-// import axios from "axios";
 import { useNavigate } from "react-router-dom";
-const AuthContext = createContext();
 import api from "../lib/api";
+
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // { id, name, email, avatar }
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(() => localStorage.getItem("token")); // reactive
   const navigate = useNavigate();
 
-  // Get token from localStorage
-  const token = localStorage.getItem("token");
-
-  // Fetch current user when token changes
+  // Fetch current user whenever token changes
   useEffect(() => {
     const fetchMe = async () => {
       if (!token) {
@@ -20,6 +18,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return;
       }
+
       try {
         const { data } = await api.get("/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
@@ -28,11 +27,13 @@ export const AuthProvider = ({ children }) => {
           id: data.id,
           name: data.name,
           email: data.email,
-          avatar: data.avatar || null,
+          avatar: data.avatar || null, // ✅ consistent everywhere
         });
       } catch (err) {
         console.error("Auth fetch failed:", err?.response?.data || err.message);
         setUser(null);
+        localStorage.removeItem("token"); // clear bad token
+        setToken(null);
       } finally {
         setLoading(false);
       }
@@ -41,27 +42,17 @@ export const AuthProvider = ({ children }) => {
     fetchMe();
   }, [token]);
 
-  const login = async (token) => {
-    localStorage.setItem("token", token);
-    try {
-      const { data } = await api.get("/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUser({
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        avatarUrl: data.avatar || null,
-      });
-    } catch (err) {
-      console.error("Failed to fetch user on login:", err);
-      setUser(null);
-    }
+  // Save token + fetch user
+  const login = async (newToken) => {
+    localStorage.setItem("token", newToken);
+    setToken(newToken); // triggers useEffect → fetches user
   };
 
+  // Clear auth state
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
+    setToken(null);
     navigate("/login");
   };
 
