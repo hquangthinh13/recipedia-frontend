@@ -46,6 +46,8 @@ const HomePage = () => {
   };
 
   const handleLogin = async (values) => {
+    console.log("Content:", values);
+
     try {
       const { data } = await api.post("/auth/login", values);
       if (data.token) {
