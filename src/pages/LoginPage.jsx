@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { LoginFormSchema } from "../formSchema/loginFormSchema"; // schema
 import { Link, useNavigate } from "react-router-dom";
-
+import { useAuth } from "../context/AuthContext";
 import loginImage from "../assets/images/image0.jpg";
 import logo from "../assets/images/Recipedia-logo-square.svg";
 import { CookingPot } from "lucide-react";
@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/card";
 const LoginPage = () => {
   const navigate = useNavigate();
-
+  const { login } = useAuth();
   const form = useForm({
     resolver: zodResolver(LoginFormSchema),
     defaultValues: {
@@ -42,15 +42,12 @@ const LoginPage = () => {
     try {
       const { data } = await axios.post(
         "http://localhost:5001/api/auth/login",
-        values,
-        { withCredentials: true }
+        values
       );
-
-      if (data.success) {
+      if (data.token) {
+        // Call the AuthContext login, which fetches user and updates Navbar
+        await login(data.token);
         navigate("/");
-      } else {
-        console.log(data.message);
-        // show error toast or set error state
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -103,6 +100,7 @@ const LoginPage = () => {
                         {/* Title */}
                         <FormField
                           control={form.control}
+                          type="password"
                           name="password"
                           render={({ field }) => (
                             <FormItem>

@@ -4,15 +4,17 @@ import "./index.css";
 import App from "./App.jsx";
 import { Toaster } from "sonner";
 import { BrowserRouter } from "react-router-dom";
-import { CookiesProvider } from "react-cookie";
+// import { CookiesProvider } from "react-cookie";
+import { AuthProvider } from "./context/AuthContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <CookiesProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      {" "}
+      <AuthProvider>
         <App />
-        <Toaster />
-      </BrowserRouter>
-    </CookiesProvider>
+        <Toaster />{" "}
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>
 );

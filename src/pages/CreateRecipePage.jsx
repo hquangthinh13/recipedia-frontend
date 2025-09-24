@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import { Button } from "@/components/ui/button";
 import { Plus, CookingPot, ArrowLeft, Trash2 } from "lucide-react";
@@ -38,6 +38,8 @@ import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 
 const CreateRecipePage = () => {
+  const navigate = useNavigate();
+
   const [file, setfile] = useState("");
   const [image, setImage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -72,13 +74,12 @@ const CreateRecipePage = () => {
 
   const onSubmit = async (values) => {
     console.log("Form submitted:", values);
-    // toast.success("Successfully toasted!");
-    // TODO: upload coverImage to Cloudinary here
-    // then send payload with image URL to backend
-    const result = await axios.post("http://localhost:5001/api/upload", {
-      image: image,
-    });
+    setLoading(true);
+
     try {
+      const result = await axios.post("http://localhost:5001/api/upload", {
+        image: image,
+      });
       console.log(result.data);
       const uploadedImg = result.data.secure_url; // Đã upload ảnh thành công từ server side lên Cloudinary -> secure_url -> để tạo URL hiển thị ảnh ở FE
 
@@ -89,12 +90,25 @@ const CreateRecipePage = () => {
       };
       console.log("Final recipe payload:", recipePayload);
       // Send to your recipe backend
-      await axios.post("http://localhost:5001/api/recipes/", recipePayload);
-
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please log in to create a recipe.");
+        navigate("/login");
+        return;
+      }
+      await axios.post("http://localhost:5001/api/recipes/", recipePayload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Your dish is served!");
+      navigate("/");
     } catch (error) {
-      console.log(error);
+      console.log(
+        "Create recipe error:",
+        error.response?.data || error.message
+      );
       toast.error("Failed to create recipe");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -483,7 +497,7 @@ const CreateRecipePage = () => {
                 </div>
                 <div className="flex w-full justify-end">
                   <Button
-                    className="cursor-pointer"
+                    className={`cursor-pointer ${loading ? "opacity-60" : ""}`}
                     type="submit"
                     disabled={loading}
                   >

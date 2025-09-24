@@ -1,13 +1,14 @@
 import React, { useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 import LoginCard from "../components/login-card";
 import Navbar from "../components/navbar";
 import { useState } from "react";
 import axios from "axios";
 import RecipeCard from "../components/recipe-card";
-import LogoutButton from "../components/log-out-button";
+// import LogoutButton from "../components/log-out-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -23,63 +24,67 @@ const HomePage = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
-
+  const [cookingTime, setCookingTime] = useState("");
+  const [dishType, setDishType] = useState("");
+  const [sort, setSort] = useState("");
   const navigate = useNavigate();
-  const [cookies] = useCookies(["token"]);
   const [showLogin, setShowLogin] = useState(false); // control login popup
-  const [user, setUser] = useState(null);
+  const { login } = useAuth();
+  const fetchRecipes = async () => {
+    try {
+      const params = {};
+      if (cookingTime) params.cookingTime = cookingTime;
+      if (dishType) params.dishType = dishType;
+      if (sort) params.sort = sort;
+
+      const res = await axios.get("http://localhost:5001/api/recipes", {
+        params,
+      });
+      setRecipes(res.data);
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+    }
+  };
 
   const handleLogin = async (values) => {
     try {
       const { data } = await axios.post(
         "http://localhost:5001/api/auth/login",
-        values,
-        { withCredentials: true }
+        values
       );
-      if (data.success) {
-        setUser(data.user);
-        navigate("/"); // or close modal if using dialog
-      } else {
-        console.log(data.message);
+      if (data.token) {
+        login(data.token); // context will fetch user + update navbar
+        setShowLogin(false);
+        navigate("/");
       }
     } catch (error) {
       console.error("Login error:", error);
     }
   };
   useEffect(() => {
-    const verifyAndFetch = async () => {
-      // Verify cookie// Fetch recipes
-      try {
-        const res = await axios.get("http://localhost:5001/api/recipes");
-        console.log(res.data);
-        setRecipes(res.data);
-      } catch (error) {
-        console.error("Error fetching recipes:", error);
-      }
-      if (!cookies.token) {
-        setShowLogin(true); // show login popup instead of navigate
-        setLoading(false);
-        return;
-      }
+    fetchRecipes();
 
-      try {
-        const { data } = await axios.post(
-          "http://localhost:5001/api/auth/",
-          {},
-          { withCredentials: true }
-        );
-        setUsername(data.name);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setShowLogin(true);
+      setLoading(false);
+      return;
+    }
+
+    axios
+      .get("http://localhost:5001/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(({ data }) => {
+        setUsername(data.name || "");
         setShowLogin(false);
-      } catch (err) {
+      })
+      .catch((err) => {
         console.error("Error verifying user:", err);
         setShowLogin(true);
-        return;
-      } finally {
-        setLoading(false);
-      }
-    };
-    verifyAndFetch();
-  }, [cookies]);
+      })
+      .finally(() => setLoading(false));
+  }, [cookingTime, dishType, sort]); // 👈 refetch when filters change
 
   return (
     <div className="min-h-screen">
@@ -98,19 +103,28 @@ const HomePage = () => {
         </div>
       )}
       <Navbar />
-      <LogoutButton />
       <Tabs
+        onValueChange={(val) => {
+          setDishType(val === "all" ? "" : val);
+        }}
         defaultValue="all"
         className="container w-full mx-auto max-w-7xl p-4 mt-2 justify-center"
       >
         <div className="hidden md:flex lg:flex justify-center gap-6 flex-1 mb-4">
-          <Select>
+          <Select
+            onValueChange={(val) => {
+              setCookingTime(val === "all" ? "" : val);
+            }}
+          >
             <SelectTrigger className="w-[150px] cursor-pointer bg-white">
               <SelectValue placeholder="Time" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Time</SelectLabel>
+                <SelectItem value="all" className="cursor-pointer">
+                  All
+                </SelectItem>
                 <SelectItem value="quick" className="cursor-pointer">
                   {"<"} 30 minutes
                 </SelectItem>
@@ -120,7 +134,7 @@ const HomePage = () => {
                 <SelectItem value="long" className="cursor-pointer">
                   1-2 hours
                 </SelectItem>
-                <SelectItem value="very-long" className="cursor-pointer">
+                <SelectItem value="veryLong" className="cursor-pointer">
                   {">"} 2 hours
                 </SelectItem>
               </SelectGroup>
@@ -131,9 +145,9 @@ const HomePage = () => {
             <TabsTrigger value="all" className="cursor-pointer">
               All
             </TabsTrigger>
-            <TabsTrigger value="saved" className="cursor-pointer">
+            {/* <TabsTrigger value="saved" className="cursor-pointer">
               Saved
-            </TabsTrigger>
+            </TabsTrigger> */}
             <TabsTrigger value="starter" className="cursor-pointer">
               Starter
             </TabsTrigger>
@@ -151,7 +165,11 @@ const HomePage = () => {
             </TabsTrigger>
           </TabsList>
 
-          <Select>
+          <Select
+            onValueChange={(val) => {
+              setSort(val);
+            }}
+          >
             <SelectTrigger className="w-[150px] cursor-pointer bg-white">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
