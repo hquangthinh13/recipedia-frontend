@@ -55,7 +55,7 @@ const HomePage = () => {
       }
     } catch (error) {
       const msg =
-        err.response?.data?.msg || "Unable to log in. Please try again.";
+        error.response?.data?.msg || "Unable to log in. Please try again.";
       toast("Login failed", {
         description: msg,
         variant: "destructive",
