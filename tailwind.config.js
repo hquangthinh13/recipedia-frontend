@@ -5,9 +5,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", "Inter", "sans-serif"],
+        sans: ["Outfit", "ui-sans-serif", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)", "Playfair Display", "serif"],
-        heading: ["var(--font-heading)", "Poppins", "sans-serif"],
+        heading: ["Outfit", "sans-serif"], // optional if you want headings also Outfit
       },
       borderRadius: {
         lg: "var(--radius)",
