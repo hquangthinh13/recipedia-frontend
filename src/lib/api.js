@@ -9,7 +9,7 @@ console.log("API base URL:", BASE_URL);
 
 const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: false, // you’re using JWT, not cookies
+  withCredentials: false, // using JWT, not cookies
 });
 
 // 🔑 Interceptor to attach token

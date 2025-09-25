@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import api from "../lib/api";
-
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { toast } from "sonner";
@@ -37,7 +35,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import axios from "axios";
 
 const CreateRecipePage = () => {
   const navigate = useNavigate();
@@ -64,7 +61,6 @@ const CreateRecipePage = () => {
       dishType: "",
       ingredients: [{ name: "", measurement: "", amount: "" }],
       instructions: "",
-      // authorId: "someUserId", // or pass dynamically
     },
   });
 
