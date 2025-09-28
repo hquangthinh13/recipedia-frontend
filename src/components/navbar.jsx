@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import logo from "../assets/images/Recipedia-logo-square.svg";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, Bell } from "lucide-react";
+import { Plus, Bell, ChefHat } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -32,20 +32,13 @@ function getGuestSeed() {
   return seed;
 }
 
-function getInitials(nameOrEmail = "") {
-  const base = nameOrEmail.split("@")[0];
-  const parts = base.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[1][0]).toUpperCase();
-}
-
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   return (
     <header className="border-b border-border bg-white">
-      <div className="mx-auto max-w-7xl p-4">
+      <div className="mx-auto max-w-6xl p-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to={"/"}>
@@ -101,21 +94,30 @@ const Navbar = () => {
                       {user.name || user.email}
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate("/profile")}>
-                      My Profile
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => navigate("/profile")}
+                    >
+                      My Kitchen
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={logout}>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={logout}
+                    >
                       Log out
                     </DropdownMenuItem>
                   </>
                 ) : (
                   <>
                     <DropdownMenuLabel className="truncate">
-                      Guest
+                      Mysterious Chef
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {/* No login button in the navbar; keep a menu action if you still want a path to login */}
-                    <DropdownMenuItem onClick={() => navigate("/login")}>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => navigate("/login")}
+                    >
                       Log in
                     </DropdownMenuItem>
                   </>

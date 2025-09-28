@@ -3,7 +3,14 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, CakeSlice, Heart, Bookmark, MessageCircle } from "lucide-react";
+import {
+  Clock,
+  CakeSlice,
+  Heart,
+  Bookmark,
+  MessageCircle,
+  ChefHat,
+} from "lucide-react";
 import { dishTypeLabels, cookingTimeLabels } from "../lib/enumDisplayMap";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
@@ -43,102 +50,104 @@ const RecipeCard = ({ recipe }) => {
       recipe.author?.username || "U"
     )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`;
   return (
-    <Card className="cursor-pointer mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out hover:translate-y-0.5 hover:scale-105">
-      {/* Cover image */}
-      <div className=" ">
-        <img
-          src={recipe.coverImage || "https://via.placeholder.com/300"}
-          alt={recipe.title}
-          className="h-36 w-full object-cover"
-        />
-      </div>
+    <Link to={`/recipes/${recipe._id}`}>
+      <Card className="cursor-pointer mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out hover:translate-y-0.5 hover:scale-105">
+        {/* Cover image */}
+        <div className=" ">
+          <img
+            src={recipe.coverImage || "https://via.placeholder.com/300"}
+            alt={recipe.title}
+            className="h-36 w-full object-cover"
+          />
+        </div>
 
-      {/* Content */}
-      <CardContent className="p-4 h-fit">
-        {/* Author + Date */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Avatar>
-              <AvatarImage
-                src={
-                  recipe.author?.avatarUrl ||
-                  getDicebearAvatar(
-                    recipe.author?.username || recipe.author?.name || "U"
-                  )
-                }
-                alt={recipe.author?.username || recipe.author?.name || "User"}
-              />
-              <AvatarFallback>
-                {recipe.author?.username?.[0]?.toUpperCase() ||
-                  recipe.author?.name?.[0]?.toUpperCase() ||
-                  "U"}
-              </AvatarFallback>
-            </Avatar>
+        {/* Content */}
+        <CardContent className="p-4 h-fit">
+          {/* Author + Date */}
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <Avatar>
+                <AvatarImage
+                  src={
+                    recipe.author?.avatarUrl ||
+                    getDicebearAvatar(
+                      recipe.author?.username || recipe.author?.name || "U"
+                    )
+                  }
+                  alt={recipe.author?.username || recipe.author?.name || "User"}
+                />
+                <AvatarFallback>
+                  {recipe.author?.username?.[0]?.toUpperCase() ||
+                    recipe.author?.name?.[0]?.toUpperCase() ||
+                    "U"}
+                </AvatarFallback>
+              </Avatar>
 
-            <div className="flex flex-col">
-              <div className="text-sm flex line-clamp-1 font-medium text-[var(--card-foreground)]">
-                {recipe.author?.name || "Mysterious Chef"}
+              <div className="flex flex-col">
+                <div className="text-sm flex line-clamp-1 font-medium text-[var(--card-foreground)]">
+                  {recipe.author?.name || "Mysterious Chef"}
+                </div>
+                {/* <div className="flex text-gray-400 font-medium">•</div> */}
+                <div className="text-xs flex text-gray-400 font-light">
+                  {formatPostedDate(recipe.createdAt)}
+                </div>
               </div>
-              {/* <div className="flex text-gray-400 font-medium">•</div> */}
-              <div className="text-xs flex text-gray-400 font-light">
-                {formatPostedDate(recipe.createdAt)}
-              </div>
+            </div>
+
+            <Button size="icon" variant="ghost" className="cursor-pointer">
+              <Bookmark className="" />
+            </Button>
+          </div>
+          {/* Title */}
+          <h2 className="text-xl font-bold line-clamp-1 text-[var(--card-foreground)] mt-1 mb-0 antialiased">
+            {recipe.title}
+          </h2>
+
+          {/* Dish type + Cooking time */}
+          <div className="flex justify-start items-center gap-3 text-sm text-gray-500 mb-4">
+            <div className="flex items-center gap-2">
+              <ChefHat className="h-4 w-4 text-gray-400 " />
+              <span className="text-base text-gray-600 antialiased">
+                {dishTypeLabels[recipe.dishType] ?? recipe.dishType}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-gray-400 " />
+              <span className="text-base text-gray-600 antialiased">
+                {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
+              </span>
             </div>
           </div>
 
-          <Button size="icon" variant="ghost" className="cursor-pointer">
-            <Bookmark className="" />
-          </Button>
-        </div>
-        {/* Title */}
-        <h2 className="text-xl font-bold line-clamp-1 text-[var(--card-foreground)] mt-1 mb-0 antialiased">
-          {recipe.title}
-        </h2>
-
-        {/* Dish type + Cooking time */}
-        <div className="flex justify-start items-center gap-3 text-sm text-gray-500 mb-4">
-          <div className="flex items-center gap-2">
-            <CakeSlice className="h-4 w-4 text-gray-400 " />
-            <span className="text-base font-medium text-gray-600 antialiased">
-              {dishTypeLabels[recipe.dishType] ?? recipe.dishType}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-gray-400 " />
-            <span className="text-base font-medium text-gray-600 antialiased">
-              {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
-            </span>
-          </div>
-        </div>
-
-        <Separator className="flex mt-4 mb-2" />
-        {/* Buttons */}
-        <div className=" w-full flex justify-center gap-3">
-          <Button
-            // size="icon"
-            variant="ghost"
-            className="group cursor-pointer flex-1 flex"
-          >
-            <Heart className="" />
-            {/* <div className="font-normal text-gray-300 group-hover:text-current">
+          <Separator className="flex mt-4 mb-2" />
+          {/* Buttons */}
+          <div className=" w-full flex justify-center gap-3">
+            <Button
+              // size="icon"
+              variant="ghost"
+              className="group cursor-pointer flex-1 flex"
+            >
+              <Heart className="" />
+              {/* <div className="font-normal text-gray-300 group-hover:text-current">
               {recipe.likes.length}
             </div> */}
-          </Button>
+            </Button>
 
-          <Button
-            // size="icon"
-            variant="ghost"
-            className="group cursor-pointer flex-1 flex"
-          >
-            <MessageCircle className="" />
-            {/* <div className="font-normal text-gray-300 group-hover:text-current">
+            <Button
+              // size="icon"
+              variant="ghost"
+              className="group cursor-pointer flex-1 flex"
+            >
+              <MessageCircle className="" />
+              {/* <div className="font-normal text-gray-300 group-hover:text-current">
               {recipe.likes.length}
             </div> */}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>{" "}
+    </Link>
   );
 };
 

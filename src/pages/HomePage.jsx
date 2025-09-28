@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
 import { toast } from "sonner";
-
+import pattern from "../assets/images/Recipedia_Pattern.svg";
+import background from "../assets/images/Background.jpg";
 import LoginCard from "../components/login-card";
 import Navbar from "../components/navbar";
 import { useState } from "react";
@@ -43,6 +44,9 @@ const HomePage = () => {
     } catch (error) {
       console.error("Error fetching recipes:", error);
     }
+  };
+  const onClose = () => {
+    setShowLogin(false);
   };
 
   const handleLogin = async (values) => {
@@ -97,7 +101,7 @@ const HomePage = () => {
           {/* Dark semi-transparent background */}
           <div
             className="fixed inset-0 bg-black opacity-50"
-            // onClick={onClose} // Clicking outside closes modal
+            onClick={onClose} // Clicking outside closes modal
           />
 
           {/* Centered card */}
@@ -107,25 +111,51 @@ const HomePage = () => {
         </div>
       )}
       <Navbar />
+
+      <div className="relative flex w-full bg-primary px-4 py-16 items-center text-center">
+        <div className="absolute inset-0">
+          <img
+            src={background}
+            alt="Background"
+            className="w-full h-full object-cover"
+          />
+          {/* <div className="absolute inset-0 bg-black/40" />{" "} */}
+          {/* optional overlay */}
+        </div>
+
+        <div className="relative container mx-auto max-w-2xl z-10">
+          <h1 className="text-4xl font-bold text-white">
+            Welcome to Recipedia
+          </h1>
+          <p className="mt-2 text-lg text-white">
+            Discover and share amazing recipes!
+          </p>
+        </div>
+      </div>
+
+      <div className="hidden lg:flex max-w-6xl px-4 py-2 items-center justify-center mx-auto mt-4">
+        <img src={pattern} alt="Pattern" className="" />
+      </div>
+
       <Tabs
         onValueChange={(val) => {
           setDishType(val === "all" ? "" : val);
         }}
         defaultValue="all"
-        className="container w-full mx-auto max-w-7xl p-4 mt-2 justify-center"
+        className="container w-full mx-auto max-w-6xl p-4 mt-2 justify-center"
       >
-        <div className="hidden md:flex lg:flex justify-center gap-6 flex-1 mb-4">
+        <div className="hidden md:flex lg:flex justify-between gap-6 flex-1 mb-6">
           <Select
             onValueChange={(val) => {
               setCookingTime(val === "all" ? "" : val);
             }}
           >
-            <SelectTrigger className="w-[150px] cursor-pointer bg-white">
-              <SelectValue placeholder="Time" />
+            <SelectTrigger className="w-[200px] cursor-pointer bg-white">
+              <SelectValue placeholder="Cooking Time" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>Time</SelectLabel>
+                <SelectLabel>Cooking Time</SelectLabel>
                 <SelectItem value="all" className="cursor-pointer">
                   All
                 </SelectItem>
@@ -145,7 +175,7 @@ const HomePage = () => {
             </SelectContent>
           </Select>
 
-          <TabsList className="flex justify-center gap-2">
+          <TabsList className="flex justify-center gap-6">
             <TabsTrigger value="all" className="cursor-pointer">
               All
             </TabsTrigger>
@@ -174,20 +204,20 @@ const HomePage = () => {
               setSort(val);
             }}
           >
-            <SelectTrigger className="w-[150px] cursor-pointer bg-white">
-              <SelectValue placeholder="Sort by" />
+            <SelectTrigger className="w-[200px] cursor-pointer bg-white">
+              <SelectValue placeholder="Sort by: Default" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>Sort by</SelectLabel>
+                <SelectLabel>Sorting</SelectLabel>
                 <SelectItem value="liked" className="cursor-pointer">
-                  Most Liked
+                  Sort by: Most Liked
                 </SelectItem>
                 <SelectItem value="newest" className="cursor-pointer">
-                  Newest
+                  Sort by: Newest
                 </SelectItem>
                 <SelectItem value="oldest" className="cursor-pointer">
-                  Oldest
+                  Sort by: Oldest
                 </SelectItem>
               </SelectGroup>
             </SelectContent>
@@ -198,7 +228,7 @@ const HomePage = () => {
         {/* {loading && <div className="text-center text-primary py-10">Loading...</div>} */}
         {/* <div className="flex flex-1 justify-center"> */}
         {recipes.length > 0 && (
-          <div className="grid mx-auto w-auto grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid max-w-6xl mx-auto w-auto grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
             {recipes.map((recipe) => (
               <RecipeCard key={recipe._id} recipe={recipe} />
             ))}
