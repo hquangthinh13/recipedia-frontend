@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { dishTypeLabels, cookingTimeLabels } from "../lib/enumDisplayMap";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+
 import {
   Table,
   TableHeader,
@@ -13,6 +15,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import {
+  MessageSquareText,
   Check,
   Clock,
   ChefHat,
@@ -65,10 +68,23 @@ const RecipeDetailPage = () => {
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [newComment, setNewComment] = useState("");
+  const [isCommentFocused, setIsCommentFocused] = useState(false);
 
   const [selected, setSelected] = useState("1X");
   const options = ["½X", "1X", "2X"];
+  const handleCommentSubmit = () => {
+    if (newComment.trim()) {
+      // Handle comment submission
+      setNewComment("");
+      setIsCommentFocused(false);
+    }
+  };
 
+  const handleCommentCancel = () => {
+    setNewComment("");
+    setIsCommentFocused(false);
+  };
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
@@ -167,14 +183,14 @@ const RecipeDetailPage = () => {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="hidden lg:flex md:flex items-center gap-2">
                     <Heart className="h-4 w-4 text-gray-400 " />
                     <span className="text-base text-gray-600 antialiased">
                       {recipe.likes.length}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="hidden lg:flex md:flex items-center gap-2">
                     <MessageCircle className="h-4 w-4 text-gray-400 " />
                     <span className="text-base text-gray-600 antialiased">
                       {recipe.comments.length}
@@ -212,10 +228,10 @@ const RecipeDetailPage = () => {
                 </Avatar>
 
                 <div className="flex flex-col">
-                  <div className="cursor-pointer hover:text-[var(--color-primary)] text-sm flex line-clamp-1 font-medium text-[var(--card-foreground)]">
+                  <div className="cursor-pointer hover:text-[var(--color-primary)] text-base flex line-clamp-1 font-medium text-[var(--card-foreground)]">
                     {recipe.author?.name || "Mysterious Chef"}
                   </div>
-                  <div className="text-xs flex text-gray-400 font-light">
+                  <div className="text-sm flex text-[var(--muted-foreground)] font-light">
                     {formatPostedDate(recipe.createdAt)}
                   </div>
                 </div>
@@ -256,7 +272,7 @@ const RecipeDetailPage = () => {
               <div className="flex rounded-none border mt-4">
                 <Table>
                   <TableHeader>
-                    <TableRow>
+                    <TableRow className="bg-accent/20 [&>:not(:last-child)]:border-r">
                       {" "}
                       <TableHead className="text-base ">Ingredient</TableHead>
                       <TableHead className="w-24 text-right text-base ">
@@ -270,8 +286,11 @@ const RecipeDetailPage = () => {
                   </TableHeader>
                   <TableBody>
                     {ingredients.map((ingredient, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="text-foreground  text-base ">
+                      <TableRow
+                        key={index}
+                        className="[&>:not(:last-child)]:border-r"
+                      >
+                        <TableCell className="text-foreground text-base ">
                           {ingredient.name}
                         </TableCell>
 
@@ -289,6 +308,7 @@ const RecipeDetailPage = () => {
               </div>
             </div>
             <Separator className="my-4" />
+            {/* Instructions */}
             <div className="space-y-2">
               {/* Title */}
               <div className="flex justify-start items-center gap-2">
@@ -311,6 +331,61 @@ const RecipeDetailPage = () => {
                 </Table>
               </div>
             </div>
+            <Separator className="my-4" />
+
+            {/* Comments Section */}
+            <div className="space-y-2">
+              {/* Title */}
+              <div className="flex justify-start items-center gap-2">
+                <h2 className="text-2xl font-bold text-[var(--card-foreground)] antialiased">
+                  Discussions
+                </h2>
+                <MessageSquareText className="text-accent" />
+              </div>
+              <div className="flex gap-3 mt-4">
+                <Avatar className="w-10 h-10 flex-shrink-0">
+                  <AvatarImage
+                    src="/placeholder.svg?height=40&width=40"
+                    alt="Your avatar"
+                  />
+                  <AvatarFallback>YU</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <Textarea
+                    placeholder="Add a comment..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    onFocus={() => setIsCommentFocused(true)}
+                    className={`resize-none border-0 border-b-2 rounded-none focus:border-none transition-all duration-200 ${
+                      isCommentFocused ? "min-h-[80px]" : "min-h-[40px]"
+                    }`}
+                    rows={isCommentFocused ? 3 : 1}
+                  />
+                  {isCommentFocused && (
+                    <div className="flex justify-end gap-2 mt-3">
+                      <Button
+                        variant="ghost"
+                        // size="sm"
+                        onClick={handleCommentCancel}
+                        className="text-muted-foreground hover:text-foreground cursor-pointer"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleCommentSubmit}
+                        disabled={!newComment.trim()}
+                        // size="sm"
+                        // variant="default"
+                        className="cursor-pointer"
+                      >
+                        Comment
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="mb-8"></div>
           </CardContent>
         </Card>
       </div>

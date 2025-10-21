@@ -87,8 +87,7 @@ const RecipeCard = ({ recipe }) => {
                 <div className="text-sm flex line-clamp-1 font-medium text-[var(--card-foreground)]">
                   {recipe.author?.name || "Mysterious Chef"}
                 </div>
-                {/* <div className="flex text-gray-400 font-medium">•</div> */}
-                <div className="text-xs flex text-gray-400 font-light">
+                <div className="text-xs flex text-[var(--muted-foreground)] font-light">
                   {formatPostedDate(recipe.createdAt)}
                 </div>
               </div>

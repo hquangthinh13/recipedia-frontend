@@ -46,7 +46,7 @@ const Navbar = () => {
           </Link>
 
           {/* Right section */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             {/* Create Recipe */}
             <Link to={"/create"}>
               <Button variant="ghost" className="cursor-pointer">
@@ -56,7 +56,7 @@ const Navbar = () => {
             </Link>
 
             {/* Notifications */}
-            <Button variant="ghost" size="default" className="cursor-pointer">
+            <Button variant="ghost" size="icon" className="cursor-pointer">
               <Bell />
             </Button>
 

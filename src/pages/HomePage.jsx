@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
 import { toast } from "sonner";
@@ -28,18 +28,25 @@ const HomePage = () => {
   const [dishType, setDishType] = useState("");
   const [sort, setSort] = useState("");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showLogin, setShowLogin] = useState(false); // control login popup
   const { login } = useAuth();
+
   const fetchRecipes = async () => {
     try {
-      const params = {};
-      if (cookingTime) params.cookingTime = cookingTime;
-      if (dishType) params.dishType = dishType;
-      if (sort) params.sort = sort;
+      const qs = new URLSearchParams();
+      if (cookingTime) qs.set("cookingTime", cookingTime);
+      if (dishType) qs.set("dishType", dishType);
+      if (sort) qs.set("sort", sort);
 
-      const res = await api.get("/recipes", {
-        params,
-      });
+      // Update browser URL so it's shareable/bookmarkable
+      navigate(
+        { pathname: "/", search: `?${qs.toString()}` },
+        { replace: true }
+      );
+
+      // Hit the API with the same query string
+      const res = await api.get(`/recipes?${qs.toString()}`);
       setRecipes(res.data);
     } catch (error) {
       console.error("Error fetching recipes:", error);
@@ -70,6 +77,18 @@ const HomePage = () => {
       });
     }
   };
+  useEffect(() => {
+    // On first load, hydrate filters from URL (if present)
+    // This runs only once; subsequent changes come from user actions.
+    const initialCooking = searchParams.get("cookingTime") || "";
+    const initialDish = searchParams.get("dishType") || "";
+    const initialSort = searchParams.get("sort") || "";
+    if (initialCooking) setCookingTime(initialCooking);
+    if (initialDish) setDishType(initialDish);
+    if (initialSort) setSort(initialSort);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     fetchRecipes();
 
