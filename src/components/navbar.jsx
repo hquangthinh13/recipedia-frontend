@@ -48,17 +48,27 @@ const Navbar = () => {
           {/* Right section */}
           <div className="flex items-center gap-1">
             {/* Create Recipe */}
-            <Link to={"/create"}>
-              <Button variant="ghost" className="cursor-pointer">
-                <Plus className="mr-1" />
-                Post
-              </Button>
-            </Link>
+            {user && (
+              <Link to={"/create"}>
+                <Button variant="ghost" className="cursor-pointer">
+                  <Plus className="mr-1" />
+                  Post
+                </Button>
+              </Link>
+            )}
 
             {/* Notifications */}
+<<<<<<< Updated upstream
             <Button variant="ghost" size="default" className="cursor-pointer">
               <Bell />
             </Button>
+=======
+            {user && (
+              <Button variant="ghost" size="icon" className="cursor-pointer">
+                <Bell />
+              </Button>
+            )}
+>>>>>>> Stashed changes
 
             {/* Auth area */}
 

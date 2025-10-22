@@ -1,9 +1,8 @@
-import React from "react";
+import React, { forwardRef, useImperativeHandle } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormSchema } from "../formSchema/loginFormSchema";
 import logo from "../assets/images/Recipedia-logo-square.svg";
-
 import {
   Form,
   FormField,
@@ -24,11 +23,14 @@ import {
 import { Link } from "react-router-dom";
 import { CookingPot } from "lucide-react";
 
-export default function LoginCard({ onSubmit }) {
+const LoginCard = forwardRef(({ onSubmit }, ref) => {
   const form = useForm({
     resolver: zodResolver(LoginFormSchema),
     defaultValues: { email: "", password: "" },
   });
+
+  // Expose form methods to parent (for setError)
+  useImperativeHandle(ref, () => form);
 
   return (
     <Card>
@@ -38,70 +40,86 @@ export default function LoginCard({ onSubmit }) {
           Recipedia
         </a>
         <CardTitle className="text-xl">
-          {" "}
           Welcome back to the kitchen, Chef!
         </CardTitle>
         <CardDescription>Your recipes await.</CardDescription>
       </CardHeader>
+
       <CardContent>
-        {" "}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            noValidate
+            autoComplete="off"
+          >
             <div className="grid gap-6">
               <div className="grid gap-6">
-                <div className="grid gap-3">
-                  {/* Title */}
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="example@recipedia.com"
-                            {...field}
-                          />
-                        </FormControl>
+                {/* Email */}
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          autoComplete="off"
+                          placeholder="example@recipedia.com"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  {/* Title */}
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center">
-                          <FormLabel>Password</FormLabel>
-                          <Link
-                            to="#"
-                            className="ml-auto text-sm underline-offset-4 hover:underline"
-                          >
-                            Forgot your password?
-                          </Link>{" "}
-                        </div>
-                        <FormControl>
-                          <Input placeholder="••••••••••••••" {...field} />
-                        </FormControl>
+                {/* Password */}
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center">
+                        <FormLabel>Password</FormLabel>
+                        <Link
+                          to="/forgot-password"
+                          className="ml-auto text-sm underline-offset-4 hover:underline"
+                        >
+                          Forgot your password?
+                        </Link>
+                      </div>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          autoComplete="new-password"
+                          placeholder="••••••••••••••"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
+                {/* Submit */}
                 <Button
                   type="submit"
                   variant="default"
-                  className="w-full cursor-pointer transition ease-in-out delay-150 duration-300 hover:scale-105 not-odd:hover:-translate-y-0.5"
+                  className="w-full cursor-pointer"
                 >
-                  <CookingPot />
+                  <CookingPot className="" />
                   Let’s cook!
                 </Button>
+
+                {/* Inline root error */}
+                {form.formState.errors.root && (
+                  <p className="text-center text-sm text-red-500">
+                    {form.formState.errors.root.message}
+                  </p>
+                )}
               </div>
+
+              {/* Footer */}
               <div className="text-center text-sm">
                 First time in the kitchen?{" "}
                 <Link
@@ -112,9 +130,11 @@ export default function LoginCard({ onSubmit }) {
                 </Link>
               </div>
             </div>
-          </form>{" "}
+          </form>
         </Form>
       </CardContent>
     </Card>
   );
-}
+});
+
+export default LoginCard;

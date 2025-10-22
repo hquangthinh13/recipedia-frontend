@@ -1,5 +1,10 @@
+<<<<<<< Updated upstream
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+=======
+import React, { useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+>>>>>>> Stashed changes
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
 import { toast } from "sonner";
@@ -9,6 +14,8 @@ import LoginCard from "../components/login-card";
 import Navbar from "../components/navbar";
 import { useState } from "react";
 import RecipeCard from "../components/recipe-card";
+import { Button } from "@/components/ui/button";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -28,6 +35,7 @@ const HomePage = () => {
   const [dishType, setDishType] = useState("");
   const [sort, setSort] = useState("");
   const navigate = useNavigate();
+<<<<<<< Updated upstream
   const [showLogin, setShowLogin] = useState(false); // control login popup
   const { login } = useAuth();
   const fetchRecipes = async () => {
@@ -41,41 +49,117 @@ const HomePage = () => {
         params,
       });
       setRecipes(res.data);
+=======
+  const [searchParams] = useSearchParams();
+  // const [showLogin, setShowLogin] = useState(false); // control login popup
+  const { login } = useAuth();
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const loadMoreRef = useRef(null); // sentinel for infinite scroll
+  const PAGE_SIZE = 3;
+  const formRef = useRef(null);
+
+  const fetchRecipes = async ({ append = false } = {}) => {
+    try {
+      if (append) setIsLoadingMore(true);
+      else setIsLoading(true);
+
+      const qs = new URLSearchParams();
+      if (cookingTime) qs.set("cookingTime", cookingTime);
+      if (dishType) qs.set("dishType", dishType);
+      if (sort) qs.set("sort", sort);
+
+      // Update browser URL so it's shareable/bookmarkable
+      navigate(
+        { pathname: "/", search: `?${qs.toString()}` },
+        { replace: true }
+      );
+      // Add pagination params for the API call only
+      qs.set("limit", String(PAGE_SIZE));
+      qs.set("page", String(page));
+
+      // Hit the API with the same query string
+      const res = await api.get(`/recipes?${qs.toString()}`);
+      const batch = res.data || [];
+
+      setHasMore(batch.length === PAGE_SIZE);
+
+      if (append) {
+        setRecipes((prev) => [...prev, ...batch]);
+      } else {
+        setRecipes(batch);
+      }
+>>>>>>> Stashed changes
     } catch (error) {
       console.error("Error fetching recipes:", error);
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
     }
   };
   const onClose = () => {
-    setShowLogin(false);
+    // setShowLogin(false);
   };
 
   const handleLogin = async (values) => {
-    console.log("Content:", values);
-
     try {
       const { data } = await api.post("/auth/login", values);
       if (data.token) {
-        login(data.token); // context will fetch user + update navbar
-        setShowLogin(false);
+        await login(data.token);
         navigate("/");
       }
     } catch (error) {
-      console.error("Login failed:", error.response?.data);
-
       const msg =
-        error.response?.data?.msg || "Unable to log in. Please try again.";
-      toast("Login failed", {
-        description: msg,
-        variant: "destructive",
-      });
+        error?.response?.data?.msg || "Unable to log in. Please try again.";
+
+      // ✅ Use formRef.current to set errors
+      if (!formRef.current) return;
+
+      if (msg.toLowerCase().includes("not found")) {
+        formRef.current.setError("email", {
+          message: "No account found with this email.",
+        });
+      } else if (
+        msg.toLowerCase().includes("invalid") ||
+        msg.toLowerCase().includes("password")
+      ) {
+        formRef.current.setError("password", {
+          message: "Incorrect password.",
+        });
+      } else if (msg.toLowerCase().includes("verify")) {
+        formRef.current.setError("email", {
+          message: "Please verify your email first.",
+        });
+      } else {
+        formRef.current.setError("root", { message: msg });
+      }
     }
   };
+
   useEffect(() => {
+<<<<<<< Updated upstream
     fetchRecipes();
+=======
+    // On first load, hydrate filters from URL (if present)
+    // This runs only once; subsequent changes come from user actions.
+    const initialCooking = searchParams.get("cookingTime") || "";
+    const initialDish = searchParams.get("dishType") || "";
+    const initialSort = searchParams.get("sort") || "";
+    if (initialCooking) setCookingTime(initialCooking);
+    if (initialDish) setDishType(initialDish);
+    if (initialSort) setSort(initialSort);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    fetchRecipes({ append: page > 1 });
+>>>>>>> Stashed changes
 
     const token = localStorage.getItem("token");
     if (!token) {
-      setShowLogin(true);
+      // setShowLogin(true);
       setLoading(false);
       return;
     }
@@ -85,31 +169,51 @@ const HomePage = () => {
       })
       .then(({ data }) => {
         setUsername(data.name || "");
-        setShowLogin(false);
+        // setShowLogin(false);
       })
       .catch((err) => {
         console.error("Error verifying user:", err);
-        setShowLogin(true);
+        // setShowLogin(true);
       })
       .finally(() => setLoading(false));
-  }, [cookingTime, dishType, sort]); // 👈 refetch when filters change
+  }, [cookingTime, dishType, sort, page]); // 👈 refetch when filters change
+  // Reset paging when filters change (but not when page changes)
+  useEffect(() => {
+    setPage(1);
+    setHasMore(true);
+  }, [cookingTime, dishType, sort]);
 
+  // Infinite scroll via IntersectionObserver
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+    if (!hasMore) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first.isIntersecting && !isLoadingMore && !isLoading && hasMore) {
+          setPage((p) => p + 1);
+        }
+      },
+      { rootMargin: "0px" } // prefetch a bit early
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [isLoading, isLoadingMore, hasMore]);
   return (
     <div className="min-h-screen">
-      {showLogin && (
+      {/* {showLogin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* Dark semi-transparent background */}
+          Dark semi-transparent background
           <div
             className="fixed inset-0 bg-black opacity-50"
-            onClick={onClose} // Clicking outside closes modal
+            onClick={onClose} 
           />
 
-          {/* Centered card */}
-          <div className="relative z-10">
-            <LoginCard onSubmit={handleLogin} />
+          <div className="relative z-10"> 
+            <LoginCard ref={formRef} onSubmit={handleLogin} />
           </div>
         </div>
-      )}
+      )} */}
       <Navbar />
 
       <div className="relative flex w-full bg-primary px-4 py-16 items-center text-center">
@@ -210,6 +314,9 @@ const HomePage = () => {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Sorting</SelectLabel>
+                <SelectItem value="default" className="cursor-pointer">
+                  Sort by: Default
+                </SelectItem>
                 <SelectItem value="liked" className="cursor-pointer">
                   Sort by: Most Liked
                 </SelectItem>
@@ -234,8 +341,23 @@ const HomePage = () => {
             ))}
           </div>
         )}
-        {/* </div> */}
-        {/* </div> */}
+        {/* Load more + sentinel */}
+        <div className="flex justify-center my-8">
+          {hasMore ? (
+            <Button
+              variant="outline"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={isLoadingMore}
+              className="w-full disabled:opacity-60"
+            >
+              {isLoadingMore ? "Loading..." : "Load more"}
+            </Button>
+          ) : (
+            <div className="text-xs text-muted-foreground "></div>
+          )}
+        </div>
+        {/* Invisible sentinel triggers infinite scroll */}
+        <div ref={loadMoreRef} style={{ height: 1 }} />
       </Tabs>
     </div>
   );

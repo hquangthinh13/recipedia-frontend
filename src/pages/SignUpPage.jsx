@@ -57,7 +57,6 @@ const SignUpPage = () => {
       confirmPassword: "",
     },
   });
-
   const onSubmit = async (values) => {
     try {
       const { data } = await api.post("/auth/signup", {
@@ -66,47 +65,31 @@ const SignUpPage = () => {
         password: values.password,
       });
 
-      if (data.token) {
-        await login(data.token); // from AuthContext
-        navigate("/");
+      if (data.msg?.toLowerCase().includes("verification code")) {
+        navigate(`/verify-code?email=${encodeURIComponent(values.email)}`);
       }
     } catch (err) {
+      // 🔍 Extract message from backend response
       const msg = err?.response?.data?.msg || "Something went wrong";
 
-      // If the email is already taken, try logging in with the same credentials
+      // 🧠 Handle specific messages to show per field
       if (msg.toLowerCase().includes("user already exists")) {
-        try {
-          const { data } = await api.post("/auth/login", {
-            email: values.email,
-            password: values.password,
-          });
-          if (data.token) {
-            await login(data.token);
-            navigate("/");
-          }
-          return;
-        } catch (loginErr) {
-          // Password mismatch for existing account
-          console.error(
-            "Auto-login failed:",
-            loginErr?.response?.data || loginErr.message
-          );
-          // Show a friendly message / toast here if you use one
-          // toast.error("Account exists. Please log in with your existing password.");
-          navigate("/login");
-          return;
-        }
+        form.setError("email", {
+          message: "This email is already registered.",
+        });
+      } else if (msg.toLowerCase().includes("password")) {
+        form.setError("password", { message: msg });
+      } else {
+        // Default fallback (top-level error)
+        form.setError("root", { message: msg });
       }
-
-      console.error("Signup error:", err?.response?.data || err.message);
-      // toast.error(msg);
     }
   };
 
   return (
     <div
       style={{ backgroundImage: `url(${loginImage})` }}
-      className="bg-cover bg-center flex min-h-svh flex-col items-center md:items-end lg:items-end justify-center gap-6 p-6 md:p-10"
+      className="bg-cover bg-center flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10"
     >
       <div className="flex w-full mx-0 md:mx-18 lg:mx-18 max-w-sm flex-col gap-6">
         <div className="flex flex-col gap-6">
@@ -121,7 +104,11 @@ const SignUpPage = () => {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  noValidate
+                  autoComplete="off"
+                >
                   <div className="grid gap-6">
                     <div className="grid gap-6">
                       {/* Name */}
@@ -200,7 +187,7 @@ const SignUpPage = () => {
                     <Button
                       type="submit"
                       variant="default"
-                      className="w-full cursor-pointer transition ease-in-out delay-150 duration-300 hover:scale-105 not-odd:hover:-translate-y-0.5"
+                      className="w-full cursor-pointer"
                     >
                       <CookingPot className="mr-2" />
                       Create account

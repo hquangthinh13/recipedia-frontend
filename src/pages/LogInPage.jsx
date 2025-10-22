@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import api from "../lib/api";
-import { toast } from "sonner";
+import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
@@ -31,6 +31,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 const LoginPage = () => {
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
   const { login } = useAuth();
   const form = useForm({
@@ -53,22 +55,41 @@ const LoginPage = () => {
     } catch (error) {
       const msg =
         error.response?.data?.msg || "Unable to log in. Please try again.";
-      toast("Login failed", {
-        description: msg,
-        variant: "destructive",
-      });
+      // toast("Login failed", {
+      //   description: msg,
+      //   variant: "destructive",
+      // });
+      if (msg.toLowerCase().includes("user does not exist")) {
+        form.setError("email", {
+          message: "No account found with this email.",
+        });
+      } else if (
+        msg.toLowerCase().includes("invalid") ||
+        msg.toLowerCase().includes("password")
+      ) {
+        form.setError("password", {
+          message: "Incorrect password. Please try again.",
+        });
+      } else if (msg.toLowerCase().includes("verify")) {
+        form.setError("email", {
+          message: "Please verify your email before logging in.",
+        });
+      } else {
+        form.setError("root", { message: msg });
+      }
     }
+    return false;
   };
   return (
     <div
       style={{ backgroundImage: `url(${loginImage})` }}
-      className="bg-cover bg-center flex min-h-svh flex-col items-center md:items-end lg:items-end justify-center gap-6 p-6 md:p-10"
+      className="bg-cover bg-center flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10"
     >
       <div className="flex w-full mx-0 md:mx-18 lg:mx-18 max-w-sm flex-col gap-6">
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader className="text-center">
-              <a className="flex items-center gap-2 self-center font-medium mb-6">
+              <a className="cursor-pointer flex items-center gap-2 self-center font-medium mb-6">
                 <img src={logo} alt="Recipedia Logo" className="h-9" />
                 Recipedia
               </a>
@@ -81,7 +102,11 @@ const LoginPage = () => {
             <CardContent>
               {" "}
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  noValidate
+                  autoComplete="off"
+                >
                   <div className="grid gap-6">
                     <div className="grid gap-6">
                       <div className="grid gap-3">
@@ -113,19 +138,22 @@ const LoginPage = () => {
                               <div className="flex items-center">
                                 <FormLabel>Password</FormLabel>
                                 <Link
-                                  to="#"
+                                  to={`/forgot-password`}
                                   className="ml-auto text-sm underline-offset-4 hover:underline"
                                 >
                                   Forgot your password?
-                                </Link>{" "}
+                                </Link>
+                              </div>{" "}
+                              <div className="relative">
+                                <FormControl>
+                                  <Input
+                                    type={showPassword ? "text" : "password"}
+                                    autoComplete="new-password"
+                                    placeholder="••••••••••••••"
+                                    {...field}
+                                  />
+                                </FormControl>
                               </div>
-                              <FormControl>
-                                <Input
-                                  placeholder="••••••••••••••"
-                                  {...field}
-                                />
-                              </FormControl>
-
                               <FormMessage />
                             </FormItem>
                           )}
@@ -135,7 +163,7 @@ const LoginPage = () => {
                       <Button
                         type="submit"
                         variant="default"
-                        className="w-full cursor-pointer transition ease-in-out delay-150 duration-300 hover:scale-105 not-odd:hover:-translate-y-0.5"
+                        className="w-full cursor-pointer"
                       >
                         <CookingPot />
                         Let’s cook!
