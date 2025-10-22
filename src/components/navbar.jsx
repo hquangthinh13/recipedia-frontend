@@ -58,17 +58,12 @@ const Navbar = () => {
             )}
 
             {/* Notifications */}
-<<<<<<< Updated upstream
-            <Button variant="ghost" size="default" className="cursor-pointer">
-              <Bell />
-            </Button>
-=======
+
             {user && (
               <Button variant="ghost" size="icon" className="cursor-pointer">
                 <Bell />
               </Button>
             )}
->>>>>>> Stashed changes
 
             {/* Auth area */}
 

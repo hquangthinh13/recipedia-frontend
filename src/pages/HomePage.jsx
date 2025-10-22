@@ -1,10 +1,5 @@
-<<<<<<< Updated upstream
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-=======
 import React, { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
->>>>>>> Stashed changes
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
 import { toast } from "sonner";
@@ -35,21 +30,7 @@ const HomePage = () => {
   const [dishType, setDishType] = useState("");
   const [sort, setSort] = useState("");
   const navigate = useNavigate();
-<<<<<<< Updated upstream
-  const [showLogin, setShowLogin] = useState(false); // control login popup
-  const { login } = useAuth();
-  const fetchRecipes = async () => {
-    try {
-      const params = {};
-      if (cookingTime) params.cookingTime = cookingTime;
-      if (dishType) params.dishType = dishType;
-      if (sort) params.sort = sort;
 
-      const res = await api.get("/recipes", {
-        params,
-      });
-      setRecipes(res.data);
-=======
   const [searchParams] = useSearchParams();
   // const [showLogin, setShowLogin] = useState(false); // control login popup
   const { login } = useAuth();
@@ -76,6 +57,7 @@ const HomePage = () => {
         { pathname: "/", search: `?${qs.toString()}` },
         { replace: true }
       );
+
       // Add pagination params for the API call only
       qs.set("limit", String(PAGE_SIZE));
       qs.set("page", String(page));
@@ -91,7 +73,6 @@ const HomePage = () => {
       } else {
         setRecipes(batch);
       }
->>>>>>> Stashed changes
     } catch (error) {
       console.error("Error fetching recipes:", error);
     } finally {
@@ -99,6 +80,7 @@ const HomePage = () => {
       setIsLoadingMore(false);
     }
   };
+
   const onClose = () => {
     // setShowLogin(false);
   };
@@ -139,9 +121,6 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-<<<<<<< Updated upstream
-    fetchRecipes();
-=======
     // On first load, hydrate filters from URL (if present)
     // This runs only once; subsequent changes come from user actions.
     const initialCooking = searchParams.get("cookingTime") || "";
@@ -155,7 +134,6 @@ const HomePage = () => {
 
   useEffect(() => {
     fetchRecipes({ append: page > 1 });
->>>>>>> Stashed changes
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -177,6 +155,7 @@ const HomePage = () => {
       })
       .finally(() => setLoading(false));
   }, [cookingTime, dishType, sort, page]); // 👈 refetch when filters change
+
   // Reset paging when filters change (but not when page changes)
   useEffect(() => {
     setPage(1);
@@ -199,17 +178,13 @@ const HomePage = () => {
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
   }, [isLoading, isLoadingMore, hasMore]);
+
   return (
     <div className="min-h-screen">
       {/* {showLogin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          Dark semi-transparent background
-          <div
-            className="fixed inset-0 bg-black opacity-50"
-            onClick={onClose} 
-          />
-
-          <div className="relative z-10"> 
+          <div className="fixed inset-0 bg-black opacity-50" onClick={onClose} />
+          <div className="relative z-10">
             <LoginCard ref={formRef} onSubmit={handleLogin} />
           </div>
         </div>
@@ -223,8 +198,6 @@ const HomePage = () => {
             alt="Background"
             className="w-full h-full object-cover"
           />
-          {/* <div className="absolute inset-0 bg-black/40" />{" "} */}
-          {/* optional overlay */}
         </div>
 
         <div className="relative container mx-auto max-w-2xl z-10">
@@ -238,7 +211,7 @@ const HomePage = () => {
       </div>
 
       <div className="hidden lg:flex max-w-6xl px-4 py-2 items-center justify-center mx-auto mt-4">
-        <img src={pattern} alt="Pattern" className="" />
+        <img src={pattern} alt="Pattern" />
       </div>
 
       <Tabs
@@ -283,9 +256,6 @@ const HomePage = () => {
             <TabsTrigger value="all" className="cursor-pointer">
               All
             </TabsTrigger>
-            {/* <TabsTrigger value="saved" className="cursor-pointer">
-              Saved
-            </TabsTrigger> */}
             <TabsTrigger value="starter" className="cursor-pointer">
               Starter
             </TabsTrigger>
@@ -330,10 +300,7 @@ const HomePage = () => {
             </SelectContent>
           </Select>
         </div>
-        {/* <div className="container mx-auto max-w-6xl p-4 mt-6"> */}
 
-        {/* {loading && <div className="text-center text-primary py-10">Loading...</div>} */}
-        {/* <div className="flex flex-1 justify-center"> */}
         {recipes.length > 0 && (
           <div className="grid max-w-6xl mx-auto w-auto grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
             {recipes.map((recipe) => (
@@ -341,7 +308,7 @@ const HomePage = () => {
             ))}
           </div>
         )}
-        {/* Load more + sentinel */}
+
         <div className="flex justify-center my-8">
           {hasMore ? (
             <Button
@@ -356,7 +323,6 @@ const HomePage = () => {
             <div className="text-xs text-muted-foreground "></div>
           )}
         </div>
-        {/* Invisible sentinel triggers infinite scroll */}
         <div ref={loadMoreRef} style={{ height: 1 }} />
       </Tabs>
     </div>
