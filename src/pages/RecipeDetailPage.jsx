@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { dishTypeLabels, cookingTimeLabels } from "../lib/enumDisplayMap";
@@ -12,6 +14,8 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+
 import {
   Check,
   Clock,
@@ -22,11 +26,15 @@ import {
   Microwave,
   BadgeInfo,
   Utensils,
+  MessageSquareText,
 } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import { useParams } from "react-router-dom";
 import api from "../lib/api";
 import Navbar from "../components/navbar";
+import UserComment from "../components/user-comment";
+import { useAuth } from "../context/AuthContext";
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -65,16 +73,47 @@ const RecipeDetailPage = () => {
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [newComment, setNewComment] = useState("");
+  const [isCommentFocused, setIsCommentFocused] = useState(false);
+  const { user } = useAuth();
+  const [comments, setComments] = useState([]);
+  const location = useLocation(); // 👈 to read state from navigation
+  const commentInputRef = useRef(null); // 👈 ref for textarea
   const [selected, setSelected] = useState("1X");
   const options = ["½X", "1X", "2X"];
+  const handleCommentSubmit = async () => {
+    if (!newComment.trim()) return;
+    try {
+      const res = await api.post(
+        `/recipes/${recipe._id}/comments`,
+        { text: newComment },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
 
+      setComments((prev) => [...prev, res.data.comment]);
+      setNewComment("");
+      setIsCommentFocused(false);
+      toast.success("Comment added!");
+    } catch (error) {
+      console.error("Error posting comment:", error);
+      toast.error("Failed to add comment.");
+    }
+  };
+
+  const handleCommentCancel = () => {
+    setNewComment("");
+    setIsCommentFocused(false);
+  };
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
         const { data } = await api.get(`/recipes/${id}`);
         console.log("Fetched recipe:", data);
         setRecipe(data);
+        setRecipe(data);
+        setComments(data.comments || []);
       } catch (err) {
         console.error("Error fetching recipe:", err);
       } finally {
@@ -84,6 +123,18 @@ const RecipeDetailPage = () => {
 
     fetchRecipe();
   }, [id]);
+  useEffect(() => {
+    if (location.state?.scrollToComment && commentInputRef.current) {
+      // Smooth scroll and focus
+      setTimeout(() => {
+        commentInputRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        commentInputRef.current.focus();
+      }, 300);
+    }
+  }, [location.state, recipe]);
 
   if (loading) return <div className="p-4">Loading...</div>;
   if (!recipe) return <div className="p-4">Recipe not found.</div>;
@@ -129,7 +180,7 @@ const RecipeDetailPage = () => {
         </Link>
 
         <Card className="mt-2 overflow-hidden">
-          {/* Cover image */}{" "}
+          {/* Cover image */}
           {recipe.coverImage && (
             <div className="flex h-56 w-full overflow-hidden">
               <img
@@ -248,7 +299,6 @@ const RecipeDetailPage = () => {
                 ))}
               </div>
               <div className="text-sm flex text-[var(--muted-foreground)] font-light items-center gap-1">
-                {" "}
                 <BadgeInfo className="h-4 w-4" />
                 Original recipe (1X) yields 4 servings
               </div>
@@ -257,10 +307,8 @@ const RecipeDetailPage = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      {" "}
                       <TableHead className="text-base ">Ingredient</TableHead>
                       <TableHead className="w-24 text-right text-base ">
-                        {" "}
                         Amount
                       </TableHead>
                       <TableHead className="w-24 text-center text-base ">
@@ -303,13 +351,93 @@ const RecipeDetailPage = () => {
                   <TableBody>
                     <TableRow>
                       <TableCell className="text-base leading-loose">
-                        {" "}
                         {recipe.instructions}
                       </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-4">
+          <CardContent className="space-y-6 p-6">
+            {/* Comments Section */}
+            <div className="space-y-2">
+              {/* Title */}
+              <div className="flex justify-start items-center gap-2">
+                <h2 className="text-2xl font-bold text-[var(--card-foreground)] antialiased">
+                  Discussions
+                </h2>
+                <MessageSquareText className="text-accent" />
+              </div>
+              <div className="flex gap-3 mt-4">
+                <Avatar className="w-10 h-10 flex-shrink-0">
+                  <AvatarImage
+                    src={
+                      user?.avatar ||
+                      `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
+                        user?.name || "U"
+                      )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`
+                    }
+                    alt={user?.name || "Your avatar"}
+                  />
+                  <AvatarFallback>
+                    {user?.name?.[0]?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="flex-1">
+                  <Textarea
+                    ref={commentInputRef}
+                    placeholder="Add a comment..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    onFocus={() => setIsCommentFocused(true)}
+                    className={`resize-none border-0 border-b-2 rounded-none focus:border-none transition-all duration-200 ${
+                      isCommentFocused ? "min-h-[80px]" : "min-h-[40px]"
+                    }`}
+                    rows={isCommentFocused ? 3 : 1}
+                  />
+                  {isCommentFocused && (
+                    <div className="flex justify-end gap-2 mt-3">
+                      <Button
+                        variant="ghost"
+                        // size="sm"
+                        onClick={handleCommentCancel}
+                        className="text-muted-foreground hover:text-foreground cursor-pointer"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleCommentSubmit}
+                        disabled={!newComment.trim()}
+                        // size="sm"
+                        // variant="default"
+                        className="cursor-pointer"
+                      >
+                        Comment
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            {/* Comments Section */}
+
+            {/* <Separator className="my-2" /> */}
+            {/* Comment List */}
+            <div className="mt-6">
+              {comments.length > 0 ? (
+                comments.map((comment) => (
+                  <UserComment key={comment._id} comment={comment} />
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No comments yet. Be the first to share your thoughts!
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>

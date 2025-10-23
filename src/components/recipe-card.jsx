@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -13,6 +14,9 @@ import {
 } from "lucide-react";
 import { dishTypeLabels, cookingTimeLabels } from "../lib/enumDisplayMap";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import api from "../lib/api";
+import { toast } from "sonner";
+import { useAuth } from "../context/AuthContext";
 
 // Helper: format date
 const formatPostedDate = (createdAt) => {
@@ -44,6 +48,52 @@ const getDicebearAvatar = (seed) =>
   )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`;
 
 const RecipeCard = ({ recipe }) => {
+  const navigate = useNavigate();
+  const commentCount = recipe.comments?.length || 0;
+
+  const { user } = useAuth(); // ✅ Get current logged-in user
+  const userId = user?._id;
+
+  const [liked, setLiked] = useState(
+    recipe.likes?.some((id) => id === userId || id._id === userId) || false
+  );
+
+  const [favorite, setFavorite] = useState(
+    user?.favorites?.some((id) => id === recipe._id || id._id === recipe._id) ||
+      false
+  );
+
+  const [likeCount, setLikeCount] = useState(recipe.likes?.length || 0);
+  const handleLike = async () => {
+    try {
+      const res = await api.post(`/recipes/${recipe._id}/like`);
+      setLiked(res.data.likedByUser);
+      setLikeCount(res.data.likesCount);
+    } catch (error) {
+      toast.error("Failed to like recipe");
+      console.error(error);
+    }
+  };
+
+  const handleFavorite = async () => {
+    try {
+      const res = await api.post(`/recipes/${recipe._id}/favorite`);
+      setFavorite(res.data.isFavorite);
+      toast.success(res.data.message);
+    } catch (error) {
+      toast.error("Failed to update favorites");
+      console.error(error);
+    }
+  };
+  // Keep favorite state in sync when user or recipe changes
+  useEffect(() => {
+    if (user?.favorites && recipe?._id) {
+      const isFav = user.favorites.some(
+        (id) => id === recipe._id || id._id === recipe._id
+      );
+      setFavorite(isFav);
+    }
+  }, [user, recipe]);
   const avatarUrl =
     recipe.author?.avatar ||
     `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
@@ -95,8 +145,18 @@ const RecipeCard = ({ recipe }) => {
             </div>
           </div>
 
-          <Button size="icon" variant="ghost" className="cursor-pointer">
-            <Bookmark className="" />
+          <Button
+            size="icon"
+            variant="ghost"
+            className="cursor-pointer"
+            onClick={handleFavorite}
+          >
+            <Bookmark
+              className={`transition ${
+                favorite &&
+                "fill-secondary-foreground text-secondary-foreground"
+              }`}
+            />
           </Button>
         </div>
         {/* Title */}
@@ -125,25 +185,35 @@ const RecipeCard = ({ recipe }) => {
         {/* Buttons */}
         <div className=" w-full flex justify-center gap-3">
           <Button
+            onClick={handleLike}
             // size="icon"
             variant="ghost"
             className="group cursor-pointer flex-1 flex"
           >
-            <Heart className="" />
-            {/* <div className="font-normal text-gray-300 group-hover:text-current">
-              {recipe.likes.length}
-            </div> */}
+            <Heart
+              className={`transition ${liked && "fill-primary text-primary"}`}
+            />{" "}
+            {/* {likeCount} */}
+            <div className="font-normal text-gray-500 group-hover:text-current">
+              <span>{likeCount || 0}</span>
+            </div>
           </Button>
 
           <Button
             // size="icon"
             variant="ghost"
             className="group cursor-pointer flex-1 flex"
+            onClick={() =>
+              navigate(`/recipes/${recipe._id}`, {
+                state: { scrollToComment: true },
+              })
+            }
           >
             <MessageCircle className="" />
-            {/* <div className="font-normal text-gray-300 group-hover:text-current">
-              {recipe.likes.length}
-            </div> */}
+
+            <div className="font-normal text-gray-500 group-hover:text-current">
+              <span>{commentCount}</span>
+            </div>
           </Button>
         </div>
       </CardContent>

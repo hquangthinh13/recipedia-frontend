@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
           name: data.name,
           email: data.email,
           avatar: data.avatar || null, // ✅ consistent everywhere
+          favorites: data.favorites || [], // ✅ store favorites
         });
       } catch (err) {
         console.error("Auth fetch failed:", err?.response?.data || err.message);
