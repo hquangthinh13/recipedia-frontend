@@ -21,6 +21,10 @@ const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=fals
 const RecipeCard = ({ recipe }) => {
   const navigate = useNavigate();
   const commentCount = recipe.comments?.length || 0;
+  // define this inside your RecipeCard component, right before the return()
+  const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
+
+  const authorName = recipe?.author?.name || "Mysterious Chef";
 
   const { user } = useAuth();
   const userId = user?.id;
@@ -107,10 +111,8 @@ const RecipeCard = ({ recipe }) => {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Avatar className="cursor-pointer">
-              <AvatarImage
-                src={recipe.author?.avatar || FallBackAvatar}
-                alt={recipe.author?.username || user.author?.name || "User"}
-              />
+              <AvatarImage src={avatarUrl} alt={authorName} />
+              <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
             </Avatar>
 
             <div className="flex flex-col">
