@@ -75,7 +75,7 @@ const VerifyCodePage = () => {
             <div className="mb-4 text-[var(--muted-foreground)]">
               <p className="text-xs">
                 Sometimes our verification email lands in your
-                <strong>Spam or Trash </strong>
+                <strong> Spam or Trash </strong>
                 folder. Please check there — and mark it as “Not spam” so you
                 don’t miss future updates!
               </p>
