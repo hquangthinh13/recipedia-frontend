@@ -98,7 +98,7 @@ const RecipeCard = ({ recipe }) => {
             className="h-36 w-full object-cover"
             //  transition ease-in-out delay-150 duration-300 hover:scale-105
           />
-        </div>{" "}
+        </div>
       </Link>
 
       {/* Content */}
