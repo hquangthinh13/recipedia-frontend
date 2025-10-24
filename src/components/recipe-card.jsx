@@ -16,11 +16,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-const getDicebearAvatar = (seed) =>
-  `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
-    seed || "U"
-  )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`;
+const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 
 const RecipeCard = ({ recipe }) => {
   const navigate = useNavigate();
@@ -110,21 +106,11 @@ const RecipeCard = ({ recipe }) => {
         {/* Author + Date */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Avatar>
+            <Avatar className="cursor-pointer">
               <AvatarImage
-                src={
-                  recipe.author?.avatarUrl ||
-                  getDicebearAvatar(
-                    recipe.author?.username || recipe.author?.name || "U"
-                  )
-                }
-                alt={recipe.author?.username || recipe.author?.name || "User"}
+                src={recipe.author?.avatar || FallBackAvatar}
+                alt={recipe.author?.username || user.author?.name || "User"}
               />
-              <AvatarFallback>
-                {recipe.author?.username?.[0]?.toUpperCase() ||
-                  recipe.author?.name?.[0]?.toUpperCase() ||
-                  "U"}
-              </AvatarFallback>
             </Avatar>
 
             <div className="flex flex-col">

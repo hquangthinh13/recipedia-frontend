@@ -160,6 +160,7 @@ const HomePage = () => {
   useEffect(() => {
     setPage(1);
     setHasMore(true);
+    setRecipes([]);
   }, [cookingTime, dishType, sort]);
 
   // Infinite scroll via IntersectionObserver

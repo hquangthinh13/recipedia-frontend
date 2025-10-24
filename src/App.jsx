@@ -1,6 +1,5 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-
 import HomePage from "./pages/HomePage";
 import LogInPage from "./pages/LogInPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -11,6 +10,7 @@ import VerifyCodePage from "./pages/VerifyCodePage";
 import VerifyResetCodePage from "./pages/VerifyResetCodePage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import NewPasswordPage from "./pages/NewPasswordPage";
+import AvatarCustomizerPage from "./pages/AvatarCustomizerPage";
 const App = () => {
   return (
     <div>
@@ -25,8 +25,8 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/verify-reset-code" element={<VerifyResetCodePage />} />
         <Route path="/reset-password" element={<NewPasswordPage />} />
-
         <Route path="/verify-code" element={<VerifyCodePage />} />
+        <Route path="/customize-avatar" element={<AvatarCustomizerPage />} />
       </Routes>
     </div>
   );

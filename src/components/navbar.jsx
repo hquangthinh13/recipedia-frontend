@@ -59,11 +59,11 @@ const Navbar = () => {
 
             {/* Notifications */}
 
-            {user && (
+            {/* {user && (
               <Button variant="ghost" size="icon" className="cursor-pointer">
                 <Bell />
               </Button>
-            )}
+            )} */}
 
             {/* Auth area */}
 
@@ -105,6 +105,14 @@ const Navbar = () => {
                     >
                       My Kitchen
                     </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => navigate("/customize-avatar")}
+                    >
+                      Dress Your Chef
+                    </DropdownMenuItem>
+
                     <DropdownMenuItem
                       className="cursor-pointer"
                       onClick={logout}

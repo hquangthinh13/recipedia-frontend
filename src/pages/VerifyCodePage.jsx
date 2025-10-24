@@ -22,7 +22,7 @@ const VerifyCodePage = () => {
     try {
       const { data } = await api.post("/auth/verify-code", { email, code });
       setMessage(data.msg);
-      setTimeout(() => navigate("/login"), 2500);
+      setTimeout(() => navigate("/customize-avatar"), 2500); //
     } catch (err) {
       const msg = err?.response?.data?.msg || "Verification failed";
       setMessage(msg);

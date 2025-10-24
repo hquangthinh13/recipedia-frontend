@@ -42,10 +42,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-const getDicebearAvatar = (seed) =>
-  `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
-    seed || "U"
-  )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`;
+const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
+
 const formatPostedDate = (createdAt) => {
   const now = new Date();
   const posted = new Date(createdAt);
@@ -171,7 +169,7 @@ const RecipeDetailPage = () => {
     <div className="min-h-screen">
       <Navbar />
 
-      <div className="mx-auto max-w-2xl mt-2 p-4">
+      <div className="mx-auto max-w-6xl mt-2 p-4">
         <Link to={"/"}>
           <Button variant="ghost" className="cursor-pointer">
             <ArrowLeft />
@@ -245,21 +243,9 @@ const RecipeDetailPage = () => {
               <div className="flex items-center gap-2">
                 <Avatar className="cursor-pointer">
                   <AvatarImage
-                    src={
-                      recipe.author?.avatarUrl ||
-                      getDicebearAvatar(
-                        recipe.author?.username || recipe.author?.name || "U"
-                      )
-                    }
-                    alt={
-                      recipe.author?.username || recipe.author?.name || "User"
-                    }
+                    src={recipe.author?.avatar || FallBackAvatar}
+                    alt={recipe.author?.username || user.author?.name || "User"}
                   />
-                  <AvatarFallback>
-                    {recipe.author?.username?.[0]?.toUpperCase() ||
-                      recipe.author?.name?.[0]?.toUpperCase() ||
-                      "U"}
-                  </AvatarFallback>
                 </Avatar>
 
                 <div className="flex flex-col">
