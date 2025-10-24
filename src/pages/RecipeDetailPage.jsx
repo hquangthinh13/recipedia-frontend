@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { dishTypeLabels, cookingTimeLabels } from "../lib/enumDisplayMap";
@@ -33,6 +32,7 @@ import { useParams } from "react-router-dom";
 import api from "../lib/api";
 import Navbar from "../components/navbar";
 import UserComment from "../components/user-comment";
+import Spinner from "../components/spinner";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
 import {
@@ -43,29 +43,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
-
-const formatPostedDate = (createdAt) => {
-  const now = new Date();
-  const posted = new Date(createdAt);
-  const diffMs = now - posted;
-  const diffMinutes = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffMinutes < 60) {
-    return `${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""} ago`;
-  } else if (diffHours < 24) {
-    return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`;
-  } else if (diffDays < 3) {
-    return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
-  } else {
-    return posted.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  }
-};
+import { formatDate } from "../lib/formatDate";
 
 const RecipeDetailPage = () => {
   const { id } = useParams();
@@ -73,12 +51,42 @@ const RecipeDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState("");
   const [isCommentFocused, setIsCommentFocused] = useState(false);
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [comments, setComments] = useState([]);
   const location = useLocation(); // 👈 to read state from navigation
   const commentInputRef = useRef(null); // 👈 ref for textarea
   const [selected, setSelected] = useState("1X");
   const options = ["½X", "1X", "2X"];
+  const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
+  const authorName = recipe?.author?.name || "Mysterious Chef";
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const [favorite, setFavorite] = useState(false);
+
+  const handleFavorite = async () => {
+    if (!token) {
+      toast.error("Please log in first.");
+      return;
+    }
+    try {
+      const res = await api.post(`/recipes/${recipe._id}/favorite`);
+      setFavorite(res.data.isFavorite);
+      toast.success(res.data.message);
+
+      // ✅ Update global user favorites so both pages sync
+      setUser((prev) => {
+        if (!prev) return prev;
+        const updatedFavorites = res.data.isFavorite
+          ? [...prev.favorites, recipe._id] // add
+          : prev.favorites.filter((id) => id !== recipe._id); // remove
+        return { ...prev, favorites: updatedFavorites };
+      });
+    } catch (error) {
+      toast.error("Failed to update favorites");
+      console.error(error);
+    }
+  };
+
   const handleCommentSubmit = async () => {
     if (!newComment.trim()) return;
     try {
@@ -121,6 +129,15 @@ const RecipeDetailPage = () => {
 
     fetchRecipe();
   }, [id]);
+  // Keep favorite state in sync when user or recipe changes
+  useEffect(() => {
+    if (user?.favorites && recipe?._id) {
+      const isFav = user.favorites.some(
+        (id) => id === recipe._id || id._id === recipe._id
+      );
+      setFavorite(isFav);
+    }
+  }, [user, recipe]);
   useEffect(() => {
     if (location.state?.scrollToComment && commentInputRef.current) {
       // Smooth scroll and focus
@@ -134,7 +151,12 @@ const RecipeDetailPage = () => {
     }
   }, [location.state, recipe]);
 
-  if (loading) return <div className="p-4">Loading...</div>;
+  if (loading)
+    return (
+      <div className="w-screen h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
   if (!recipe) return <div className="p-4">Recipe not found.</div>;
 
   // Ingredients (already an array of objects per schema)
@@ -168,7 +190,6 @@ const RecipeDetailPage = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-
       <div className="mx-auto max-w-6xl mt-2 p-4">
         <Link to={"/"}>
           <Button variant="ghost" className="cursor-pointer">
@@ -234,18 +255,26 @@ const RecipeDetailPage = () => {
 
               {/* Bookmark button on the right */}
 
-              <Button size="icon" variant="ghost" className="cursor-pointer">
-                <Bookmark className="" />
+              <Button
+                onClick={handleFavorite}
+                size="icon"
+                variant="ghost"
+                className="cursor-pointer"
+              >
+                <Bookmark
+                  className={`transition ${
+                    favorite &&
+                    "fill-secondary-foreground text-secondary-foreground"
+                  }`}
+                />{" "}
               </Button>
             </div>
             {/* Author + Date */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Avatar className="cursor-pointer">
-                  <AvatarImage
-                    src={recipe.author?.avatar || FallBackAvatar}
-                    alt={recipe.author?.username || user.author?.name || "User"}
-                  />
+                  <AvatarImage src={avatarUrl} alt={authorName} />
+                  <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
                 </Avatar>
 
                 <div className="flex flex-col">
@@ -253,7 +282,7 @@ const RecipeDetailPage = () => {
                     {recipe.author?.name || "Mysterious Chef"}
                   </div>
                   <div className="text-xs flex text-gray-400 font-light">
-                    {formatPostedDate(recipe.createdAt)}
+                    {formatDate(recipe.createdAt)}
                   </div>
                 </div>
               </div>

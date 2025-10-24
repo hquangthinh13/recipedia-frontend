@@ -10,6 +10,7 @@ import Navbar from "../components/navbar";
 import { useState } from "react";
 import RecipeCard from "../components/recipe-card";
 import { Button } from "@/components/ui/button";
+import CarouselBanner from "../components/carousel-banner";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -32,15 +33,12 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
-  // const [showLogin, setShowLogin] = useState(false); // control login popup
-  const { login } = useAuth();
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const loadMoreRef = useRef(null); // sentinel for infinite scroll
-  const PAGE_SIZE = 3;
-  const formRef = useRef(null);
+  const PAGE_SIZE = 6;
 
   const fetchRecipes = async ({ append = false } = {}) => {
     try {
@@ -81,45 +79,6 @@ const HomePage = () => {
     }
   };
 
-  const onClose = () => {
-    // setShowLogin(false);
-  };
-
-  const handleLogin = async (values) => {
-    try {
-      const { data } = await api.post("/auth/login", values);
-      if (data.token) {
-        await login(data.token);
-        navigate("/");
-      }
-    } catch (error) {
-      const msg =
-        error?.response?.data?.msg || "Unable to log in. Please try again.";
-
-      // ✅ Use formRef.current to set errors
-      if (!formRef.current) return;
-
-      if (msg.toLowerCase().includes("not found")) {
-        formRef.current.setError("email", {
-          message: "No account found with this email.",
-        });
-      } else if (
-        msg.toLowerCase().includes("invalid") ||
-        msg.toLowerCase().includes("password")
-      ) {
-        formRef.current.setError("password", {
-          message: "Incorrect password.",
-        });
-      } else if (msg.toLowerCase().includes("verify")) {
-        formRef.current.setError("email", {
-          message: "Please verify your email first.",
-        });
-      } else {
-        formRef.current.setError("root", { message: msg });
-      }
-    }
-  };
-
   useEffect(() => {
     // On first load, hydrate filters from URL (if present)
     // This runs only once; subsequent changes come from user actions.
@@ -137,7 +96,6 @@ const HomePage = () => {
 
     const token = localStorage.getItem("token");
     if (!token) {
-      // setShowLogin(true);
       setLoading(false);
       return;
     }
@@ -147,14 +105,12 @@ const HomePage = () => {
       })
       .then(({ data }) => {
         setUsername(data.name || "");
-        // setShowLogin(false);
       })
       .catch((err) => {
         console.error("Error verifying user:", err);
-        // setShowLogin(true);
       })
       .finally(() => setLoading(false));
-  }, [cookingTime, dishType, sort, page]); // 👈 refetch when filters change
+  }, [cookingTime, dishType, sort, page]); // refetch when filters change
 
   // Reset paging when filters change (but not when page changes)
   useEffect(() => {
@@ -182,32 +138,25 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen">
-      {/* {showLogin && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black opacity-50" onClick={onClose} />
-          <div className="relative z-10">
-            <LoginCard ref={formRef} onSubmit={handleLogin} />
-          </div>
-        </div>
-      )} */}
       <Navbar />
+      <div className="p-4">
+        <div className=" mx-auto rounded-md overflow-hidden relative flex max-w-6xl w-full bg-primary px-4 py-16 items-center text-center">
+          <div className="absolute inset-0">
+            <img
+              src={background}
+              alt="Background"
+              className=" w-full h-full object-cover"
+            />
+          </div>
 
-      <div className="relative flex w-full bg-primary px-4 py-16 items-center text-center">
-        <div className="absolute inset-0">
-          <img
-            src={background}
-            alt="Background"
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        <div className="relative container mx-auto max-w-2xl z-10">
-          <h1 className="text-4xl font-bold text-white">
-            Welcome to Recipedia
-          </h1>
-          <p className="mt-2 text-lg text-white">
-            Discover and share amazing recipes!
-          </p>
+          <div className="relative container mx-auto max-w-2xl z-10">
+            <h1 className="text-4xl font-bold text-white">
+              Welcome to Recipedia
+            </h1>
+            <p className="mt-2 text-lg text-white">
+              Discover and share amazing recipes!
+            </p>
+          </div>
         </div>
       </div>
 
@@ -310,21 +259,27 @@ const HomePage = () => {
           </div>
         )}
 
-        <div className="flex justify-center my-8">
-          {hasMore ? (
-            <Button
-              variant="outline"
-              onClick={() => setPage((p) => p + 1)}
-              disabled={isLoadingMore}
-              className="w-full disabled:opacity-60"
-            >
-              {isLoadingMore ? "Loading..." : "Load more"}
-            </Button>
-          ) : (
-            <div className="text-xs text-muted-foreground "></div>
-          )}
-        </div>
+        {recipes.length > 0 && (
+          <div className="flex justify-center my-8">
+            {hasMore ? (
+              <Button
+                variant="outline"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={isLoadingMore}
+                className="w-full disabled:opacity-60"
+              >
+                {isLoadingMore ? "Loading..." : "Load more"}
+              </Button>
+            ) : (
+              <div className="text-xs text-muted-foreground "></div>
+            )}
+          </div>
+        )}
+
         <div ref={loadMoreRef} style={{ height: 1 }} />
+        <div className="max-w-6xl mt-4 mb-8 mx-auto">
+          <CarouselBanner />
+        </div>
       </Tabs>
     </div>
   );

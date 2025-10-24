@@ -21,12 +21,11 @@ const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=fals
 const RecipeCard = ({ recipe }) => {
   const navigate = useNavigate();
   const commentCount = recipe.comments?.length || 0;
-  // define this inside your RecipeCard component, right before the return()
-  const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
 
+  const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
   const authorName = recipe?.author?.name || "Mysterious Chef";
 
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const userId = user?.id;
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -72,15 +71,29 @@ const RecipeCard = ({ recipe }) => {
   };
 
   const handleFavorite = async () => {
+    if (!token) {
+      toast.error("Please log in first.");
+      return;
+    }
     try {
       const res = await api.post(`/recipes/${recipe._id}/favorite`);
       setFavorite(res.data.isFavorite);
       toast.success(res.data.message);
+
+      // ✅ Update global user favorites so both pages sync
+      setUser((prev) => {
+        if (!prev) return prev;
+        const updatedFavorites = res.data.isFavorite
+          ? [...prev.favorites, recipe._id] // add
+          : prev.favorites.filter((id) => id !== recipe._id); // remove
+        return { ...prev, favorites: updatedFavorites };
+      });
     } catch (error) {
       toast.error("Failed to update favorites");
       console.error(error);
     }
   };
+
   // Keep favorite state in sync when user or recipe changes
   useEffect(() => {
     if (user?.favorites && recipe?._id) {
