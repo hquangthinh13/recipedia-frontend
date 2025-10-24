@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// helpers (put near top of file)
+
 const getDicebearAvatar = (seed) =>
   `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
     seed || "U"
@@ -118,7 +118,13 @@ const Navbar = () => {
                       Mysterious Chef
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {/* No login button in the navbar; keep a menu action if you still want a path to login */}
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => navigate("/signup")}
+                    >
+                      Sign up
+                    </DropdownMenuItem>
+
                     <DropdownMenuItem
                       className="cursor-pointer"
                       onClick={() => navigate("/login")}

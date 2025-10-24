@@ -5,15 +5,17 @@ import App from "./App.jsx";
 import { Toaster } from "sonner";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      {" "}
-      <AuthProvider>
-        <App />
-        <Toaster />{" "}
-      </AuthProvider>
+      <TooltipProvider>
+        <AuthProvider>
+          <App />
+          <Toaster />
+        </AuthProvider>
+      </TooltipProvider>
     </BrowserRouter>
   </StrictMode>
 );

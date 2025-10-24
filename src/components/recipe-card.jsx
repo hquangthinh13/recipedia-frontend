@@ -4,43 +4,18 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Clock,
-  CakeSlice,
-  Heart,
-  Bookmark,
-  MessageCircle,
-  ChefHat,
-} from "lucide-react";
+import { Clock, Heart, Bookmark, MessageCircle, ChefHat } from "lucide-react";
 import { dishTypeLabels, cookingTimeLabels } from "../lib/enumDisplayMap";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import api from "../lib/api";
 import { toast } from "sonner";
 import { useAuth } from "../context/AuthContext";
-
-// Helper: format date
-const formatPostedDate = (createdAt) => {
-  const now = new Date();
-  const posted = new Date(createdAt);
-  const diffMs = now - posted;
-  const diffMinutes = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffMinutes < 60) {
-    return `${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""} ago`;
-  } else if (diffHours < 24) {
-    return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`;
-  } else if (diffDays < 3) {
-    return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
-  } else {
-    return posted.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  }
-};
+import { formatDate } from "../lib/formatDate";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const getDicebearAvatar = (seed) =>
   `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
@@ -51,26 +26,47 @@ const RecipeCard = ({ recipe }) => {
   const navigate = useNavigate();
   const commentCount = recipe.comments?.length || 0;
 
-  const { user } = useAuth(); // ✅ Get current logged-in user
-  const userId = user?._id;
+  const { user } = useAuth();
+  const userId = user?.id;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const [liked, setLiked] = useState(recipe.likedByUser || false);
+  const [likeCount, setLikeCount] = useState(recipe.likes?.length || 0);
 
-  const [liked, setLiked] = useState(
-    recipe.likes?.some((id) => id === userId || id._id === userId) || false
-  );
+  useEffect(() => {
+    if (!userId || !recipe?.likes) {
+      setLiked(false);
+      return;
+    }
+
+    // recipe.likes is an array of ObjectIds
+    const userHasLiked = recipe.likes.some(
+      (id) =>
+        id.toString() === userId.toString() ||
+        (id._id && id._id.toString() === userId.toString())
+    );
+
+    setLiked(userHasLiked);
+  }, [userId, recipe.likes]);
 
   const [favorite, setFavorite] = useState(
     user?.favorites?.some((id) => id === recipe._id || id._id === recipe._id) ||
       false
   );
 
-  const [likeCount, setLikeCount] = useState(recipe.likes?.length || 0);
   const handleLike = async () => {
+    // Only block when we definitively know the user isn't logged in
+    if (!token) {
+      toast.error("Please log in to like recipes.");
+      return;
+    }
+
     try {
       const res = await api.post(`/recipes/${recipe._id}/like`);
       setLiked(res.data.likedByUser);
       setLikeCount(res.data.likesCount);
     } catch (error) {
-      toast.error("Failed to like recipe");
+      toast.error("Failed to update like status");
       console.error(error);
     }
   };
@@ -94,11 +90,7 @@ const RecipeCard = ({ recipe }) => {
       setFavorite(isFav);
     }
   }, [user, recipe]);
-  const avatarUrl =
-    recipe.author?.avatar ||
-    `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
-      recipe.author?.username || "U"
-    )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`;
+
   return (
     <Card className="mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out hover:translate-y-0.5 hover:scale-105">
       {/* Cover image */}
@@ -140,7 +132,14 @@ const RecipeCard = ({ recipe }) => {
                 {recipe.author?.name || "Mysterious Chef"}
               </div>
               <div className="text-xs flex text-[var(--muted-foreground)] font-light">
-                {formatPostedDate(recipe.createdAt)}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>{formatDate(recipe.createdAt)}</span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{new Date(recipe.createdAt).toLocaleString()}</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </div>
           </div>

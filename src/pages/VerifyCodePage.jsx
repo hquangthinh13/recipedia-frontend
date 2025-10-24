@@ -60,7 +60,8 @@ const VerifyCodePage = () => {
         </CardHeader>
         <CardContent>
           <p className="mb-4">
-            We sent a 6-digit code to <strong>{email}</strong>
+            We sent a 6-digit code to{" "}
+            <strong className="text-primary">{email}</strong>
           </p>
 
           <form onSubmit={handleSubmit}>
@@ -68,9 +69,17 @@ const VerifyCodePage = () => {
               placeholder="Enter 6-digit code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="mb-4 text-center tracking-widest"
+              className="mb-4 text-center tracking-wide"
               maxLength={6}
             />
+            <div className="mb-4 text-[var(--muted-foreground)]">
+              <p className="text-xs">
+                Sometimes our verification email lands in your
+                <strong>Spam or Trash </strong>
+                folder. Please check there — and mark it as “Not spam” so you
+                don’t miss future updates!
+              </p>
+            </div>
             <Button type="submit" className="cursor-pointer w-full">
               <Check />
               Verify

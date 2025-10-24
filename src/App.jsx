@@ -6,7 +6,6 @@ import LogInPage from "./pages/LogInPage";
 import SignUpPage from "./pages/SignUpPage";
 import CreateRecipePage from "./pages/CreateRecipePage";
 import RecipeDetailPage from "./pages/RecipeDetailPage";
-// import VerifyInfoPage from "./pages/VerifyInfoPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import VerifyCodePage from "./pages/VerifyCodePage";
 import VerifyResetCodePage from "./pages/VerifyResetCodePage";

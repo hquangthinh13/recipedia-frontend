@@ -372,58 +372,61 @@ const RecipeDetailPage = () => {
                 </h2>
                 <MessageSquareText className="text-accent" />
               </div>
-              <div className="flex gap-3 mt-4">
-                <Avatar className="w-10 h-10 flex-shrink-0">
-                  <AvatarImage
-                    src={
-                      user?.avatar ||
-                      `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
-                        user?.name || "U"
-                      )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`
-                    }
-                    alt={user?.name || "Your avatar"}
-                  />
-                  <AvatarFallback>
-                    {user?.name?.[0]?.toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
+              {user && (
+                <div className="flex gap-3 mt-4">
+                  <Avatar className="w-10 h-10 flex-shrink-0">
+                    <AvatarImage
+                      src={
+                        user?.avatar ||
+                        `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
+                          user?.name || "U"
+                        )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`
+                      }
+                      alt={user?.name || "Your avatar"}
+                    />
+                    <AvatarFallback>
+                      {user?.name?.[0]?.toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
 
-                <div className="flex-1">
-                  <Textarea
-                    ref={commentInputRef}
-                    placeholder="Add a comment..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    onFocus={() => setIsCommentFocused(true)}
-                    className={`resize-none border-0 border-b-2 rounded-none focus:border-none transition-all duration-200 ${
-                      isCommentFocused ? "min-h-[80px]" : "min-h-[40px]"
-                    }`}
-                    rows={isCommentFocused ? 3 : 1}
-                  />
-                  {isCommentFocused && (
-                    <div className="flex justify-end gap-2 mt-3">
-                      <Button
-                        variant="ghost"
-                        // size="sm"
-                        onClick={handleCommentCancel}
-                        className="text-muted-foreground hover:text-foreground cursor-pointer"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={handleCommentSubmit}
-                        disabled={!newComment.trim()}
-                        // size="sm"
-                        // variant="default"
-                        className="cursor-pointer"
-                      >
-                        Comment
-                      </Button>
-                    </div>
-                  )}
+                  <div className="flex-1">
+                    <Textarea
+                      ref={commentInputRef}
+                      placeholder="Add a comment..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      onFocus={() => setIsCommentFocused(true)}
+                      className={`resize-none border-0 border-b-2 rounded-none focus:border-none transition-all duration-200 ${
+                        isCommentFocused ? "min-h-[80px]" : "min-h-[40px]"
+                      }`}
+                      rows={isCommentFocused ? 3 : 1}
+                    />
+                    {isCommentFocused && (
+                      <div className="flex justify-end gap-2 mt-3">
+                        <Button
+                          variant="ghost"
+                          // size="sm"
+                          onClick={handleCommentCancel}
+                          className="text-muted-foreground hover:text-foreground cursor-pointer"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleCommentSubmit}
+                          disabled={!newComment.trim()}
+                          // size="sm"
+                          // variant="default"
+                          className="cursor-pointer"
+                        >
+                          Comment
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
+
             {/* Comments Section */}
 
             {/* <Separator className="my-2" /> */}
