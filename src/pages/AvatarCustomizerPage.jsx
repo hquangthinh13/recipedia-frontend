@@ -4,6 +4,7 @@ import Navbar from "../components/navbar";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 import {
   Scissors,
@@ -25,6 +26,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 const AvatarCustomizerPage = () => {
+  const navigate = useNavigate();
+
   // === Core states ===
   const [skinColor, setSkinColor] = useState("f9c9b6");
   const [backgroundColor, setBackgroundColor] = useState("ffd5dc");
@@ -78,6 +81,7 @@ const AvatarCustomizerPage = () => {
       toast.success("Chef’s kiss! Everything saved beautifully.");
       // force refresh user data from backend
       setUser((prev) => ({ ...prev, avatar: avatarUrl }));
+      setTimeout(() => navigate("/"), 2500);
     } catch (err) {
       console.error(err);
       toast.error("Oops! Something’s burnt. Try again.");
