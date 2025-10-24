@@ -70,13 +70,15 @@ const AvatarCustomizerPage = () => {
         : `&glassesProbability=0`
     }
   `.replace(/\s/g, "");
-
+  const { user, setUser } = useAuth();
   const handleSaveAvatar = async () => {
     try {
       console.log("Avatar URL being sent:", avatarUrl);
 
       await api.post("/users/avatar", { avatarUrl });
       toast.success("Chef’s kiss! Everything saved beautifully.");
+      // force refresh user data from backend
+      setUser((prev) => ({ ...prev, avatar: avatarUrl }));
     } catch (err) {
       console.error(err);
       toast.error("Oops! Something’s burnt. Try again.");
