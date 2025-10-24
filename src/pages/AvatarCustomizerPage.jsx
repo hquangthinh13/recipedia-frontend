@@ -74,7 +74,6 @@ const AvatarCustomizerPage = () => {
   const handleSaveAvatar = async () => {
     try {
       console.log("Avatar URL being sent:", avatarUrl);
-
       await api.post("/users/avatar", { avatarUrl });
       toast.success("Chef’s kiss! Everything saved beautifully.");
       // force refresh user data from backend

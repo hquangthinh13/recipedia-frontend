@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Check, RotateCcw } from "lucide-react";
 import logo from "../assets/images/Recipedia-logo-square.svg";
 import { Link } from "react-router-dom";
-
+import { useAuth } from "../context/AuthContext";
 const VerifyCodePage = () => {
   const [params] = useSearchParams();
   const email = params.get("email");
@@ -15,6 +15,7 @@ const VerifyCodePage = () => {
   const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
   const [resending, setResending] = useState(false);
+  const { login } = useAuth();
 
   // --- Verify the code ---
   const handleSubmit = async (e) => {
@@ -22,7 +23,15 @@ const VerifyCodePage = () => {
     try {
       const { data } = await api.post("/auth/verify-code", { email, code });
       setMessage(data.msg);
-      setTimeout(() => navigate("/customize-avatar"), 2500); //
+
+      if (data.token) {
+        // ✅ Auto login using the AuthContext
+        await login(data.token);
+        setMessage("Account verified! Logging you in...");
+        setTimeout(() => navigate("/customize-avatar"), 1500);
+      } else {
+        setTimeout(() => navigate("/login"), 2500);
+      }
     } catch (err) {
       const msg = err?.response?.data?.msg || "Verification failed";
       setMessage(msg);
