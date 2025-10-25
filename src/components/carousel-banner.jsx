@@ -23,7 +23,9 @@ const CarouselBanner = () => {
         plugins={[
           Autoplay({
             delay: 3000, // 3 seconds between slides
-            stopOnInteraction: true, // keep autoplay even when user clicks
+            stopOnInteraction: false,
+            stopOnMouseEnter: true,
+            stopOnFocusIn: true,
           }),
         ]}
         opts={{

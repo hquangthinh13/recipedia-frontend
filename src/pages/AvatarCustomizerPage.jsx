@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-
+import Footer from "../components/page-footer";
 import {
   Scissors,
   Smile,
@@ -145,18 +145,34 @@ const AvatarCustomizerPage = () => {
   ];
 
   // === Colors ===
-  const skinColors = ["f9c9b6", "ac6651", "77311d", "8d5524"];
+  const skinColors = [
+    "FFCCCC", // light pink
+    "FFE6CC", // pale peach
+    "f9c9b6", // soft warm light
+    "E0AC69", // medium warm tan
+    "C68642", // golden brown
+    "ac6651", // reddish tan
+    "8d5524", // deep brown
+    "77311d", // darkest warm brown
+    "B4B4B4", // gray (neutral transition)
+    "80C878", // green tone
+    "96D2FF", // blue tone
+  ];
+
   const hairColors = [
     "000000",
     "6bd9e9",
     "9287ff",
     "77311d",
+    "b35340",
     "ac6651",
     "d2eff3",
     "e0ddff",
     "f4d150",
     "f9c9b6",
     "fc909f",
+    "feb47b",
+    "ff7e5f",
     "ffeba4",
     "ffedef",
     "ffffff",
@@ -166,12 +182,15 @@ const AvatarCustomizerPage = () => {
     "6bd9e9",
     "9287ff",
     "77311d",
+    "b35340",
     "ac6651",
     "d2eff3",
     "e0ddff",
     "f4d150",
     "f9c9b6",
     "fc909f",
+    "feb47b",
+    "ff7e5f",
     "ffeba4",
     "ffedef",
     "ffffff",
@@ -182,12 +201,15 @@ const AvatarCustomizerPage = () => {
     "6bd9e9",
     "9287ff",
     "77311d",
+    "b35340",
     "ac6651",
     "d2eff3",
     "e0ddff",
     "f4d150",
     "f9c9b6",
     "fc909f",
+    "feb47b",
+    "ff7e5f",
     "ffeba4",
     "ffedef",
     "ffffff",
@@ -209,20 +231,23 @@ const AvatarCustomizerPage = () => {
   ];
   const glassesColors = [
     "000000",
-    "ffffff",
     "6bd9e9",
     "9287ff",
     "77311d",
+    "b35340",
     "ac6651",
     "d2eff3",
     "e0ddff",
     "f4d150",
     "f9c9b6",
     "fc909f",
+    "feb47b",
+    "ff7e5f",
     "ffeba4",
     "ffedef",
+    "ffffff",
   ];
-  const bgColors = ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf"];
+  const bgColors = ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf", "feb47b"];
   const eyeShadowColors = ["d2eff3", "e0ddff", "ffeba4", "ffedef", "ffffff"];
   // === Button Feature Map ===
   const featureButtons = [
@@ -440,6 +465,7 @@ const AvatarCustomizerPage = () => {
           </CardContent>
         </Card>
       </div>
+      <Footer />
     </div>
   );
 };
@@ -477,7 +503,9 @@ const FeatureSelector = ({
               className="w-12 h-12 mx-auto"
             />
 
-            <p className="text-sm text-center mt-1">{opt.label}</p>
+            <p className="text-xs text-muted-foreground text-center mt-1">
+              {opt.label}
+            </p>
           </button>
         );
       })}

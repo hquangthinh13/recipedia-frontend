@@ -37,7 +37,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
 
   return (
-    <header className="border-b border-border bg-white">
+    <header className="sticky top-0 z-50 border-b border-border bg-white">
       <div className="mx-auto max-w-6xl p-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -101,7 +101,7 @@ const Navbar = () => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       className="cursor-pointer"
-                      onClick={() => navigate("/profile")}
+                      onClick={() => navigate(`/profile/${user?.id}`)}
                     >
                       My Kitchen
                     </DropdownMenuItem>

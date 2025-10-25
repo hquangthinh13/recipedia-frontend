@@ -3,6 +3,8 @@ import api from "../lib/api";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import { Button } from "@/components/ui/button";
+import Footer from "../components/page-footer";
+
 import { Plus, CookingPot, ArrowLeft, Trash2 } from "lucide-react";
 import {
   Card,
@@ -113,7 +115,7 @@ const CreateRecipePage = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="mx-auto max-w-2xl mt-2 p-4">
+      <div className="mx-auto max-w-6xl mt-2 p-4">
         <Link to={"/"}>
           <Button variant="ghost" className="cursor-pointer">
             <ArrowLeft />
@@ -124,7 +126,10 @@ const CreateRecipePage = () => {
         <Card className="mt-2">
           <CardHeader>
             <CardTitle>Create your Recipe</CardTitle>
-            <CardDescription>Share your recipe</CardDescription>
+            <CardDescription>
+              Share your favorite dish with the world — start by adding your
+              ingredients and steps.
+            </CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -427,8 +432,9 @@ const CreateRecipePage = () => {
                         Add Ingredient
                       </Button>
                       <FormDescription>
-                        Fill in amount, unit, and ingredient — repeat until
-                        delicious.
+                        Fill in the amount, unit, and ingredient — repeat until
+                        delicious. Use ingredient amounts for 4 servings
+                        (original recipe).
                       </FormDescription>
                     </FormItem>
                   )}
@@ -491,7 +497,13 @@ const CreateRecipePage = () => {
                   )}
                 />
                 <div className="">
-                  {image && <img src={image} alt="Preview Image" />}
+                  {image && (
+                    <img
+                      className="aspect-video h-48 object-cover border-accent border-1 rounded-sm"
+                      src={image}
+                      alt="Preview Image"
+                    />
+                  )}
                 </div>
                 <div className="flex w-full justify-end">
                   <Button
@@ -507,7 +519,8 @@ const CreateRecipePage = () => {
             </Form>
           </CardContent>
         </Card>
-      </div>
+      </div>{" "}
+      <Footer />
     </div>
   );
 };

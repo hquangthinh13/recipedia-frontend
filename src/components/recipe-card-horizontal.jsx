@@ -4,7 +4,15 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, Heart, Bookmark, MessageCircle, ChefHat } from "lucide-react";
+import {
+  Clock,
+  Heart,
+  Bookmark,
+  MessageCircle,
+  ChefHat,
+  SquarePen,
+  Trash,
+} from "lucide-react";
 import { dishTypeLabels, cookingTimeLabels } from "../lib/enumDisplayMap";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import api from "../lib/api";
@@ -18,7 +26,7 @@ import {
 } from "@/components/ui/tooltip";
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 
-const RecipeCard = ({ recipe }) => {
+const RecipeCardHorizontal = ({ recipe, isOwner = false }) => {
   const navigate = useNavigate();
   const commentCount = recipe.comments?.length || 0;
 
@@ -105,19 +113,7 @@ const RecipeCard = ({ recipe }) => {
   }, [user, recipe]);
 
   return (
-    <Card className="mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out hover:translate-y-0.5 hover:scale-105">
-      {/* Cover image */}
-      <Link to={`/recipes/${recipe._id}`}>
-        <div className="cursor-pointer  ">
-          <img
-            src={recipe.coverImage || "https://via.placeholder.com/300"}
-            alt={recipe.title}
-            className="h-36 w-full object-cover"
-            //  transition ease-in-out delay-150 duration-300 hover:scale-105
-          />
-        </div>
-      </Link>
-
+    <Card className="mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out">
       {/* Content */}
       <CardContent className="p-4 h-fit">
         {/* Author + Date */}
@@ -134,7 +130,7 @@ const RecipeCard = ({ recipe }) => {
               <Link to={`/profile/${recipe.author?._id}`}>
                 <div className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-[var(--card-foreground)]">
                   {recipe.author?.name || "Mysterious Chef"}
-                </div>{" "}
+                </div>
               </Link>
               <div className="text-xs flex text-[var(--muted-foreground)] font-light">
                 <Tooltip>
@@ -148,19 +144,44 @@ const RecipeCard = ({ recipe }) => {
               </div>
             </div>
           </div>
-
-          <Button
-            size="icon"
-            variant="ghost"
-            className="cursor-pointer"
-            onClick={handleFavorite}
-          >
-            <Bookmark
-              className={`transition ${
-                favorite && "fill-primary text-primary"
-              }`}
-            />
-          </Button>
+          {isOwner ? (
+            <div className="flex justify-center gap-2">
+              {/* Delete */}
+              <Button
+                size="icon"
+                variant="ghost"
+                className="cursor-pointer"
+                // onClick={}
+              >
+                <Trash />
+              </Button>{" "}
+              {/* Edit */}
+              <Button
+                size="icon"
+                variant="ghost"
+                className="cursor-pointer"
+                // onClick={}
+              >
+                <SquarePen />
+              </Button>
+            </div>
+          ) : (
+            <>
+              {" "}
+              <Button
+                size="icon"
+                variant="ghost"
+                className="cursor-pointer"
+                onClick={handleFavorite}
+              >
+                <Bookmark
+                  className={`transition ${
+                    favorite && "fill-primary text-primary"
+                  }`}
+                />
+              </Button>
+            </>
+          )}
         </div>
         {/* Title */}{" "}
         <Link to={`/recipes/${recipe._id}`}>
@@ -169,7 +190,7 @@ const RecipeCard = ({ recipe }) => {
           </h2>
         </Link>
         {/* Dish type + Cooking time */}
-        <div className="flex justify-start items-center gap-3 text-sm text-gray-500 mb-4">
+        <div className="flex justify-start items-center gap-3 text-sm text-gray-500 mb-2">
           <div className="flex items-center gap-2">
             <ChefHat className="h-4 w-4 text-gray-400 " />
             <span className="text-base text-gray-600 antialiased">
@@ -184,6 +205,16 @@ const RecipeCard = ({ recipe }) => {
             </span>
           </div>
         </div>
+        {/* Cover image */}
+        <Link to={`/recipes/${recipe._id}`}>
+          <div className="cursor-pointer aspect-video overflow-hidden rounded-md">
+            <img
+              src={recipe.coverImage}
+              alt={recipe.title}
+              className="object-cover w-full h-full object-center transition ease-in-out delay-150 duration-300 hover:scale-105"
+            />
+          </div>
+        </Link>
         <Separator className="flex mt-4 mb-2" />
         {/* Buttons */}
         <div className=" w-full flex justify-center gap-3">
@@ -224,4 +255,4 @@ const RecipeCard = ({ recipe }) => {
   );
 };
 
-export default RecipeCard;
+export default RecipeCardHorizontal;

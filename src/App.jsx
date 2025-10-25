@@ -14,6 +14,8 @@ import VerifyResetCodePage from "./pages/VerifyResetCodePage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import NewPasswordPage from "./pages/NewPasswordPage";
 import AvatarCustomizerPage from "./pages/AvatarCustomizerPage";
+import ProfilePage from "./pages/ProfilePage";
+
 const App = () => {
   // const [loading, setLoading] = useState(false);
   // const location = useLocation();
@@ -37,6 +39,7 @@ const App = () => {
         <Route path="/reset-password" element={<NewPasswordPage />} />
         <Route path="/verify-code" element={<VerifyCodePage />} />
         <Route path="/customize-avatar" element={<AvatarCustomizerPage />} />
+        <Route path="/profile/:id" element={<ProfilePage />} />
       </Routes>
     </div>
   );

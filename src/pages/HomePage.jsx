@@ -1,17 +1,16 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
-import { toast } from "sonner";
 import pattern from "../assets/images/Recipedia_Pattern.svg";
-import background from "../assets/images/Background.jpg";
-import LoginCard from "../components/login-card";
+import background from "../assets/images/Background.png";
 import Navbar from "../components/navbar";
 import { useState } from "react";
 import RecipeCard from "../components/recipe-card";
 import { Button } from "@/components/ui/button";
 import CarouselBanner from "../components/carousel-banner";
-
+import Footer from "../components/page-footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -31,7 +30,6 @@ const HomePage = () => {
   const [dishType, setDishType] = useState("");
   const [sort, setSort] = useState("");
   const navigate = useNavigate();
-
   const [searchParams] = useSearchParams();
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -139,28 +137,28 @@ const HomePage = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="p-4">
-        <div className=" mx-auto rounded-md overflow-hidden relative flex max-w-6xl w-full bg-primary px-4 py-16 items-center text-center">
-          <div className="absolute inset-0">
+      <div className="px-0 pt-0 max-w-6xl mx-auto">
+        <div className="overflow-hidden relative flex w-auto h-fit px-4 items-center text-center">
+          {/* <div className="absolute inset-0">
             <img
               src={background}
               alt="Background"
               className=" w-full h-full object-cover"
             />
-          </div>
+          </div> */}
 
-          <div className="relative container mx-auto max-w-2xl z-10">
-            <h1 className="text-4xl font-bold text-white">
+          <div className="rounded-b-md relative container mx-auto p-4 max-w-6xl z-10 bg-primary">
+            <h1 className="text-xl md:text-3xl font-bold text-white">
               Welcome to Recipedia
             </h1>
-            <p className="mt-2 text-lg text-white">
+            <p className="text-sm md:text-md text-white">
               Discover and share amazing recipes!
             </p>
           </div>
         </div>
       </div>
 
-      <div className="hidden lg:flex max-w-6xl px-4 py-2 items-center justify-center mx-auto mt-4">
+      <div className="hidden lg:flex max-w-6xl px-4 py-2 items-center justify-center mx-auto mt-0">
         <img src={pattern} alt="Pattern" />
       </div>
 
@@ -169,7 +167,7 @@ const HomePage = () => {
           setDishType(val === "all" ? "" : val);
         }}
         defaultValue="all"
-        className="container w-full mx-auto max-w-6xl p-4 mt-2 justify-center"
+        className="container w-full mx-auto max-w-6xl p-4 mt-0 justify-center"
       >
         <div className="hidden md:flex lg:flex justify-between gap-6 flex-1 mb-6">
           <Select
@@ -252,7 +250,7 @@ const HomePage = () => {
         </div>
 
         {recipes.length > 0 && (
-          <div className="grid max-w-6xl mx-auto w-auto grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+          <div className="grid max-w-6xl mx-auto w-auto grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {recipes.map((recipe) => (
               <RecipeCard key={recipe._id} recipe={recipe} />
             ))}
@@ -281,6 +279,7 @@ const HomePage = () => {
           <CarouselBanner />
         </div>
       </Tabs>
+      <Footer />
     </div>
   );
 };
