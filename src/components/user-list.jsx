@@ -81,7 +81,7 @@ const UserList = ({ users: initialUsers, type, isOwner, onDeltaFollowing }) => {
 
         return (
           <div
-            key={u._id}
+            key={`${u._id}-${type}`}
             className="flex justify-between items-center px-3 py-3 hover:bg-secondary transition-colors"
           >
             <div className="flex items-center gap-3">
