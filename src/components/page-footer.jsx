@@ -11,17 +11,18 @@ const Footer = () => {
         {/* Row 1 */}
         <div className="mt-0 flex flex-row w-full items-center justify-between">
           <div className="flex flex-row w-full items-center justify-start gap-6 text-sm text-white font-normal">
-            <Link to={"/"}>
-              <a className="cursor-pointer transition-all delay-150 duration-200 ease-in-out hover:tracking-widest">
-                HOME
-              </a>{" "}
+            <Link
+              to={"/"}
+              className="cursor-pointer transition-all delay-150 duration-200 ease-in-out hover:tracking-widest"
+            >
+              HOME
             </Link>
-            <a className="cursor-pointer transition-all delay-150 duration-200 ease-in-out hover:tracking-widest">
+            <Link className="cursor-pointer transition-all delay-150 duration-200 ease-in-out hover:tracking-widest">
               EXPLORE
-            </a>
-            <a className="cursor-pointer transition-all delay-150 duration-200 ease-in-out hover:tracking-widest">
+            </Link>
+            <Link className="cursor-pointer transition-all delay-150 duration-200 ease-in-out hover:tracking-widest">
               ABOUT
-            </a>
+            </Link>
           </div>
         </div>
         <Separator className="mt-6 mb-6" />

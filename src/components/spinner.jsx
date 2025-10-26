@@ -10,16 +10,8 @@ const Spinner = ({ className, ...props }) => {
         aria-label="Loading"
         className={cn("size-16 text-primary animate-spin", className)}
         {...props}
-      />{" "}
+      />
     </div>
   );
 };
 export default Spinner;
-
-// export SpinnerCustom() {
-//   return (
-//     <div className="flex items-center gap-4">
-//       <Spinner />
-//     </div>
-//   )
-// }

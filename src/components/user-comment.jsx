@@ -13,8 +13,11 @@ const UserComment = ({ comment }) => {
 
   return (
     <div className="flex gap-3 px-2 py-3 border-b bg-white hover:bg-secondary last:border-none transition-colors ease-in-out duration-300">
-      <Link to={`/profile/${user?._id}`}>
-        <Avatar className="cursor-pointer w-10 h-10 flex-shrink-0">
+      <Link
+        to={`/profile/${user?._id}`}
+        className="cursor-pointer w-10 h-10 flex-shrink-0"
+      >
+        <Avatar>
           <AvatarImage src={avatarUrl} alt={user?.name || "User"} />
           <AvatarFallback>
             {user?.name?.[0]?.toUpperCase() || "U"}

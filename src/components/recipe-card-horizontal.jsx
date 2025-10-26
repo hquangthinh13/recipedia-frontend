@@ -119,8 +119,11 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false }) => {
         {/* Author + Date */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Link to={`/profile/${recipe.author?._id}`}>
-              <Avatar className="cursor-pointer">
+            <Link
+              to={`/profile/${recipe.author?._id}`}
+              className="cursor-pointer"
+            >
+              <Avatar>
                 <AvatarImage src={avatarUrl} alt={authorName} />
                 <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
               </Avatar>
