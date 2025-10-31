@@ -9,6 +9,7 @@ const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=fals
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import Spinner from "../components/spinner";
+import { toast } from "sonner";
 import { UserPlus, UserMinus, SquarePen } from "lucide-react";
 import {
   Card,
@@ -25,6 +26,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import EditRecipeForm from "../components/edit-recipe-form";
+
 import api from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import { format } from "date-fns";
@@ -33,6 +36,8 @@ import { formatFollowerCount } from "../lib/formatFollowerCount";
 import UserList from "../components/user-list";
 const ProfilePage = () => {
   const { id } = useParams();
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingRecipe, setEditingRecipe] = useState(null);
   const { user: authUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [recipes, setRecipes] = useState([]);
@@ -44,7 +49,7 @@ const ProfilePage = () => {
   const [listType, setListType] = useState(""); // "followers" or "following"
   const [isFollowing, setIsFollowing] = useState(false);
   const location = useLocation();
-
+  const { token } = useAuth();
   // Close dialog whenever route changes
   useEffect(() => {
     setOpen(false);
@@ -81,6 +86,10 @@ const ProfilePage = () => {
     }
   };
   const handleFollowToggle = async () => {
+    if (!token) {
+      toast.error("Please log in to follow this chef.");
+      return;
+    }
     try {
       const res = await api.post(`/users/${id}/follow`);
 
@@ -159,7 +168,16 @@ const ProfilePage = () => {
             {/* Content directly below the grouped block */}
             <div className="pt-20 text-center bg-white">
               <h2 className=" text-3xl font-bold text-[var(--card-foreground)] antialiased">
-                {profile.name}
+                {profile.name}{" "}
+                {/* {isOwner ? (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="cursor-pointer"
+                  >
+                    <SquarePen />
+                  </Button>
+                ) : null} */}
               </h2>
               <span className=" text-muted-foreground text-sm leading-2">
                 Joined {joinedDate}
@@ -209,12 +227,13 @@ const ProfilePage = () => {
               {/* Buttons */}
               {/* Owner vs Visitor Actions */}
               <div className="mt-4 flex flex-row gap-4 justify-center">
-                {isOwner ? (
-                  <Button className="cursor-pointer">
-                    <SquarePen />
-                    Edit Profile
-                  </Button>
-                ) : (
+                {!isOwner && (
+                  //  (
+                  // <Button className="cursor-pointer">
+                  //   <SquarePen />
+                  //   Edit Profile
+                  // </Button>
+                  // ) :
                   <Button
                     className="cursor-pointer"
                     onClick={handleFollowToggle}
@@ -235,7 +254,7 @@ const ProfilePage = () => {
                 )}
               </div>
             </div>
-            {/* Content directly below the grouped block */}{" "}
+            {/* Content directly below the grouped block */}
           </CardContent>
         </Card>
 
@@ -254,6 +273,16 @@ const ProfilePage = () => {
                     key={r._id}
                     recipe={r}
                     isOwner={isOwner}
+                    onEdit={(recipe) => {
+                      setEditingRecipe(recipe);
+                      setEditOpen(true);
+                    }}
+                    onDelete={(id) => {
+                      // remove the recipe from the local state
+                      setRecipes((prev) =>
+                        prev.filter((rec) => rec._id !== id)
+                      );
+                    }}
                   />
                 ))}
               </div>
@@ -270,6 +299,27 @@ const ProfilePage = () => {
       {/* Kitchen Section */}
 
       <Footer />
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Recipe</DialogTitle>
+          </DialogHeader>
+
+          {editingRecipe && (
+            <EditRecipeForm
+              recipe={editingRecipe}
+              onClose={() => setEditOpen(false)}
+              onUpdated={(updated) => {
+                setRecipes((prev) =>
+                  prev.map((r) => (r._id === updated._id ? updated : r))
+                );
+                setEditOpen(false);
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>

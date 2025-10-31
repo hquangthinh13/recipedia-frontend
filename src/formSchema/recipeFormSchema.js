@@ -48,3 +48,41 @@ export const RecipeFormSchema = z.object({
     .trim()
     .min(5, { message: "Please provide instructions." }),
 });
+
+// relaxed schema for editing recipes
+export const EditRecipeFormSchema = z.object({
+  title: z.string().trim().optional(),
+  coverImage: z.union([z.string().url(), z.instanceof(File)]).optional(),
+  cookingTime: z.enum(["quick", "medium", "long", "veryLong"]).optional(),
+  dishType: z.enum(["starter", "main", "side", "dessert", "drink"]).optional(),
+  ingredients: z
+    .array(
+      z.object({
+        name: z.string().trim().optional(),
+        amount: z.coerce.number().optional(),
+        measurement: z
+          .enum([
+            "tsp",
+            "tbsp",
+            "cup",
+            "ml",
+            "l",
+            "fl oz",
+            "g",
+            "kg",
+            "oz",
+            "lb",
+            "piece",
+            "slice",
+            "clove",
+            "stick",
+            "pinch",
+            "dash",
+            "handful",
+          ])
+          .optional(),
+      })
+    )
+    .optional(),
+  instructions: z.string().trim().optional(),
+});

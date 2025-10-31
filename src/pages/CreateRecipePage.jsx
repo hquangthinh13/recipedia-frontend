@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import { Button } from "@/components/ui/button";
 import Footer from "../components/page-footer";
-
+import { useAuth } from "../context/AuthContext";
 import { Plus, CookingPot, ArrowLeft, Trash2 } from "lucide-react";
 import {
   Card,
@@ -40,14 +40,13 @@ import { Textarea } from "@/components/ui/textarea";
 
 const CreateRecipePage = () => {
   const navigate = useNavigate();
-
+  const { token } = useAuth();
   const [file, setfile] = useState("");
   const [image, setImage] = useState("");
   const [loading, setLoading] = useState(false);
   function previewFiles(file) {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-
     reader.onloadend = () => {
       setImage(reader.result);
       console.log(image);
@@ -73,39 +72,31 @@ const CreateRecipePage = () => {
   });
 
   const onSubmit = async (values) => {
-    console.log("Form submitted:", values);
-    setLoading(true);
-
     try {
-      const result = await api.post("/upload", {
-        image: image,
-      });
-      console.log(result.data);
-      const uploadedImg = result.data.secure_url; // Đã upload ảnh thành công từ server side lên Cloudinary -> secure_url -> để tạo URL hiển thị ảnh ở FE
-
-      // Build recipe payload with Cloudinary URL
-      const recipePayload = {
-        ...values,
-        coverImage: uploadedImg,
-      };
-      console.log("Final recipe payload:", recipePayload);
-      // Send to your recipe backend
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error("Please log in to create a recipe.");
-        navigate("/login");
+      setLoading(true);
+      if (!file) {
+        toast.error("Please select an image");
         return;
       }
-      await api.post("/recipes", recipePayload, {
-        headers: { Authorization: `Bearer ${token}` },
+
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("cookingTime", values.cookingTime);
+      formData.append("dishType", values.dishType);
+      formData.append("ingredients", JSON.stringify(values.ingredients));
+      formData.append("instructions", values.instructions);
+      formData.append("coverImage", file); // important: matches multer field name
+
+      await api.post("/recipes/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+
       toast.success("Your dish is served!");
       navigate("/");
     } catch (error) {
-      console.log(
-        "Create recipe error:",
-        error.response?.data || error.message
-      );
+      console.error("Create recipe error:", error);
       toast.error("Failed to create recipe");
     } finally {
       setLoading(false);
@@ -413,6 +404,7 @@ const CreateRecipePage = () => {
                               variant="outline"
                               size="icon"
                               className="cursor-pointer"
+                              disabled={idx === 0}
                               onClick={() => remove(idx)}
                             >
                               <Trash2 />

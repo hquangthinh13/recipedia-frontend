@@ -4,6 +4,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
 import pattern from "../assets/images/Recipedia_Pattern.svg";
+import Spinner from "../components/spinner";
+
 import background from "../assets/images/Background.png";
 import Navbar from "../components/navbar";
 import { useState } from "react";
@@ -133,20 +135,17 @@ const HomePage = () => {
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
   }, [isLoading, isLoadingMore, hasMore]);
-
+  if (loading)
+    return (
+      <div className="w-screen h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
   return (
     <div className="min-h-screen">
       <Navbar />
       <div className="px-0 pt-0 max-w-6xl mx-auto">
         <div className="overflow-hidden relative flex w-auto h-fit px-4 items-center text-center">
-          {/* <div className="absolute inset-0">
-            <img
-              src={background}
-              alt="Background"
-              className=" w-full h-full object-cover"
-            />
-          </div> */}
-
           <div className="rounded-b-md relative container mx-auto p-4 max-w-6xl z-10 bg-primary">
             <h1 className="text-xl md:text-3xl font-bold text-white">
               Welcome to Recipedia
@@ -161,7 +160,9 @@ const HomePage = () => {
       <div className="hidden lg:flex max-w-6xl px-4 py-2 items-center justify-center mx-auto mt-0">
         <img src={pattern} alt="Pattern" />
       </div>
-
+      <div className="px-4 max-w-6xl mt-2 mb-2 mx-auto">
+        <CarouselBanner />
+      </div>
       <Tabs
         onValueChange={(val) => {
           setDishType(val === "all" ? "" : val);
@@ -258,7 +259,7 @@ const HomePage = () => {
         )}
 
         {recipes.length > 0 && (
-          <div className="flex justify-center my-8">
+          <div className="flex justify-center my-4">
             {hasMore ? (
               <Button
                 variant="outline"
@@ -275,9 +276,6 @@ const HomePage = () => {
         )}
 
         <div ref={loadMoreRef} style={{ height: 1 }} />
-        <div className="max-w-6xl mt-4 mb-8 mx-auto">
-          <CarouselBanner />
-        </div>
       </Tabs>
       <Footer />
     </div>

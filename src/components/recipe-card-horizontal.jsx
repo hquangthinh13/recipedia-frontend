@@ -25,41 +25,52 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-const RecipeCardHorizontal = ({ recipe, isOwner = false }) => {
+const RecipeCardHorizontal = ({
+  recipe,
+  isOwner = false,
+  onDelete,
+  onEdit,
+}) => {
   const navigate = useNavigate();
   const commentCount = recipe.comments?.length || 0;
-
   const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
   const authorName = recipe?.author?.name || "Mysterious Chef";
-
   const { user, setUser } = useAuth();
   const userId = user?.id;
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const { token } = useAuth();
   const [liked, setLiked] = useState(recipe.likedByUser || false);
   const [likeCount, setLikeCount] = useState(recipe.likes?.length || 0);
+  const [favorite, setFavorite] = useState(
+    user?.favorites?.some((id) => id === recipe._id || id._id === recipe._id) ||
+      false
+  );
 
+  useEffect(() => {
+    if (!token) {
+      setLiked(false);
+      setFavorite(false);
+    }
+  }, [token]);
   useEffect(() => {
     if (!userId || !recipe?.likes) {
       setLiked(false);
       return;
     }
-
     // recipe.likes is an array of ObjectIds
     const userHasLiked = recipe.likes.some(
       (id) =>
         id.toString() === userId.toString() ||
         (id._id && id._id.toString() === userId.toString())
     );
-
     setLiked(userHasLiked);
   }, [userId, recipe.likes]);
-
-  const [favorite, setFavorite] = useState(
-    user?.favorites?.some((id) => id === recipe._id || id._id === recipe._id) ||
-      false
-  );
 
   const handleLike = async () => {
     // Only block when we definitively know the user isn't logged in
@@ -67,7 +78,6 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false }) => {
       toast.error("Please log in to like recipes.");
       return;
     }
-
     try {
       const res = await api.post(`/recipes/${recipe._id}/like`);
       setLiked(res.data.likedByUser);
@@ -88,7 +98,7 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false }) => {
       setFavorite(res.data.isFavorite);
       toast.success(res.data.message);
 
-      // ✅ Update global user favorites so both pages sync
+      // Update global user favorites so both pages sync
       setUser((prev) => {
         if (!prev) return prev;
         const updatedFavorites = res.data.isFavorite
@@ -102,6 +112,18 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false }) => {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/recipes/${recipe._id}`);
+      toast.success("Recipe deleted successfully");
+      if (onDelete) onDelete(recipe._id); // tell parent to update
+    } catch (error) {
+      toast.error("Failed to delete recipe");
+      console.error(error);
+    }
+  };
+
+  // const handleEdit = async () => {
   // Keep favorite state in sync when user or recipe changes
   useEffect(() => {
     if (user?.favorites && recipe?._id) {
@@ -154,7 +176,7 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false }) => {
                 size="icon"
                 variant="ghost"
                 className="cursor-pointer"
-                // onClick={}
+                onClick={handleDelete}
               >
                 <Trash />
               </Button>{" "}
@@ -163,7 +185,7 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false }) => {
                 size="icon"
                 variant="ghost"
                 className="cursor-pointer"
-                // onClick={}
+                onClick={() => onEdit && onEdit(recipe)} // trigger parent modal
               >
                 <SquarePen />
               </Button>
