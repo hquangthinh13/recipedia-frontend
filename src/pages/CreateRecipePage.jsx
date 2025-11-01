@@ -40,10 +40,13 @@ import { Textarea } from "@/components/ui/textarea";
 
 const CreateRecipePage = () => {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { user } = useAuth();
   const [file, setfile] = useState("");
   const [image, setImage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  if (!user) navigate("/login");
+
   function previewFiles(file) {
     const reader = new FileReader();
     reader.readAsDataURL(file);

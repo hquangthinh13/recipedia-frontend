@@ -1,5 +1,4 @@
 import React from "react";
-import axios from "axios";
 import api from "../lib/api";
 import { useState } from "react";
 
@@ -55,10 +54,7 @@ const LoginPage = () => {
     } catch (error) {
       const msg =
         error.response?.data?.msg || "Unable to log in. Please try again.";
-      // toast("Login failed", {
-      //   description: msg,
-      //   variant: "destructive",
-      // });
+
       if (msg.toLowerCase().includes("user does not exist")) {
         form.setError("email", {
           message: "No account found with this email.",

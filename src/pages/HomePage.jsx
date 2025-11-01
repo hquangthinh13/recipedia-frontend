@@ -1,15 +1,18 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
 import pattern from "../assets/images/Recipedia_Pattern.svg";
 import Spinner from "../components/spinner";
+import { Flame, ArrowUpRight, Home } from "lucide-react";
 
 import background from "../assets/images/Background.png";
 import Navbar from "../components/navbar";
 import { useState } from "react";
 import RecipeCard from "../components/recipe-card";
+import HomeLinkCard from "../components/home-link-card";
 import { Button } from "@/components/ui/button";
 import CarouselBanner from "../components/carousel-banner";
 import Footer from "../components/page-footer";
@@ -23,9 +26,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 const HomePage = () => {
+  const { user, setUser, token } = useAuth();
   const [recipes, setRecipes] = useState([]);
+  const [topWeeklyRecipes, setTopWeeklyRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
   const [cookingTime, setCookingTime] = useState("");
@@ -39,6 +52,15 @@ const HomePage = () => {
   const [hasMore, setHasMore] = useState(true);
   const loadMoreRef = useRef(null); // sentinel for infinite scroll
   const PAGE_SIZE = 6;
+  const fetchTopWeeklyRecipes = async () => {
+    try {
+      const res = await api.get("/recipes/trending?n=12");
+      console.log("Top trending recipes:", res.data);
+      setTopWeeklyRecipes(res.data);
+    } catch (error) {
+      console.error("Error fetching top trending recipes:", error);
+    }
+  };
 
   const fetchRecipes = async ({ append = false } = {}) => {
     try {
@@ -68,8 +90,10 @@ const HomePage = () => {
 
       if (append) {
         setRecipes((prev) => [...prev, ...batch]);
+        console.log("Appending recipes:", batch);
       } else {
         setRecipes(batch);
+        console.log("Fetched recipes:", batch);
       }
     } catch (error) {
       console.error("Error fetching recipes:", error);
@@ -93,7 +117,7 @@ const HomePage = () => {
 
   useEffect(() => {
     fetchRecipes({ append: page > 1 });
-
+    fetchTopWeeklyRecipes();
     const token = localStorage.getItem("token");
     if (!token) {
       setLoading(false);
@@ -148,7 +172,9 @@ const HomePage = () => {
         <div className="overflow-hidden relative flex w-auto h-fit px-4 items-center text-center">
           <div className="rounded-b-md relative container mx-auto p-4 max-w-6xl z-10 bg-primary">
             <h1 className="text-xl md:text-3xl font-bold text-white">
-              Welcome to Recipedia
+              {username
+                ? `Welcome to Recipedia, ${username}!`
+                : "Welcome to Recipedia"}
             </h1>
             <p className="text-sm md:text-md text-white">
               Discover and share amazing recipes!
@@ -157,51 +183,76 @@ const HomePage = () => {
         </div>
       </div>
 
-      <div className="hidden lg:flex max-w-6xl px-4 py-2 items-center justify-center mx-auto mt-0">
+      <div className="max-w-6xl mx-auto my-2 px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        <HomeLinkCard index={1} title="Discover New Recipes" />
+        <HomeLinkCard index={2} title="Trending This Week" />
+        <HomeLinkCard index={3} title="Chef’s Hall of Fame" />
+      </div>
+
+      <div className="hidden lg:flex max-w-6xl px-4 pb-2 items-center justify-center mx-auto mt-0">
         <img src={pattern} alt="Pattern" />
       </div>
-      <div className="px-4 max-w-6xl mt-2 mb-2 mx-auto">
-        <CarouselBanner />
+      <div className="w-full max-w-6xl px-4 mx-auto mt-4">
+        <Carousel
+          className="relative w-full"
+          plugins={[
+            Autoplay({
+              delay: 5000, // 5 seconds between slides
+              stopOnInteraction: false,
+              stopOnMouseEnter: true,
+              stopOnFocusIn: true,
+            }),
+          ]}
+          opts={{
+            loop: false, // makes the carousel loop infinitely
+          }}
+        >
+          {/* Header row */}
+          <div className="flex justify-between">
+            <h2 className="flex flex-1 text-2xl cursor-pointer font-bold mb-4 text-card-foreground items-center gap-1">
+              <Flame className="text-primary fill-primary" />
+              <Link className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
+                Hot Recipes This Week
+              </Link>
+            </h2>
+
+            <div className="flex justify-end items-center mb-3 gap-2">
+              <CarouselPrevious className="cursor-pointer relative left-auto right-auto top-auto translate-y-0 h-8 w-8" />
+              <CarouselNext className="cursor-pointer relative left-auto right-auto top-auto translate-y-0 h-8 w-8" />
+            </div>
+          </div>
+
+          <CarouselContent>
+            {topWeeklyRecipes.map((recipe) => (
+              <CarouselItem
+                className="md:basis-1/2 lg:basis-1/3"
+                key={recipe._id}
+              >
+                <RecipeCard recipe={recipe} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
       </div>
+
+      <div className="hidden lg:flex max-w-6xl px-4 py-2  items-center justify-center mx-auto mt-2">
+        <img src={pattern} alt="Pattern" />
+      </div>
+
       <Tabs
         onValueChange={(val) => {
           setDishType(val === "all" ? "" : val);
         }}
         defaultValue="all"
-        className="container w-full mx-auto max-w-6xl p-4 mt-0 justify-center"
+        className="container w-full mx-auto max-w-6xl gap-2 p-4 mt-0 justify-center"
       >
-        <div className="hidden md:flex lg:flex justify-between gap-6 flex-1 mb-6">
-          <Select
-            onValueChange={(val) => {
-              setCookingTime(val === "all" ? "" : val);
-            }}
-          >
-            <SelectTrigger className="w-[200px] cursor-pointer bg-white">
-              <SelectValue placeholder="Cooking Time" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Cooking Time</SelectLabel>
-                <SelectItem value="all" className="cursor-pointer">
-                  All
-                </SelectItem>
-                <SelectItem value="quick" className="cursor-pointer">
-                  {"<"} 30 minutes
-                </SelectItem>
-                <SelectItem value="medium" className="cursor-pointer">
-                  30–60 minutes
-                </SelectItem>
-                <SelectItem value="long" className="cursor-pointer">
-                  1-2 hours
-                </SelectItem>
-                <SelectItem value="veryLong" className="cursor-pointer">
-                  {">"} 2 hours
-                </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          <TabsList className="flex justify-center gap-6">
+        <h2 className="flex flex-1 text-2xl cursor-pointer font-bold mb-4 text-card-foreground items-center gap-1">
+          <Link className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
+            Explore Recipes
+          </Link>
+        </h2>
+        <div className="flex flex-col md:flex-row flex-wrap justify-between gap-2 flex-1 mb-6">
+          <TabsList className="flex h-fit flex-wrap justify-center md:justify-start gap-2">
             <TabsTrigger value="all" className="cursor-pointer">
               All
             </TabsTrigger>
@@ -221,33 +272,69 @@ const HomePage = () => {
               Drink
             </TabsTrigger>
           </TabsList>
-
-          <Select
-            onValueChange={(val) => {
-              setSort(val);
-            }}
-          >
-            <SelectTrigger className="w-[200px] cursor-pointer bg-white">
-              <SelectValue placeholder="Sort by: Default" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Sorting</SelectLabel>
-                <SelectItem value="default" className="cursor-pointer">
-                  Sort by: Default
-                </SelectItem>
-                <SelectItem value="liked" className="cursor-pointer">
-                  Sort by: Most Liked
-                </SelectItem>
-                <SelectItem value="newest" className="cursor-pointer">
-                  Sort by: Newest
-                </SelectItem>
-                <SelectItem value="oldest" className="cursor-pointer">
-                  Sort by: Oldest
-                </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-row justify-between gap-12 md:gap-8 w-full sm:w-auto">
+            <div className="flex flex-1 flex-row gap-2 items-center">
+              <a className="flex text-xs uppercase text-muted-foreground whitespace-nowrap">
+                Time
+              </a>
+              <Select
+                className=""
+                onValueChange={(val) => {
+                  setCookingTime(val === "all" ? "" : val);
+                }}
+              >
+                <SelectTrigger className="flex flex-1 md:w-[150px] cursor-pointer ">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="all" className="cursor-pointer">
+                      All
+                    </SelectItem>
+                    <SelectItem value="quick" className="cursor-pointer">
+                      {"<"} 30 minutes
+                    </SelectItem>
+                    <SelectItem value="medium" className="cursor-pointer">
+                      30–60 minutes
+                    </SelectItem>
+                    <SelectItem value="long" className="cursor-pointer">
+                      1-2 hours
+                    </SelectItem>
+                    <SelectItem value="veryLong" className="cursor-pointer">
+                      {">"} 2 hours
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-1 flex-row gap-2 items-center">
+              <a className="flex text-xs uppercase text-muted-foreground whitespace-nowrap">
+                Sort by
+              </a>
+              <Select
+                onValueChange={(val) => {
+                  setSort(val);
+                }}
+              >
+                <SelectTrigger className="flex-1 md:w-[150px] cursor-pointer ">
+                  <SelectValue placeholder="Newest" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="liked" className="cursor-pointer">
+                      Most Liked
+                    </SelectItem>
+                    <SelectItem value="newest" className="cursor-pointer">
+                      Newest
+                    </SelectItem>
+                    <SelectItem value="oldest" className="cursor-pointer">
+                      Oldest
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
 
         {recipes.length > 0 && (

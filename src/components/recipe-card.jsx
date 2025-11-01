@@ -105,15 +105,15 @@ const RecipeCard = ({ recipe }) => {
   }, [user, recipe]);
 
   return (
-    <Card className="mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out hover:translate-y-0.5 hover:scale-105">
+    <Card className="mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out">
       {/* Cover image */}
       <Link to={`/recipes/${recipe._id}`}>
-        <div className="cursor-pointer  ">
+        <div className="cursor-pointer overflow-hidden  ">
           <img
             src={recipe.coverImage || "https://via.placeholder.com/300"}
             alt={recipe.title}
-            className="h-36 w-full object-cover"
-            //  transition ease-in-out delay-150 duration-300 hover:scale-105
+            className=" h-36 w-full object-cover
+             transition ease-in-out delay-150 duration-300 hover:scale-105"
           />
         </div>
       </Link>
