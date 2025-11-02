@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import api from "../lib/api";
+import api from "@/lib/api";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check, RotateCcw } from "lucide-react";
-import logo from "../assets/images/Recipedia-logo-square.svg";
+import logo from "@/assets/images/Recipedia-logo-square.svg";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
+
 const VerifyCodePage = () => {
   const [params] = useSearchParams();
   const email = params.get("email");

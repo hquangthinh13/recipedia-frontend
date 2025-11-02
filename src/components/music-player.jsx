@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import {
   Tooltip,
@@ -8,16 +8,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
-import { formatTime } from "../lib/formatTime";
-import Track1 from "../assets/songs/12DP.mp3";
-import Track1Art from "../assets/songs/12DP.jpg";
-import Track2 from "../assets/songs/MysteriousPower.mp3";
-import Track2Art from "../assets/songs/MysteriousPower.jpg";
+import { formatTime } from "@/lib/formatTime";
+import Track1 from "@/assets/songs/12DP.mp3";
+import Track1Art from "@/assets/songs/12DP.jpg";
+import Track2 from "@/assets/songs/MysteriousPower.mp3";
+import Track2Art from "@/assets/songs/MysteriousPower.jpg";
 
-import Track3 from "../assets/songs/TheFateOfOphelia.mp3";
-import Track3Art from "../assets/songs/TheFateOfOphelia.webp";
-import Track4 from "../assets/songs/Wood.mp3";
-import Track4Art from "../assets/songs/TheFateOfOphelia.webp";
+import Track3 from "@/assets/songs/TheFateOfOphelia.mp3";
+import Track3Art from "@/assets/songs/TheFateOfOphelia.webp";
+import Track4 from "@/assets/songs/Wood.mp3";
+import Track4Art from "@/assets/songs/TheFateOfOphelia.webp";
 const songsList = [
   {
     title: "Barbie in the 12 Dancing Princesses Theme",

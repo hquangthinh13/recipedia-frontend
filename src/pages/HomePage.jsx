@@ -1,28 +1,23 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-
-import { useAuth } from "../context/AuthContext";
-import api from "../lib/api";
-import pattern from "../assets/images/Recipedia_Pattern.svg";
-import Spinner from "../components/spinner";
-import { Flame, ArrowUpRight, Home } from "lucide-react";
-
-import background from "../assets/images/Background.png";
-import Navbar from "../components/navbar";
+import { useAuth } from "@/context/AuthContext";
+import api from "@/lib/api";
+import pattern from "@/assets/images/Recipedia_Pattern.svg";
+import Spinner from "@/components/spinner";
+import { Flame } from "lucide-react";
+import Navbar from "@/components/navbar";
 import { useState } from "react";
-import RecipeCard from "../components/recipe-card";
-import HomeLinkCard from "../components/home-link-card";
+import RecipeCard from "@/components/recipe-card";
+import HomeLinkCard from "@/components/home-link-card";
 import { Button } from "@/components/ui/button";
-import CarouselBanner from "../components/carousel-banner";
-import Footer from "../components/page-footer";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Footer from "@/components/page-footer";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -36,7 +31,6 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 
 const HomePage = () => {
-  const { user, setUser, token } = useAuth();
   const [recipes, setRecipes] = useState([]);
   const [topWeeklyRecipes, setTopWeeklyRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -114,7 +108,6 @@ const HomePage = () => {
     if (initialCooking) setCookingTime(initialCooking);
     if (initialDish) setDishType(initialDish);
     if (initialSort) setSort(initialSort);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

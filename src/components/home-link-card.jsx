@@ -1,11 +1,8 @@
 import React from "react";
 import { ArrowUpRight } from "lucide-react";
-// import img2 from "../assets/images/pho.jpg";
-// import img1 from "../assets/images/image1.jpg";
-// import img3 from "../assets/images/image3.jpg";
-import img1 from "../assets/images/overcooked3.jpg";
-import img2 from "../assets/images/overcooked0.jpg";
-import img3 from "../assets/images/overcooked2.jpg";
+import img1 from "@/assets/images/overcooked3.jpg";
+import img2 from "@/assets/images/overcooked0.jpg";
+import img3 from "@/assets/images/overcooked2.jpg";
 
 const HomeLinkCard = ({ index, title }) => {
   // Pick background image based on index

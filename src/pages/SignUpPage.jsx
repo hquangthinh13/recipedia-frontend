@@ -1,15 +1,13 @@
 // src/pages/SignUpPage.jsx
 import React, { useEffect } from "react";
-import api from "../lib/api";
-
-import axios from "axios";
+import api from "@/lib/api";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import loginImage from "../assets/images/overcooked5.jpg";
-import logo from "../assets/images/Recipedia-logo-square.svg";
+import { useAuth } from "@/context/AuthContext";
+import loginImage from "@/assets/images/overcooked5.jpg";
+import logo from "@/assets/images/Recipedia-logo-square.svg";
 import { CookingPot } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

@@ -1,8 +1,5 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
-import Spinner from "./components/spinner";
 import HomePage from "./pages/HomePage";
 import LogInPage from "./pages/LogInPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -16,17 +13,10 @@ import NewPasswordPage from "./pages/NewPasswordPage";
 import AvatarCustomizerPage from "./pages/AvatarCustomizerPage";
 import ProfilePage from "./pages/ProfilePage";
 import UserDashboard from "./pages/UserDashboard";
+
 const App = () => {
-  // const [loading, setLoading] = useState(false);
-  // const location = useLocation();
-  // useEffect(() => {
-  //   setLoading(true);
-  //   const timeout = setTimeout(() => setLoading(false), 500); // simulate load
-  //   return () => clearTimeout(timeout);
-  // }, [location]);
   return (
     <div>
-      {/* {loading && <Spinner />} */}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/recipes/:id" element={<RecipeDetailPage />} />

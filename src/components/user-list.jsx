@@ -3,8 +3,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { UserPlus, UserMinus } from "lucide-react";
-import api from "../lib/api";
-import { useAuth } from "../context/AuthContext";
+import api from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 const UserList = ({ users: initialUsers, type, isOwner, onDeltaFollowing }) => {
   const { user: authUser } = useAuth();

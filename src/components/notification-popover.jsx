@@ -6,10 +6,10 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import api from "../lib/api";
-import { useAuth } from "../context/AuthContext";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { formatDate } from "../lib/formatDate";
+import api from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { formatDate } from "@/lib/formatDate";
 export function NotificationPopover() {
   const { user, token } = useAuth();
   const [open, setOpen] = useState(false);

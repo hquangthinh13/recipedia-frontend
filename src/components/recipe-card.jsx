@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock, Heart, Bookmark, MessageCircle, ChefHat } from "lucide-react";
-import { dishTypeLabels, cookingTimeLabels } from "../lib/enumDisplayMap";
+import { dishTypeLabels, cookingTimeLabels } from "@/lib/enumDisplayMap";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import api from "../lib/api";
+import api from "@/lib/api";
 import { toast } from "sonner";
-import { useAuth } from "../context/AuthContext";
-import { formatDate } from "../lib/formatDate";
+import { useAuth } from "@/context/AuthContext";
+import { formatDate } from "@/lib/formatDate";
 import {
   Tooltip,
   TooltipContent,

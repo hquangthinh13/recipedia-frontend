@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import api from "../lib/api";
-import Navbar from "../components/navbar";
+import api from "@/lib/api";
+import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import Footer from "../components/page-footer";
+import Footer from "@/components/page-footer";
 import {
   Scissors,
   Smile,
@@ -18,13 +18,7 @@ import {
   Check,
   Laugh,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 const AvatarCustomizerPage = () => {
   const navigate = useNavigate();
 

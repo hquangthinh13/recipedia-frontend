@@ -1,6 +1,6 @@
 import React, { use, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../lib/api";
+import api from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Send } from "lucide-react";
-import logo from "../assets/images/Recipedia-logo-square.svg";
+import logo from "@/assets/images/Recipedia-logo-square.svg";
 
 const schema = z.object({
   email: z.string().trim().email("Enter a valid email"),

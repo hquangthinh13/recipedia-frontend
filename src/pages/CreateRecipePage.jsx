@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import api from "../lib/api";
+import api from "@/lib/api";
 import { Link, useNavigate } from "react-router-dom";
-import Navbar from "../components/navbar";
+import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
-import Footer from "../components/page-footer";
-import { useAuth } from "../context/AuthContext";
+import Footer from "@/components/page-footer";
+import { useAuth } from "@/context/AuthContext";
 import { Plus, CookingPot, ArrowLeft, Trash2 } from "lucide-react";
 import {
   Card,
@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
-import { RecipeFormSchema } from "../formSchema/recipeFormSchema"; // schema
+import { RecipeFormSchema } from "@/formSchema/recipeFormSchema"; // schema
 import {
   Form,
   FormControl,

@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
-import logo from "../assets/images/Recipedia-logo-square.svg";
+import logo from "@/assets/images/Recipedia-logo-square.svg";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, Bell, ChefHat, House } from "lucide-react";
+import { Plus } from "lucide-react";
 import { NotificationPopover } from "./notification-popover";
 
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,

@@ -1,22 +1,20 @@
 import React, { useEffect } from "react";
-import api from "../lib/api";
+import api from "@/lib/api";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { LoginFormSchema } from "../formSchema/loginFormSchema"; // schema
+import { useForm } from "react-hook-form";
+import { LoginFormSchema } from "@/formSchema/loginFormSchema"; // schema
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import loginImage from "../assets/images/overcooked2.jpg";
-import logo from "../assets/images/Recipedia-logo-square.svg";
+import { useAuth } from "@/context/AuthContext";
+import loginImage from "@/assets/images/overcooked2.jpg";
+import logo from "@/assets/images/Recipedia-logo-square.svg";
 import { CookingPot } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
-  FormDescription,
   FormItem,
   FormLabel,
   FormMessage,

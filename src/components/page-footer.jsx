@@ -1,12 +1,11 @@
 import React from "react";
 import { Separator } from "@/components/ui/separator";
-import GitHubLogo from "../assets/images/GitHub-logo.svg";
+import GitHubLogo from "@/assets/images/GitHub-logo.svg";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
     <footer className="mt-6 bottom-0 px-4 max-w-6xl overflow-hidden mx-auto">
-      {/* <div className="p-4"> */}
       <div className="flex flex-col items-center justify-center px-6 pt-6 pb-12 bg-primary rounded-t-md">
         {/* Row 1 */}
         <div className="mt-0 flex flex-row w-full items-center justify-between">
@@ -36,7 +35,6 @@ const Footer = () => {
           </Link>
         </div>
       </div>
-      {/* </div> */}
     </footer>
   );
 };

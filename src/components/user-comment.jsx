@@ -1,6 +1,6 @@
 import React, { use } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { formatDate } from "../lib/formatDate";
+import { formatDate } from "@/lib/formatDate";
 import { Link } from "react-router-dom";
 
 const UserComment = ({ comment }) => {

@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import api from "../lib/api";
+import api from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Link } from "react-router-dom";
-import logo from "../assets/images/Recipedia-logo-square.svg";
+import logo from "@/assets/images/Recipedia-logo-square.svg";
 import { Check } from "lucide-react";
-
 import {
   Form,
   FormControl,

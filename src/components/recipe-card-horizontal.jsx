@@ -13,24 +13,18 @@ import {
   SquarePen,
   Trash,
 } from "lucide-react";
-import { dishTypeLabels, cookingTimeLabels } from "../lib/enumDisplayMap";
+import { dishTypeLabels, cookingTimeLabels } from "@/lib/enumDisplayMap";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import api from "../lib/api";
+import api from "@/lib/api";
 import { toast } from "sonner";
-import { useAuth } from "../context/AuthContext";
-import { formatDate } from "../lib/formatDate";
+import { useAuth } from "@/context/AuthContext";
+import { formatDate } from "@/lib/formatDate";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 const RecipeCardHorizontal = ({
   recipe,

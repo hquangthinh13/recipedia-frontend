@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import Navbar from "../components/navbar";
-import Footer from "../components/page-footer";
-import RecipeCardHorizontal from "../components/recipe-card-horizontal";
-import coverImage from "../assets/images/overcooked0.jpg";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/page-footer";
+import RecipeCardHorizontal from "@/components/recipe-card-horizontal";
+import coverImage from "@/assets/images/overcooked0.jpg";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import Spinner from "../components/spinner";
+import Spinner from "@/components/spinner";
 import { toast } from "sonner";
 import { UserPlus, UserMinus, SquarePen } from "lucide-react";
 import {
@@ -26,14 +26,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import EditRecipeForm from "../components/edit-recipe-form";
+import EditRecipeForm from "@/components/edit-recipe-form";
 
-import api from "../lib/api";
-import { useAuth } from "../context/AuthContext";
+import api from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 import { format } from "date-fns";
-import { getTotalLikes } from "../lib/getTotalLikes";
-import { formatFollowerCount } from "../lib/formatFollowerCount";
-import UserList from "../components/user-list";
+import { getTotalLikes } from "@/lib/getTotalLikes";
+import { formatFollowerCount } from "@/lib/formatFollowerCount";
+import UserList from "@/components/user-list";
 const ProfilePage = () => {
   const { id } = useParams();
   const [editOpen, setEditOpen] = useState(false);

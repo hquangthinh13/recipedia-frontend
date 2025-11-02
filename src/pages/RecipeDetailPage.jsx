@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as htmlToImage from "html-to-image";
 import { saveAs } from "file-saver";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { dishTypeLabels, cookingTimeLabels } from "../lib/enumDisplayMap";
+import { dishTypeLabels, cookingTimeLabels } from "@/lib/enumDisplayMap";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -21,7 +21,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import Footer from "../components/page-footer";
+import Footer from "@/components/page-footer";
 import {
   Check,
   Clock,
@@ -39,22 +39,17 @@ import {
 } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import { useParams } from "react-router-dom";
-import api from "../lib/api";
-import Navbar from "../components/navbar";
-import UserComment from "../components/user-comment";
-import Spinner from "../components/spinner";
-import { MusicPlayer } from "../components/music-player";
-import { useAuth } from "../context/AuthContext";
+import api from "@/lib/api";
+import Navbar from "@/components/navbar";
+import UserComment from "@/components/user-comment";
+import Spinner from "@/components/spinner";
+import { MusicPlayer } from "@/components/music-player";
+import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { formatDate } from "@/lib/formatDate";
+
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
-import { formatDate } from "../lib/formatDate";
 
 const RecipeDetailPage = () => {
   const { id } = useParams();
@@ -64,8 +59,8 @@ const RecipeDetailPage = () => {
   const [isCommentFocused, setIsCommentFocused] = useState(false);
   const { user, setUser } = useAuth();
   const [comments, setComments] = useState([]);
-  const location = useLocation(); // 👈 to read state from navigation
-  const commentInputRef = useRef(null); // 👈 ref for textarea
+  const location = useLocation(); // to read state from navigation
+  const commentInputRef = useRef(null); // ref for textarea
   const [selected, setSelected] = useState("1X");
   const options = ["½X", "1X", "2X"];
   const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
@@ -77,39 +72,60 @@ const RecipeDetailPage = () => {
 
   const handleExport = async () => {
     if (!cardRef.current) return;
+
     try {
-      // Clone the card node
+      // Wait for fonts & layout to be ready
+      await document.fonts.ready;
+
+      // Clone the card to avoid altering live layout
       const clone = cardRef.current.cloneNode(true);
 
-      // Create outer and inner wrappers
+      // Expand any scrollable content (like ingredients tables)
+      const scrollables = clone.querySelectorAll("*");
+      scrollables.forEach((el) => {
+        const computed = window.getComputedStyle(el);
+        if (
+          computed.overflow === "auto" ||
+          computed.overflowY === "auto" ||
+          computed.overflowY === "scroll"
+        ) {
+          el.style.overflow = "visible";
+          el.style.maxHeight = "none";
+          el.style.height = "auto";
+        }
+      });
+
+      // Create wrapper containers
       const outerWrapper = document.createElement("div");
       outerWrapper.style.display = "flex";
       outerWrapper.style.justifyContent = "center";
       outerWrapper.style.backgroundColor = "#fcfcfc";
       outerWrapper.style.width = "fit-content";
       outerWrapper.style.maxWidth = "100%";
-      // Limit the width
+
       const innerWrapper = document.createElement("div");
       innerWrapper.style.width = "800px";
       innerWrapper.style.maxWidth = "100%";
       innerWrapper.style.padding = "8px";
       innerWrapper.style.backgroundColor = "#fcfcfc";
       innerWrapper.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
-      innerWrapper.appendChild(clone);
+      innerWrapper.style.borderRadius = "8px";
 
+      innerWrapper.appendChild(clone);
       outerWrapper.appendChild(innerWrapper);
       document.body.appendChild(outerWrapper);
 
-      // Export
+      // Export to PNG with consistent resolution
       const dataUrl = await htmlToImage.toPng(outerWrapper, {
         pixelRatio: 2,
         backgroundColor: "#fcfcfc",
+        cacheBust: true, // ensures fresh assets
       });
 
-      // Clean up
+      // Clean up temp elements
       document.body.removeChild(outerWrapper);
 
-      // Download
+      // Trigger download
       saveAs(dataUrl, `Recipedia - ${recipe.title || "recipe"}.png`);
     } catch (error) {
       console.error("Export failed:", error);
