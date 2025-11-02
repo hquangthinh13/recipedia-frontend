@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,6 +47,10 @@ const ForgotPasswordPage = () => {
     }
   };
 
+  useEffect(() => {
+    document.title = "Recipedia | Reset Password";
+  }, []);
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-primary">
       <Card className="max-w-md w-full">
@@ -55,7 +59,7 @@ const ForgotPasswordPage = () => {
             <img src={logo} alt="Recipedia Logo" className="h-9" />
             Recipedia
           </Link>
-          <CardTitle>Forgot Password?</CardTitle>
+          <CardTitle>Change your Password?</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>

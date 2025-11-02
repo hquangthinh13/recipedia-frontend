@@ -101,7 +101,18 @@ const Navbar = () => {
                   >
                     Dress Your Chef
                   </DropdownMenuItem>
-
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => navigate("/analytics")}
+                  >
+                    View Analytics
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => navigate("/change-password")}
+                  >
+                    Change Password
+                  </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer" onClick={logout}>
                     Log out
                   </DropdownMenuItem>

@@ -1,10 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
+import * as htmlToImage from "html-to-image";
+import { saveAs } from "file-saver";
 import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { dishTypeLabels, cookingTimeLabels } from "../lib/enumDisplayMap";
 import { Separator } from "@/components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Table,
   TableHeader,
@@ -28,6 +35,7 @@ import {
   MessageSquareText,
   MessageSquarePlus,
   X,
+  ImageDown,
 } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import { useParams } from "react-router-dom";
@@ -35,6 +43,7 @@ import api from "../lib/api";
 import Navbar from "../components/navbar";
 import UserComment from "../components/user-comment";
 import Spinner from "../components/spinner";
+import { MusicPlayer } from "../components/music-player";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
 import {
@@ -64,10 +73,52 @@ const RecipeDetailPage = () => {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const [favorite, setFavorite] = useState(false);
+  const cardRef = useRef(null);
+
+  const handleExport = async () => {
+    if (!cardRef.current) return;
+    try {
+      // Clone the card node
+      const clone = cardRef.current.cloneNode(true);
+
+      // Create outer and inner wrappers
+      const outerWrapper = document.createElement("div");
+      outerWrapper.style.display = "flex";
+      outerWrapper.style.justifyContent = "center";
+      outerWrapper.style.backgroundColor = "#fcfcfc";
+      outerWrapper.style.width = "fit-content";
+      outerWrapper.style.maxWidth = "100%";
+      // Limit the width
+      const innerWrapper = document.createElement("div");
+      innerWrapper.style.width = "800px";
+      innerWrapper.style.maxWidth = "100%";
+      innerWrapper.style.padding = "8px";
+      innerWrapper.style.backgroundColor = "#fcfcfc";
+      innerWrapper.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
+      innerWrapper.appendChild(clone);
+
+      outerWrapper.appendChild(innerWrapper);
+      document.body.appendChild(outerWrapper);
+
+      // Export
+      const dataUrl = await htmlToImage.toPng(outerWrapper, {
+        pixelRatio: 2,
+        backgroundColor: "#fcfcfc",
+      });
+
+      // Clean up
+      document.body.removeChild(outerWrapper);
+
+      // Download
+      saveAs(dataUrl, `Recipedia - ${recipe.title || "recipe"}.png`);
+    } catch (error) {
+      console.error("Export failed:", error);
+    }
+  };
 
   const handleFavorite = async () => {
     if (!token) {
-      toast.error("Please log in first.");
+      toast.error("Please log in first");
       return;
     }
     try {
@@ -75,7 +126,7 @@ const RecipeDetailPage = () => {
       setFavorite(res.data.isFavorite);
       toast.success(res.data.message);
 
-      // ✅ Update global user favorites so both pages sync
+      // Update global user favorites so both pages sync
       setUser((prev) => {
         if (!prev) return prev;
         const updatedFavorites = res.data.isFavorite
@@ -106,7 +157,7 @@ const RecipeDetailPage = () => {
       toast.success("Comment added!");
     } catch (error) {
       console.error("Error posting comment:", error);
-      toast.error("Failed to add comment.");
+      toast.error("Failed to add comment");
     }
   };
 
@@ -114,14 +165,15 @@ const RecipeDetailPage = () => {
     setNewComment("");
     setIsCommentFocused(false);
   };
+
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
         const { data } = await api.get(`/recipes/${id}`);
         console.log("Fetched recipe:", data);
         setRecipe(data);
-        setRecipe(data);
         setComments(data.comments || []);
+        document.title = `Recipedia | ${data.title}`;
       } catch (err) {
         console.error("Error fetching recipe:", err);
       } finally {
@@ -159,7 +211,12 @@ const RecipeDetailPage = () => {
         <Spinner />
       </div>
     );
-  if (!recipe) return <div className="p-4">Recipe not found.</div>;
+  if (!recipe)
+    return (
+      <div className="w-screen h-screen flex items-center justify-center">
+        Recipe not found.
+      </div>
+    );
 
   // Ingredients (already an array of objects per schema)
   const ingredients = Array.isArray(recipe.ingredients)
@@ -193,14 +250,25 @@ const RecipeDetailPage = () => {
     <div className="min-h-screen">
       <Navbar />
       <div className="mx-auto max-w-6xl mt-2 p-4">
-        <Link to={"/"}>
-          <Button variant="ghost" className="mb-2 cursor-pointer">
-            <ArrowLeft />
-            <div className="hidden md:flex lg:flex">Back to Recipes</div>
+        <div className="flex flex-row justify-between items-center mb-2">
+          <Link to={"/"}>
+            <Button variant="ghost" className="cursor-pointer">
+              <ArrowLeft />
+              <div className="hidden md:flex lg:flex">Back to Recipes</div>
+            </Button>
+          </Link>
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            className="cursor-pointer"
+          >
+            <ImageDown />
+            <div className="hidden md:flex lg:flex">Save Recipe Card</div>
           </Button>
-        </Link>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-4">
-          <Card className="flex-1 mt-0 overflow-hidden h-fit">
+          <Card ref={cardRef} className="flex-1 mt-0 overflow-hidden h-fit">
             {/* Cover image */}
             {recipe.coverImage && (
               <div className="flex aspect-video w-full overflow-hidden">
@@ -284,11 +352,18 @@ const RecipeDetailPage = () => {
                     <Link to={`/profile/${recipe.author?._id}`}>
                       <div className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-[var(--card-foreground)]">
                         {recipe.author?.name || "Mysterious Chef"}
-                      </div>{" "}
+                      </div>
                     </Link>
-                    <div className="text-xs flex text-gray-400 font-light">
-                      {formatDate(recipe.createdAt)}
-                    </div>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="text-xs flex text-gray-400 font-light">
+                          {formatDate(recipe.createdAt)}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{new Date(recipe.createdAt).toLocaleString()}</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
               </div>
@@ -381,93 +456,96 @@ const RecipeDetailPage = () => {
               </div>
             </CardContent>
           </Card>
-          <Card className="lg:w-sm mt-0 h-fit">
-            <CardContent className="space-y-6 p-6">
-              {/* Comments Section */}
-              <div className="space-y-2">
-                {/* Title */}
-                <div className="flex justify-start items-center gap-2">
-                  <h2 className="text-2xl font-bold text-[var(--card-foreground)] antialiased">
-                    Discussions
-                  </h2>
-                  <MessageSquareText className="text-accent" />
-                </div>
-                {user && (
-                  <div className="flex gap-3 mt-4">
-                    <Avatar className="w-10 h-10 flex-shrink-0">
-                      <AvatarImage
-                        src={
-                          user?.avatar ||
-                          `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
-                            user?.name || "U"
-                          )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`
-                        }
-                        alt={user?.name || "Your avatar"}
-                      />
-                      <AvatarFallback>
-                        {user?.name?.[0]?.toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    <div className="flex-1">
-                      <Textarea
-                        ref={commentInputRef}
-                        placeholder="Add a comment..."
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        onFocus={() => setIsCommentFocused(true)}
-                        className={`resize-none border-0 border-b-2 rounded-none focus:border-none transition-all duration-200 ${
-                          isCommentFocused ? "min-h-[80px]" : "min-h-[40px]"
-                        }`}
-                        rows={isCommentFocused ? 3 : 1}
-                      />
-                      {isCommentFocused && (
-                        <div className="flex justify-end gap-2 mt-3">
-                          <Button
-                            variant="ghost"
-                            // size="sm"
-                            onClick={handleCommentCancel}
-                            className="text-muted-foreground hover:text-foreground cursor-pointer"
-                          >
-                            {" "}
-                            <X />
-                            Cancel
-                          </Button>
-                          <Button
-                            onClick={handleCommentSubmit}
-                            disabled={!newComment.trim()}
-                            // size="sm"
-                            // variant="default"
-                            className="cursor-pointer"
-                          >
-                            {" "}
-                            <MessageSquarePlus />
-                            Comment
-                          </Button>
-                        </div>
-                      )}
-                    </div>
+          <div className="flex flex-col gap-4">
+            <MusicPlayer />{" "}
+            <Card className="lg:w-sm mt-0 h-fit">
+              <CardContent className="space-y-6 p-6">
+                {/* Comments Section */}
+                <div className="space-y-2">
+                  {/* Title */}
+                  <div className="flex justify-start items-center gap-2">
+                    <h2 className="text-2xl font-bold text-card-foreground antialiased">
+                      Discussions
+                    </h2>
+                    <MessageSquareText className="text-accent" />
                   </div>
-                )}
-              </div>
+                  {user && (
+                    <div className="flex gap-3 mt-4">
+                      <Avatar className="w-10 h-10 flex-shrink-0">
+                        <AvatarImage
+                          src={
+                            user?.avatar ||
+                            `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
+                              user?.name || "U"
+                            )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`
+                          }
+                          alt={user?.name || "Your avatar"}
+                        />
+                        <AvatarFallback>
+                          {user?.name?.[0]?.toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
 
-              {/* Comments Section */}
+                      <div className="flex-1">
+                        <Textarea
+                          ref={commentInputRef}
+                          placeholder="Add a comment..."
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                          onFocus={() => setIsCommentFocused(true)}
+                          className={`resize-none border-0 border-b-2 rounded-none focus:border-none transition-all duration-200 ${
+                            isCommentFocused ? "min-h-[80px]" : "min-h-[40px]"
+                          }`}
+                          rows={isCommentFocused ? 3 : 1}
+                        />
+                        {isCommentFocused && (
+                          <div className="flex justify-end gap-2 mt-3">
+                            <Button
+                              variant="ghost"
+                              // size="sm"
+                              onClick={handleCommentCancel}
+                              className="text-muted-foreground hover:text-foreground cursor-pointer"
+                            >
+                              {" "}
+                              <X />
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={handleCommentSubmit}
+                              disabled={!newComment.trim()}
+                              // size="sm"
+                              // variant="default"
+                              className="cursor-pointer"
+                            >
+                              {" "}
+                              <MessageSquarePlus />
+                              Comment
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-              {/* <Separator className="my-2" /> */}
-              {/* Comment List */}
-              <div className="mt-6">
-                {comments.length > 0 ? (
-                  comments.map((comment) => (
-                    <UserComment key={comment._id} comment={comment} />
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    No comments yet. Be the first to share your thoughts!
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>{" "}
+                {/* Comments Section */}
+
+                {/* <Separator className="my-2" /> */}
+                {/* Comment List */}
+                <div className="mt-6">
+                  {comments.length > 0 ? (
+                    comments.map((comment) => (
+                      <UserComment key={comment._id} comment={comment} />
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No comments yet. Be the first to share your thoughts!
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>{" "}
+          </div>
         </div>
       </div>
       <Footer />

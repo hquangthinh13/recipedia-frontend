@@ -104,6 +104,8 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+    document.title = "Recipedia | Home";
+
     // On first load, hydrate filters from URL (if present)
     // This runs only once; subsequent changes come from user actions.
     const initialCooking = searchParams.get("cookingTime") || "";

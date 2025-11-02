@@ -15,7 +15,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import NewPasswordPage from "./pages/NewPasswordPage";
 import AvatarCustomizerPage from "./pages/AvatarCustomizerPage";
 import ProfilePage from "./pages/ProfilePage";
-
+import UserDashboard from "./pages/UserDashboard";
 const App = () => {
   // const [loading, setLoading] = useState(false);
   // const location = useLocation();
@@ -34,12 +34,13 @@ const App = () => {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/create" element={<CreateRecipePage />} />
         <Route path="/verify/:token" element={<EmailVerificationPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/change-password" element={<ForgotPasswordPage />} />
         <Route path="/verify-reset-code" element={<VerifyResetCodePage />} />
         <Route path="/reset-password" element={<NewPasswordPage />} />
         <Route path="/verify-code" element={<VerifyCodePage />} />
         <Route path="/customize-avatar" element={<AvatarCustomizerPage />} />
         <Route path="/profile/:id" element={<ProfilePage />} />
+        <Route path="/analytics" element={<UserDashboard />} />
       </Routes>
     </div>
   );

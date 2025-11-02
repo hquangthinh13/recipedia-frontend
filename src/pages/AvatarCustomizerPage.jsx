@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import api from "../lib/api";
 import Navbar from "../components/navbar";
 import { Button } from "@/components/ui/button";
@@ -47,7 +47,9 @@ const AvatarCustomizerPage = () => {
   const [nose, setNose] = useState("curve");
   // === Current active section ===
   const [activeFeature, setActiveFeature] = useState("hair");
-
+  useEffect(() => {
+    document.title = "Recipedia | Dress your Chef";
+  }, []);
   const avatarUrl =
     `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true
   &baseColor=${skinColor}

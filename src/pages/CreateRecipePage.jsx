@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import api from "../lib/api";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
@@ -46,7 +46,9 @@ const CreateRecipePage = () => {
   const [loading, setLoading] = useState(false);
 
   if (!user) navigate("/login");
-
+  useEffect(() => {
+    document.title = "Recipedia | Create Recipe";
+  }, []);
   function previewFiles(file) {
     const reader = new FileReader();
     reader.readAsDataURL(file);

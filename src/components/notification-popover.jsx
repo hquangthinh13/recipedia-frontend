@@ -102,8 +102,8 @@ export function NotificationPopover() {
             {notifications.map((n) => (
               <div
                 key={n._id}
-                className={`flex flex-row gap-2 items-center cursor-pointer p-3 text-sm hover:bg-accent ${
-                  n.isRead ? "text-muted-foreground" : "font-medium"
+                className={`flex flex-row gap-2 items-center cursor-pointer p-3 text-sm hover:bg-secondary ${
+                  n.isRead ? "text-muted-foreground" : "bg-secondary"
                 }`}
               >
                 <Avatar className="h-8 w-8 align-middle">
@@ -112,11 +112,13 @@ export function NotificationPopover() {
                 <div className="flex flex-col gap-1">
                   <div className="flex flex-col">
                     <span className="">
-                      <strong>{n.sender?.name || "Someone"} </strong>{" "}
+                      <span className="text-foreground font-medium">
+                        {n.sender?.name || "Someone"}{" "}
+                      </span>{" "}
                       {n.type === "like"
-                        ? "liked your recipe:"
+                        ? "liked your recipe"
                         : n.type === "comment"
-                        ? "commented on your recipe:"
+                        ? "commented:"
                         : n.type === "follow"
                         ? "started following you."
                         : ""}

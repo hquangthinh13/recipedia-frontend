@@ -1,5 +1,5 @@
 // src/pages/SignUpPage.jsx
-import React from "react";
+import React, { useEffect } from "react";
 import api from "../lib/api";
 
 import axios from "axios";
@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import loginImage from "../assets/images/image0.jpg";
+import loginImage from "../assets/images/overcooked5.jpg";
 import logo from "../assets/images/Recipedia-logo-square.svg";
 import { CookingPot } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -48,6 +48,9 @@ const SignUpFormSchema = z
 const SignUpPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  useEffect(() => {
+    document.title = "Recipedia | Sign Up";
+  }, []);
   const form = useForm({
     resolver: zodResolver(SignUpFormSchema),
     defaultValues: {
@@ -89,16 +92,19 @@ const SignUpPage = () => {
   return (
     <div
       style={{ backgroundImage: `url(${loginImage})` }}
-      className="bg-cover bg-center flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10"
+      className="bg-cover bg-center flex min-h-svh flex-col items-center md:items-start justify-center gap-6 p-6 md:p-10"
     >
       <div className="flex w-full mx-0 md:mx-18 lg:mx-18 max-w-sm flex-col gap-6">
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader className="text-center">
-              <a className="flex items-center gap-2 self-center font-medium mb-6">
+              <Link
+                to={"/"}
+                className="flex items-center gap-2 self-center font-medium mb-2"
+              >
                 <img src={logo} alt="Recipedia Logo" className="h-9" />
                 Recipedia
-              </a>
+              </Link>
               <CardTitle className="text-xl">Create your account</CardTitle>
               <CardDescription>Join the feast.</CardDescription>
             </CardHeader>
@@ -208,10 +214,10 @@ const SignUpPage = () => {
             </CardContent>
           </Card>
 
-          <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
+          {/* <div className="text-white *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
             By signing up, you agree to our <a>Terms of Service</a> and{" "}
             <a>Privacy Policy</a>.
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

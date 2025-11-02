@@ -3,7 +3,7 @@ import { useParams, useLocation } from "react-router-dom";
 import Navbar from "../components/navbar";
 import Footer from "../components/page-footer";
 import RecipeCardHorizontal from "../components/recipe-card-horizontal";
-import coverImage from "../assets/images/Background.png";
+import coverImage from "../assets/images/overcooked0.jpg";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 import { Separator } from "@/components/ui/separator";
@@ -111,6 +111,7 @@ const ProfilePage = () => {
         setProfile(res.data.user);
         setRecipes(res.data.recipes);
         setIsFollowing(res.data.isFollowing || false);
+        document.title = `Kitchen | ${res.data.user.name}`;
       } catch (err) {
         console.error("Failed to fetch profile:", err);
       } finally {
@@ -141,43 +142,26 @@ const ProfilePage = () => {
       <Navbar />
 
       {/* Kitchen Section */}
-      <div className="flex flex-col mx-auto max-w-6xl px-4 pb-4">
+      <div className="flex mt-2 flex-col mx-auto max-w-lg px-4 py-4">
         <Card>
-          {/* cover + avatar */}
-          <div className="relative w-full flex flex-col items-center">
-            {/* Cover Image */}
-            <div className="w-full overflow-hidden  h-32 md:h-48">
-              <img
-                src={coverImage}
-                alt="Cover"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Avatar — positioned inside the same group */}
-            <div className=" absolute left-1/2 bottom-0 translate-y-1/2 transform -translate-x-1/2 rounded-full outline-white outline-4">
-              <Avatar className="object-cover w-36 h-36 cursor-pointer hover:brightness-95 transition duration-300 ">
-                <AvatarImage
-                  src={profile.avatar || FallBackAvatar}
-                  alt={profile.name}
-                />
-              </Avatar>
-            </div>
-          </div>
-          <CardContent>
+          {/* <img
+            src={coverImage}
+            alt={profile.name}
+            className="object-cover w-full h-24 cursor-pointer hover:brightness-95 transition duration-300"
+          /> */}
+          <CardContent className="p-4 space-y-4">
             {/* Content directly below the grouped block */}
-            <div className="pt-20 text-center bg-white">
-              <h2 className=" text-3xl font-bold text-[var(--card-foreground)] antialiased">
+            <div className="text-center">
+              <div className="relative flex justify-center ">
+                <Avatar className="object-cover w-32 h-32 cursor-pointer hover:brightness-95 transition duration-300 ">
+                  <AvatarImage
+                    src={profile.avatar || FallBackAvatar}
+                    alt={profile.name}
+                  />
+                </Avatar>
+              </div>
+              <h2 className="pt-2 text-3xl font-bold text-[var(--card-foreground)] antialiased">
                 {profile.name}{" "}
-                {/* {isOwner ? (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="cursor-pointer"
-                  >
-                    <SquarePen />
-                  </Button>
-                ) : null} */}
               </h2>
               <span className=" text-muted-foreground text-sm leading-2">
                 Joined {joinedDate}
@@ -258,13 +242,15 @@ const ProfilePage = () => {
           </CardContent>
         </Card>
 
-        <div className="mt-4 flex flex-row gap-4 w-full mx-auto justify-center">
-          <div className="mt-2 flex w-lg flex-col gap-2">
-            <div className="flex justify-start items-center gap-2">
-              <h2 className="text-xl font-bold text-[var(--card-foreground)] antialiased">
-                Shared Recipes
-              </h2>
-            </div>
+        <div className="mt-4 flex flex-row gap-4 max-w-lg mx-auto justify-center">
+          <div className="mt-2 flex flex-col gap-2">
+            {recipes.length > 0 ? (
+              <div className="flex justify-start items-center gap-2">
+                <h2 className="text-xl font-bold text-[var(--card-foreground)] antialiased">
+                  Shared Recipes
+                </h2>
+              </div>
+            ) : null}
 
             {recipes.length > 0 ? (
               <div className="grid grid-cols-1 gap-4">
