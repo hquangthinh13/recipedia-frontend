@@ -10,14 +10,8 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/spinner";
 import { toast } from "sonner";
-import { UserPlus, UserMinus, SquarePen } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { UserPlus, UserMinus } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -26,8 +20,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EditRecipeForm from "@/components/edit-recipe-form";
-
 import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { format } from "date-fns";
@@ -41,6 +35,7 @@ const ProfilePage = () => {
   const { user: authUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [recipes, setRecipes] = useState([]);
+  const [favRecipes, setFavRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const isOwner = authUser?._id === id || authUser?.id === id;
   const totalLikes = getTotalLikes(recipes);
@@ -108,7 +103,9 @@ const ProfilePage = () => {
     const fetchProfile = async () => {
       try {
         const res = await api.get(`/users/${id}/profile`);
+        console.log("Profile data:", res.data);
         setProfile(res.data.user);
+        setFavRecipes(res.data.favorites);
         setRecipes(res.data.recipes);
         setIsFollowing(res.data.isFollowing || false);
         document.title = `Kitchen | ${res.data.user.name}`;
@@ -242,46 +239,82 @@ const ProfilePage = () => {
           </CardContent>
         </Card>
 
-        <div className="mt-4 flex flex-row gap-4 max-w-lg mx-auto justify-center">
-          <div className="mt-2 flex flex-col gap-2">
-            {recipes.length > 0 ? (
-              <div className="flex justify-start items-center gap-2">
-                <h2 className="text-xl font-bold text-[var(--card-foreground)] antialiased">
-                  Shared Recipes
-                </h2>
+        <Tabs defaultValue="shared" className="mt-4 ">
+          <TabsList className="">
+            <TabsTrigger className="cursor-pointer" value="shared">
+              Shared Recipes
+            </TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="favorites">
+              Favorites
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="shared">
+            <div className="flex flex-row gap-4 max-w-lg mx-auto justify-center">
+              <div className="mt-2 flex flex-col gap-2">
+                {recipes.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-4">
+                    {recipes.map((r) => (
+                      <RecipeCardHorizontal
+                        key={r._id}
+                        recipe={r}
+                        isOwner={isOwner}
+                        onEdit={(recipe) => {
+                          setEditingRecipe(recipe);
+                          setEditOpen(true);
+                        }}
+                        onDelete={(id) => {
+                          setRecipes((prev) =>
+                            prev.filter((rec) => rec._id !== id)
+                          );
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm text-center">
+                    {isOwner
+                      ? "You haven't shared any recipes yet."
+                      : "This chef hasn’t shared any recipes yet."}
+                  </p>
+                )}
               </div>
-            ) : null}
-
-            {recipes.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4">
-                {recipes.map((r) => (
-                  <RecipeCardHorizontal
-                    key={r._id}
-                    recipe={r}
-                    isOwner={isOwner}
-                    onEdit={(recipe) => {
-                      setEditingRecipe(recipe);
-                      setEditOpen(true);
-                    }}
-                    onDelete={(id) => {
-                      // remove the recipe from the local state
-                      setRecipes((prev) =>
-                        prev.filter((rec) => rec._id !== id)
-                      );
-                    }}
-                  />
-                ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="favorites">
+            <div className="flex flex-row gap-4 max-w-lg mx-auto justify-center">
+              <div className="mt-2 flex flex-col gap-2">
+                {favRecipes.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-4">
+                    {favRecipes.map((r) => (
+                      <RecipeCardHorizontal
+                        key={r._id}
+                        recipe={r}
+                        isOwner={isOwner}
+                        onEdit={(recipe) => {
+                          setEditingRecipe(recipe);
+                          setEditOpen(true);
+                        }}
+                        onDelete={(id) => {
+                          setRecipes((prev) =>
+                            prev.filter((rec) => rec._id !== id)
+                          );
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm text-center">
+                    {isOwner
+                      ? "You haven't saved any recipes yet."
+                      : "This chef hasn’t saved any recipes yet."}
+                  </p>
+                )}
               </div>
-            ) : (
-              <p className="text-muted-foreground text-sm text-center">
-                {isOwner
-                  ? "You haven't shared any recipes yet."
-                  : "This chef hasn’t shared any recipes yet."}
-              </p>
-            )}
-          </div>
-        </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
+      {/* </div> */}
       {/* Kitchen Section */}
 
       <Footer />

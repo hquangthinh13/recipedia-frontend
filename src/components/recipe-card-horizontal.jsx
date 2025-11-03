@@ -24,6 +24,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 
 const RecipeCardHorizontal = ({
@@ -166,14 +176,41 @@ const RecipeCardHorizontal = ({
           {isOwner ? (
             <div className="flex justify-center gap-2">
               {/* Delete */}
-              <Button
-                size="icon"
-                variant="ghost"
-                className="cursor-pointer"
-                onClick={handleDelete}
-              >
-                <Trash />
-              </Button>{" "}
+
+              <Dialog>
+                <DialogTrigger>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="cursor-pointer"
+                  >
+                    <Trash />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Delete recipe?</DialogTitle>
+                    <DialogDescription>
+                      Once deleted, you won’t be able to recover it.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button className="cursor-pointer" variant="outline">
+                        Cancel
+                      </Button>
+                    </DialogClose>
+                    <Button
+                      className="cursor-pointer"
+                      variant="destructive"
+                      onClick={handleDelete}
+                    >
+                      Delete
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
               {/* Edit */}
               <Button
                 size="icon"

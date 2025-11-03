@@ -1,14 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/api";
-import pattern from "@/assets/images/Recipedia_Pattern.svg";
+import Pattern from "@/components/pattern";
 import Spinner from "@/components/spinner";
 import { Flame } from "lucide-react";
 import Navbar from "@/components/navbar";
 import { useState } from "react";
 import RecipeCard from "@/components/recipe-card";
+import UserCard from "@/components/user-card";
 import HomeLinkCard from "@/components/home-link-card";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/page-footer";
@@ -33,6 +33,7 @@ import Autoplay from "embla-carousel-autoplay";
 const HomePage = () => {
   const [recipes, setRecipes] = useState([]);
   const [topWeeklyRecipes, setTopWeeklyRecipes] = useState([]);
+  const [topUsers, setTopUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
   const [cookingTime, setCookingTime] = useState("");
@@ -45,7 +46,17 @@ const HomePage = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const loadMoreRef = useRef(null); // sentinel for infinite scroll
+  const sectionRef = useRef(null);
   const PAGE_SIZE = 6;
+  const scrollToSection = () => {
+    requestAnimationFrame(() => {
+      sectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  };
+
   const fetchTopWeeklyRecipes = async () => {
     try {
       const res = await api.get("/recipes/trending?n=12");
@@ -55,7 +66,15 @@ const HomePage = () => {
       console.error("Error fetching top trending recipes:", error);
     }
   };
-
+  const fetchTopUsers = async () => {
+    try {
+      const res = await api.get("/users/top?limit=6");
+      console.log("Top users:", res.data.topUsers);
+      setTopUsers(res.data.topUsers);
+    } catch (error) {
+      console.error("Error fetching top users.", error);
+    }
+  };
   const fetchRecipes = async ({ append = false } = {}) => {
     try {
       if (append) setIsLoadingMore(true);
@@ -99,7 +118,6 @@ const HomePage = () => {
 
   useEffect(() => {
     document.title = "Recipedia | Home";
-
     // On first load, hydrate filters from URL (if present)
     // This runs only once; subsequent changes come from user actions.
     const initialCooking = searchParams.get("cookingTime") || "";
@@ -111,8 +129,9 @@ const HomePage = () => {
   }, []);
 
   useEffect(() => {
-    fetchRecipes({ append: page > 1 });
     fetchTopWeeklyRecipes();
+    fetchRecipes({ append: page > 1 });
+    fetchTopUsers();
     const token = localStorage.getItem("token");
     if (!token) {
       setLoading(false);
@@ -179,14 +198,23 @@ const HomePage = () => {
       </div>
 
       <div className="max-w-6xl mx-auto my-2 px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-        <HomeLinkCard index={1} title="Discover New Recipes" />
-        <HomeLinkCard index={2} title="Trending This Week" />
-        <HomeLinkCard index={3} title="Chef’s Hall of Fame" />
+        <HomeLinkCard
+          onClick={scrollToSection}
+          index={1}
+          title="Discover New Recipes"
+        />
+        <Link to="/customize-avatar">
+          <HomeLinkCard index={2} title="Dress Your Chef" />
+        </Link>{" "}
+        {/* <Link to="/analytics">
+          <HomeLinkCard index={3} title="Chef's Hall of Fame" />
+        </Link> */}
+        <Link to="/analytics">
+          <HomeLinkCard index={3} title="Check Your Cooking Stats" />
+        </Link>
       </div>
+      <Pattern />
 
-      <div className="hidden lg:flex max-w-6xl px-4 pb-2 items-center justify-center mx-auto mt-0">
-        <img src={pattern} alt="Pattern" />
-      </div>
       <div className="w-full max-w-6xl px-4 mx-auto mt-4">
         <Carousel
           className="relative w-full"
@@ -207,7 +235,7 @@ const HomePage = () => {
             <h2 className="flex flex-1 text-2xl cursor-pointer font-bold mb-4 text-card-foreground items-center gap-1">
               <Flame className="text-primary fill-primary" />
               <Link className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
-                Hot Recipes This Week
+                Trending This Week
               </Link>
             </h2>
 
@@ -223,16 +251,44 @@ const HomePage = () => {
                 className="md:basis-1/2 lg:basis-1/3"
                 key={recipe._id}
               >
-                <RecipeCard recipe={recipe} />
+                <RecipeCard isTrending={true} recipe={recipe} />
               </CarouselItem>
             ))}
           </CarouselContent>
         </Carousel>
       </div>
 
-      <div className="hidden lg:flex max-w-6xl px-4 py-2  items-center justify-center mx-auto mt-2">
-        <img src={pattern} alt="Pattern" />
+      <Pattern />
+
+      <div className="w-full max-w-6xl px-4 mx-auto mt-4">
+        <Carousel className="relative w-full">
+          {/* Header row */}
+          <div className="flex justify-between">
+            <h2 className="flex flex-1 text-2xl cursor-pointer font-bold mb-4 text-card-foreground items-center gap-1">
+              <Link className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
+                Chef's Hall of Fame
+              </Link>
+            </h2>
+
+            <div className="flex justify-end items-center mb-3 gap-2">
+              <CarouselPrevious className="cursor-pointer relative left-auto right-auto top-auto translate-y-0 h-8 w-8" />
+              <CarouselNext className="cursor-pointer relative left-auto right-auto top-auto translate-y-0 h-8 w-8" />
+            </div>
+          </div>
+
+          <CarouselContent>
+            {topUsers.map((user) => (
+              <CarouselItem
+                className="md:basis-1/2 lg:basis-1/3"
+                key={user._id}
+              >
+                <UserCard rank={user.rank} user={user} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
       </div>
+      <Pattern />
 
       <Tabs
         onValueChange={(val) => {
@@ -241,7 +297,10 @@ const HomePage = () => {
         defaultValue="all"
         className="container w-full mx-auto max-w-6xl gap-2 p-4 mt-0 justify-center"
       >
-        <h2 className="flex flex-1 text-2xl cursor-pointer font-bold mb-4 text-card-foreground items-center gap-1">
+        <h2
+          ref={sectionRef}
+          className="scroll-mt-24 flex flex-1 text-2xl cursor-pointer font-bold mb-4 text-card-foreground items-center gap-1"
+        >
           <Link className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
             Explore Recipes
           </Link>
@@ -331,7 +390,16 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-
+        {recipes.length === 0 && !isLoading && (
+          <p className="text-muted-foreground text-sm text-center">
+            No recipes found matching the selected filters.
+          </p>
+        )}
+        {isLoading && page === 1 ? (
+          <div className="w-full h-32 flex items-center justify-center">
+            <Spinner />
+          </div>
+        ) : null}
         {recipes.length > 0 && (
           <div className="grid max-w-6xl mx-auto w-auto grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {recipes.map((recipe) => (

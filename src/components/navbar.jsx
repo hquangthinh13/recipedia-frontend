@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { NotificationPopover } from "./notification-popover";
-
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -15,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { Timer } from "./timer";
 const getDicebearAvatar = (seed) =>
   `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
     seed || "U"
@@ -34,7 +33,7 @@ function getGuestSeed() {
   return seed;
 }
 
-const Navbar = () => {
+const Navbar = ({ needTimer }) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
@@ -46,6 +45,7 @@ const Navbar = () => {
           <Link to={"/"} className="flex flex-1">
             <img src={logo} alt="Recipedia Logo" className="h-12" />
           </Link>
+          {needTimer && <Timer />}
           {/* Right section */}{" "}
           {user ? (
             <div className="flex flex-1 items-center gap-2 justify-end">

@@ -264,7 +264,7 @@ const RecipeDetailPage = () => {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
+      <Navbar needTimer={true} />
       <div className="mx-auto max-w-6xl mt-2 p-4">
         <div className="flex flex-row justify-between items-center mb-2">
           <Link to={"/"}>
@@ -291,7 +291,7 @@ const RecipeDetailPage = () => {
                 <img
                   src={recipe.coverImage}
                   alt={recipe.title}
-                  className="w-full object-cover"
+                  className="w-full object-cover ease-in-out duration-300 hover:brightness-90 hover:scale-105"
                 />
               </div>
             )}
@@ -340,7 +340,6 @@ const RecipeDetailPage = () => {
                 </div>
 
                 {/* Bookmark button on the right */}
-
                 <Button
                   onClick={handleFavorite}
                   size="icon"
@@ -518,7 +517,6 @@ const RecipeDetailPage = () => {
                           <div className="flex justify-end gap-2 mt-3">
                             <Button
                               variant="ghost"
-                              // size="sm"
                               onClick={handleCommentCancel}
                               className="text-muted-foreground hover:text-foreground cursor-pointer"
                             >
@@ -529,11 +527,8 @@ const RecipeDetailPage = () => {
                             <Button
                               onClick={handleCommentSubmit}
                               disabled={!newComment.trim()}
-                              // size="sm"
-                              // variant="default"
                               className="cursor-pointer"
                             >
-                              {" "}
                               <MessageSquarePlus />
                               Comment
                             </Button>

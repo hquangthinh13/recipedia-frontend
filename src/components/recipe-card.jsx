@@ -4,7 +4,15 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, Heart, Bookmark, MessageCircle, ChefHat } from "lucide-react";
+import {
+  Clock,
+  Heart,
+  Bookmark,
+  MessageCircle,
+  ChefHat,
+  TrendingUp,
+  Star,
+} from "lucide-react";
 import { dishTypeLabels, cookingTimeLabels } from "@/lib/enumDisplayMap";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import api from "@/lib/api";
@@ -16,9 +24,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 
-const RecipeCard = ({ recipe }) => {
+const RecipeCard = ({ isTrending, recipe }) => {
   const navigate = useNavigate();
   const commentCount = recipe.comments?.length || 0;
 
@@ -59,7 +72,6 @@ const RecipeCard = ({ recipe }) => {
       toast.error("Please log in to like recipes.");
       return;
     }
-
     try {
       const res = await api.post(`/recipes/${recipe._id}/like`);
       setLiked(res.data.likedByUser);
@@ -80,7 +92,7 @@ const RecipeCard = ({ recipe }) => {
       setFavorite(res.data.isFavorite);
       toast.success(res.data.message);
 
-      // ✅ Update global user favorites so both pages sync
+      // Update global user favorites so both pages sync
       setUser((prev) => {
         if (!prev) return prev;
         const updatedFavorites = res.data.isFavorite
@@ -108,13 +120,19 @@ const RecipeCard = ({ recipe }) => {
     <Card className="mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out">
       {/* Cover image */}
       <Link to={`/recipes/${recipe._id}`}>
-        <div className="cursor-pointer overflow-hidden  ">
+        <div className="cursor-pointer overflow-hidden relative">
           <img
             src={recipe.coverImage || "https://via.placeholder.com/300"}
             alt={recipe.title}
             className=" h-36 w-full object-cover
              transition ease-in-out delay-150 duration-300 hover:scale-105"
           />
+          {isTrending && (
+            <div className="absolute top-4 right-4 bg-primary text-white rounded-full p-1 flex text-center items-center shadow-xl">
+              <TrendingUp className="w-4 h-4" />{" "}
+              {/* <Star className="w-4 h-4 fill-white" />{" "} */}
+            </div>
+          )}
         </div>
       </Link>
 

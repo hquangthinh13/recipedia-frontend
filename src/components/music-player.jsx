@@ -81,10 +81,6 @@ export function MusicPlayer({ playlist = songsList }) {
 
   return (
     <Card className="lg:w-sm mt-0 h-fit">
-      {/* <CardHeader>
-        <CardTitle className="">{currentSong.title}</CardTitle>
-        <p className="text-gray-400">{currentSong.artist}</p>
-      </CardHeader> */}
       <CardContent className="space-y-2 p-6">
         <div className="flex flex-row w-full justify-start items-start gap-4">
           {/* Album artwork */}
@@ -94,14 +90,14 @@ export function MusicPlayer({ playlist = songsList }) {
               alt={currentSong.title}
               className="aspect-square h-32 rounded-sm object-cover shadow-lg ease-in-out duration-300 hover:brightness-90"
             />
-          </div>{" "}
+          </div>
           <audio
             ref={audioRef}
             src={currentSong.src}
             onEnded={() => skipSong(true)}
             onTimeUpdate={() => setCurrentTime(audioRef.current.currentTime)}
             onLoadedMetadata={() => setDuration(audioRef.current.duration)}
-          />{" "}
+          />
           <div className="flex flex-1 flex-col  min-w-0 overflow-hidden items-start gap-0">
             <Tooltip>
               <TooltipTrigger asChild>
