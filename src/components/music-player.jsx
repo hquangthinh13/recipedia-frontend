@@ -13,12 +13,14 @@ import Track1 from "@/assets/songs/12DP.mp3";
 import Track1Art from "@/assets/songs/12DP.jpg";
 import Track2 from "@/assets/songs/MysteriousPower.mp3";
 import Track2Art from "@/assets/songs/MysteriousPower.jpg";
-
+import Track5 from "@/assets/songs/Dong.mp3";
+import Track5Art from "@/assets/songs/Dong.jpeg";
 import Track3 from "@/assets/songs/TheFateOfOphelia.mp3";
 import Track3Art from "@/assets/songs/TheFateOfOphelia.webp";
 import Track4 from "@/assets/songs/Wood.mp3";
 import Track4Art from "@/assets/songs/TheFateOfOphelia.webp";
 const songsList = [
+  { title: "Dong", artist: "Power Station", src: Track5, artwork: Track5Art },
   {
     title: "Barbie in the 12 Dancing Princesses Theme",
     artist: "Fairy Lullaby",
@@ -26,23 +28,18 @@ const songsList = [
     artwork: Track1Art,
   },
   {
-    title: "Mysterious Power",
-    artist: " Ezra Furman & The Harpoons",
-    src: Track2,
-    artwork: Track2Art,
-  },
-  //   {
-  //     title: "Vũ Trụ Cò Bay",
-  //     artist: "Phương Mỹ Chi",
-  //     src: Track2,
-  //     artwork: Track2Art,
-  //   },
-  {
     title: "Wood",
     artist: "Taylor Swift",
     src: Track4,
     artwork: Track4Art,
   },
+  {
+    title: "Mysterious Power",
+    artist: " Ezra Furman & The Harpoons",
+    src: Track2,
+    artwork: Track2Art,
+  },
+
   {
     title: "The Fate of Ophelia",
     artist: "Taylor Swift",
@@ -80,7 +77,7 @@ export function MusicPlayer({ playlist = songsList }) {
   }, [isPlaying, currentSongIndex]);
 
   return (
-    <Card className="lg:w-sm mt-0 h-fit">
+    <Card className="w-full mt-0 h-fit">
       <CardContent className="space-y-2 p-6">
         <div className="flex flex-row w-full justify-start items-start gap-4">
           {/* Album artwork */}

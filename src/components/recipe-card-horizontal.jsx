@@ -178,7 +178,7 @@ const RecipeCardHorizontal = ({
               {/* Delete */}
 
               <Dialog>
-                <DialogTrigger>
+                <DialogTrigger asChild>
                   <Button
                     size="icon"
                     variant="ghost"
@@ -194,7 +194,7 @@ const RecipeCardHorizontal = ({
                       Once deleted, you won’t be able to recover it.
                     </DialogDescription>
                   </DialogHeader>
-                  <DialogFooter>
+                  <DialogFooter className="flex gap-2">
                     <DialogClose asChild>
                       <Button className="cursor-pointer" variant="outline">
                         Cancel

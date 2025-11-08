@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,9 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -82,7 +84,17 @@ const EditRecipeForm = ({ recipe, onClose, onUpdated }) => {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    form.reset({
+      title: recipe.title || "",
+      cookingTime: recipe.cookingTime || "",
+      dishType: recipe.dishType || "",
+      ingredients: recipe.ingredients?.length
+        ? recipe.ingredients
+        : [{ name: "", measurement: "", amount: "" }],
+      instructions: recipe.instructions || "",
+    });
+  }, [recipe, form]);
   return (
     <div className="w-full">
       <Form {...form}>
@@ -120,7 +132,7 @@ const EditRecipeForm = ({ recipe, onClose, onUpdated }) => {
                     <FormLabel>Dish Type</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value ?? ""}
                     >
                       <FormControl>
                         <SelectTrigger className="cursor-pointer h-9 border border-input bg-white">
@@ -153,7 +165,7 @@ const EditRecipeForm = ({ recipe, onClose, onUpdated }) => {
                     <FormLabel>Time to Make</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value ?? ""}
                     >
                       <FormControl>
                         <SelectTrigger className="cursor-pointer h-9 border border-input bg-white">
@@ -184,7 +196,7 @@ const EditRecipeForm = ({ recipe, onClose, onUpdated }) => {
               <FormItem>
                 <FormLabel>Ingredients</FormLabel>
 
-                <div>
+                <div className="flex flex-col gap-2">
                   {fields.map((field, idx) => (
                     <div key={field.id} className="flex gap-2">
                       <FormField
@@ -192,7 +204,12 @@ const EditRecipeForm = ({ recipe, onClose, onUpdated }) => {
                         name={`ingredients.${idx}.amount`}
                         render={({ field }) => (
                           <FormItem className="w-1/6">
-                            <Input placeholder="Amount" {...field} />
+                            <Input
+                              type="number"
+                              step="any"
+                              placeholder="Amount"
+                              {...field}
+                            />
                           </FormItem>
                         )}
                       />
@@ -201,7 +218,133 @@ const EditRecipeForm = ({ recipe, onClose, onUpdated }) => {
                         name={`ingredients.${idx}.measurement`}
                         render={({ field }) => (
                           <FormItem className="w-2/6">
-                            <Input placeholder="Units" {...field} />
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value ?? ""}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="cursor-pointer h-9 border border-input bg-white">
+                                  <SelectValue placeholder="Units" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="max-h-60 overflow-y-auto">
+                                <SelectGroup>
+                                  <SelectLabel>Volume</SelectLabel>
+                                  <SelectItem
+                                    value="tsp"
+                                    className="cursor-pointer"
+                                  >
+                                    tsp (teaspoon)
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="tbsp"
+                                    className="cursor-pointer"
+                                  >
+                                    tbsp (tablespoon)
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="cup"
+                                    className="cursor-pointer"
+                                  >
+                                    cup
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="ml"
+                                    className="cursor-pointer"
+                                  >
+                                    ml
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="l"
+                                    className="cursor-pointer"
+                                  >
+                                    l
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="fl oz"
+                                    className="cursor-pointer"
+                                  >
+                                    fl oz
+                                  </SelectItem>
+                                </SelectGroup>
+
+                                {/* Weight Units */}
+                                <SelectGroup>
+                                  <SelectLabel>Weight</SelectLabel>
+                                  <SelectItem
+                                    value="g"
+                                    className="cursor-pointer"
+                                  >
+                                    g (gram)
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="kg"
+                                    className="cursor-pointer"
+                                  >
+                                    kg (kilogram)
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="oz"
+                                    className="cursor-pointer"
+                                  >
+                                    oz (ounce)
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="lb"
+                                    className="cursor-pointer"
+                                  >
+                                    lb (pound)
+                                  </SelectItem>
+                                </SelectGroup>
+
+                                {/* Count / Other Units */}
+                                <SelectGroup>
+                                  <SelectLabel>Other</SelectLabel>
+                                  <SelectItem
+                                    value="piece"
+                                    className="cursor-pointer"
+                                  >
+                                    piece
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="slice"
+                                    className="cursor-pointer"
+                                  >
+                                    slice
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="clove"
+                                    className="cursor-pointer"
+                                  >
+                                    clove
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="stick"
+                                    className="cursor-pointer"
+                                  >
+                                    stick
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="pinch"
+                                    className="cursor-pointer"
+                                  >
+                                    pinch
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="dash"
+                                    className="cursor-pointer"
+                                  >
+                                    dash
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="handful"
+                                    className="cursor-pointer"
+                                  >
+                                    handful
+                                  </SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
                           </FormItem>
                         )}
                       />

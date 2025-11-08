@@ -24,12 +24,6 @@ const HomeLinkCard = ({ index, title, onClick }) => {
                    transition-transform duration-500 ease-out group-hover:scale-110"
       />
 
-      {/* Overlay darkens on hover */}
-      {/* <span
-        className="absolute inset-0 bg-black/40 transition-colors duration-500
-                   group-hover:bg-black/60"
-      ></span> */}
-      {/* Overlay with gradient + darken on hover */}
       <span
         className="absolute inset-0 bg-gradient-to-bl via-primary/40 to-primary/100 brightness-60
              transition-colors duration-500 group-hover:via-primary/60 group-hover:to-primary/100"

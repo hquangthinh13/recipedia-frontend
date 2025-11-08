@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as htmlToImage from "html-to-image";
 import { saveAs } from "file-saver";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -20,8 +20,17 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Textarea } from "@/components/ui/textarea";
 import Footer from "@/components/page-footer";
+import logo from "@/assets/images/Recipedia-logo-square.svg";
 import {
   Check,
   Clock,
@@ -37,6 +46,15 @@ import {
   X,
   ImageDown,
 } from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { ArrowLeft } from "lucide-react";
 import { useParams } from "react-router-dom";
 import api from "@/lib/api";
@@ -52,6 +70,7 @@ import { formatDate } from "@/lib/formatDate";
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 
 const RecipeDetailPage = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -69,6 +88,76 @@ const RecipeDetailPage = () => {
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const [favorite, setFavorite] = useState(false);
   const cardRef = useRef(null);
+
+  // Add these to your component state (near other useState hooks)
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10); // page size
+  const [totalPages, setTotalPages] = useState(1);
+  // Helper to compute which page numbers to show (with ellipses)
+  const getPageNumbers = () => {
+    const max = totalPages;
+    const current = page;
+    const delta = 1; // how many neighbors to show around current
+    if (max <= 7) return Array.from({ length: max }, (_, i) => i + 1);
+
+    const pages = [1];
+    const left = Math.max(2, current - delta);
+    const right = Math.min(max - 1, current + delta);
+
+    if (left > 2) pages.push("ellipsis-left");
+    for (let p = left; p <= right; p++) pages.push(p);
+    if (right < max - 1) pages.push("ellipsis-right");
+    pages.push(max);
+    return pages;
+  };
+  const handleCommentDeleted = async (deletedId) => {
+    // reload current page; if it becomes empty and not first page, go to previous
+    await fetchComments(page);
+    if (comments.length === 1 && page > 1) {
+      await fetchComments(page - 1);
+    }
+  };
+
+  // Fetch *paginated* comments (call this after the recipe loads)
+  const fetchComments = async (pageToFetch = 1) => {
+    setCommentsLoading(true);
+    try {
+      const res = await api.get(`/recipes/${id}/comments`, {
+        params: { page: pageToFetch, limit },
+      });
+      console.log("Comments: ", res);
+      const list = res.data?.comments || res.data?.data || []; // flexible field name
+      // prefer server totals; fallback to recipe.comments length if needed
+      const totalCount =
+        typeof res.data?.totalCount === "number"
+          ? res.data.totalCount
+          : typeof res.data?.total === "number"
+          ? res.data.total
+          : Array.isArray(recipe?.comments)
+          ? recipe.comments.length
+          : list.length;
+
+      const serverTotalPages =
+        typeof res.data?.totalPages === "number"
+          ? res.data.totalPages
+          : Math.max(1, Math.ceil(totalCount / limit));
+
+      setComments(list);
+      setTotalPages(serverTotalPages);
+      setPage(pageToFetch);
+    } catch (e) {
+      console.error("Failed to fetch comments:", e);
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
+  // After your recipe is fetched, load page 1 of comments
+  useEffect(() => {
+    if (recipe?._id) {
+      fetchComments(1);
+    }
+  }, [recipe?._id, limit]);
 
   const handleExport = async () => {
     if (!cardRef.current) return;
@@ -229,8 +318,34 @@ const RecipeDetailPage = () => {
     );
   if (!recipe)
     return (
-      <div className="w-screen h-screen flex items-center justify-center">
-        Recipe not found.
+      <div className="min-h-screen flex justify-center items-center">
+        <Empty className="h-full">
+          <EmptyHeader>
+            <EmptyMedia>
+              <Link to={"/"} className="flex flex-1">
+                <img src={logo} alt="Recipedia Logo" className="h-12" />
+              </Link>
+            </EmptyMedia>
+            <EmptyTitle>Recipe not found</EmptyTitle>
+            <EmptyDescription>
+              The requested recipe doesn’t exist.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <div className="flex gap-2">
+              <Button className="cursor-pointer" onClick={() => navigate("/")}>
+                Back to Home
+              </Button>
+              {/* <Button
+                className="cursor-pointer"
+                onClick={() => navigate("/")}
+                variant="outline"
+              >
+                Back to Home
+              </Button> */}
+            </div>
+          </EmptyContent>
+        </Empty>{" "}
       </div>
     );
 
@@ -239,10 +354,6 @@ const RecipeDetailPage = () => {
     ? recipe.ingredients
     : [];
 
-  // Instructions split into steps by newlines
-  const instructionsArray = recipe.instructions
-    ? recipe.instructions.split("\n").filter((line) => line.trim() !== "")
-    : [];
   // helper to scale ingredient amounts
   const scaleAmount = (amount, multiplier) => {
     if (!amount) return "";
@@ -307,7 +418,7 @@ const RecipeDetailPage = () => {
                   </div>
 
                   {/* Dish type + Cooking time */}
-                  <div className="flex justify-start items-center gap-6 text-sm text-gray-500">
+                  <div className="md:flex md:flex-row grid grid-cols-2 justify-start items-start md:items-center gap-2 lg:gap-6 text-sm text-gray-500">
                     <div className="flex items-center gap-2">
                       <ChefHat className="h-4 w-4 text-gray-400 " />
                       <span className="text-base text-gray-600 antialiased">
@@ -472,7 +583,9 @@ const RecipeDetailPage = () => {
             </CardContent>
           </Card>
           <div className="flex flex-col gap-4">
-            <MusicPlayer />{" "}
+            <div className="lg:w-sm">
+              <MusicPlayer className="" />
+            </div>
             <Card className="lg:w-sm mt-0 h-fit">
               <CardContent className="space-y-6 p-6">
                 {/* Comments Section */}
@@ -538,16 +651,103 @@ const RecipeDetailPage = () => {
                     </div>
                   )}
                 </div>
-
                 {/* Comments Section */}
-
-                {/* <Separator className="my-2" /> */}
+                <Separator className="my-2" />
                 {/* Comment List */}
-                <div className="mt-6">
+                {/* <div className="mt-6">
                   {comments.length > 0 ? (
                     comments.map((comment) => (
                       <UserComment key={comment._id} comment={comment} />
                     ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No comments yet. Be the first to share your thoughts!
+                    </p>
+                  )}
+                </div> */}
+                <div className="mt-6">
+                  {commentsLoading ? (
+                    <Spinner />
+                  ) : comments.length > 0 ? (
+                    <>
+                      {comments.map((comment) => (
+                        <UserComment
+                          key={comment._id}
+                          comment={comment}
+                          recipeId={recipe._id}
+                          onDelete={handleCommentDeleted}
+                        />
+                      ))}
+
+                      {/* Pagination */}
+                      {totalPages > 1 && (
+                        <div className="mt-4">
+                          <Pagination>
+                            <PaginationContent>
+                              <PaginationItem>
+                                <PaginationPrevious
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (page > 1) fetchComments(page - 1);
+                                  }}
+                                  aria-disabled={page === 1}
+                                  className={
+                                    page === 1
+                                      ? "pointer-events-none opacity-50"
+                                      : ""
+                                  }
+                                />
+                              </PaginationItem>
+
+                              {getPageNumbers().map((p, idx) => {
+                                if (
+                                  p === "ellipsis-left" ||
+                                  p === "ellipsis-right"
+                                ) {
+                                  return (
+                                    <PaginationItem key={`${p}-${idx}`}>
+                                      <PaginationEllipsis />
+                                    </PaginationItem>
+                                  );
+                                }
+                                return (
+                                  <PaginationItem key={p}>
+                                    <PaginationLink
+                                      href="#"
+                                      isActive={p === page}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        if (p !== page) fetchComments(p);
+                                      }}
+                                    >
+                                      {p}
+                                    </PaginationLink>
+                                  </PaginationItem>
+                                );
+                              })}
+
+                              <PaginationItem>
+                                <PaginationNext
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (page < totalPages)
+                                      fetchComments(page + 1);
+                                  }}
+                                  aria-disabled={page === totalPages}
+                                  className={
+                                    page === totalPages
+                                      ? "pointer-events-none opacity-50"
+                                      : ""
+                                  }
+                                />
+                              </PaginationItem>
+                            </PaginationContent>
+                          </Pagination>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <p className="text-sm text-muted-foreground">
                       No comments yet. Be the first to share your thoughts!

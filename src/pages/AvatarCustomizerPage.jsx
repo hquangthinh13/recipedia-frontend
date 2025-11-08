@@ -4,8 +4,10 @@ import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "@/components/page-footer";
+import PreviewUserCard from "@/components/preview-user-card";
+import { MusicPlayer } from "@/components/music-player";
 import {
   Scissors,
   Smile,
@@ -19,9 +21,21 @@ import {
   Laugh,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import logo from "@/assets/images/Recipedia-logo-square.svg";
+
 const AvatarCustomizerPage = () => {
   const navigate = useNavigate();
-
+  const { user, loading, setUser } = useAuth();
+  const [name, setName] = useState("Guest");
+  const [createdAt, setCreatedAt] = useState(null);
   // === Core states ===
   const [skinColor, setSkinColor] = useState("f9c9b6");
   const [backgroundColor, setBackgroundColor] = useState("ffd5dc");
@@ -41,9 +55,21 @@ const AvatarCustomizerPage = () => {
   const [nose, setNose] = useState("curve");
   // === Current active section ===
   const [activeFeature, setActiveFeature] = useState("hair");
+
   useEffect(() => {
-    document.title = "Recipedia | Dress your Chef";
+    document.title = "Recipedia | Dress Your Chef";
   }, []);
+  // useEffect(() => {
+  //   if (!loading && !user) {
+  //     navigate("/login", { replace: true });
+  //   }
+  // }, [loading, user, navigate]);
+  useEffect(() => {
+    if (user) {
+      setName(user.name ?? "Guest");
+      setCreatedAt(user.createdAt ? new Date(user.createdAt) : null);
+    }
+  }, [user]);
   const avatarUrl =
     `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true
   &baseColor=${skinColor}
@@ -69,7 +95,6 @@ const AvatarCustomizerPage = () => {
         : `&glassesProbability=0`
     }
   `.replace(/\s/g, "");
-  const { user, setUser } = useAuth();
   const handleSaveAvatar = async () => {
     try {
       console.log("Avatar URL being sent:", avatarUrl);
@@ -261,41 +286,66 @@ const AvatarCustomizerPage = () => {
     { id: "shirt", label: "Shirt", icon: <Shirt className="w-5 h-5" /> },
     { id: "color", label: "Colors", icon: <Palette className="w-5 h-5" /> },
   ];
-
+  if (!user)
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <Empty className="h-full">
+          <EmptyHeader>
+            <EmptyMedia>
+              <Link to={"/"} className="flex flex-1">
+                <img src={logo} alt="Recipedia Logo" className="h-12" />
+              </Link>
+            </EmptyMedia>
+            <EmptyTitle>Looks like you haven’t logged in yet</EmptyTitle>
+            <EmptyDescription>
+              Sign in to customize your own chef.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <div className="flex gap-2">
+              <Button
+                className="cursor-pointer"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </Button>
+              <Button
+                className="cursor-pointer"
+                onClick={() => navigate("/")}
+                variant="outline"
+              >
+                Back to Home
+              </Button>
+            </div>
+          </EmptyContent>
+        </Empty>{" "}
+      </div>
+    );
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="max-w-6xl p-4 mx-auto mb-12">
-        <Card className="w-full flex-1 basis-full">
-          {/* <CardHeader></CardHeader> */}
-          <CardContent className="space-y-6 p-6">
-            <h2 className="text-2xl font-bold text-[var(--card-foreground)] antialiased text-center">
-              Dress Your Chef
-            </h2>
-            {/* Preview avatar */}
-            <div className="w-full flex flex-col items-center">
-              <div className="w-36 h-36 rounded-full overflow-hidden">
-                <img
-                  src={avatarUrl}
-                  alt="Avatar"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
+      <div className="flex flex-col lg:flex-row gap-4 max-w-6xl p-4 mx-auto mb-12">
+        <div className="flex lg:w-lg flex-col-reverse lg:flex-col gap-4">
+          <PreviewUserCard
+            avatarUrl={avatarUrl}
+            name={name || "Guest"}
+            createdAt={createdAt}
+          />
+          <MusicPlayer className="w-lg lg:w-fit" />
+        </div>
 
-            {/* === Feature Tabs === */}
-            {/* Switch Buttons */}
-            <div
-              className="flex flex-wrap lg:flex-wrap justify-center w-full
+        <div className="flex flex-col gap-2 flex-2/3 ">
+          <div
+            className="flex flex-wrap lg:flex-wrap justify-center w-full
              gap-1 md:gap-0 overflow-x-auto border-2 border-[var(--accent)] 
              rounded-md"
-            >
-              {featureButtons.map((btn) => (
-                <Button
-                  key={btn.id}
-                  variant="ghost"
-                  onClick={() => setActiveFeature(btn.id)}
-                  className={`cursor-pointer flex-1 min-w-[100px] sm:min-w-[120px]
+          >
+            {featureButtons.map((btn) => (
+              <Button
+                key={btn.id}
+                variant="ghost"
+                onClick={() => setActiveFeature(btn.id)}
+                className={`cursor-pointer flex-1 min-w-[100px] sm:min-w-[120px]
                   rounded-none md:rounded-none
                   flex items-center justify-center px-3 py-2 text-sm md:text-sm
                   whitespace-nowrap transition-colors
@@ -304,162 +354,166 @@ const AvatarCustomizerPage = () => {
                       ? "bg-[var(--accent)] text-white"
                       : "hover:bg-[var(--accent)]/20"
                   }`}
-                >
-                  <span className="flex items-center gap-2">
-                    {btn.icon}
-                    <span>{btn.label}</span>
-                  </span>
-                </Button>
-              ))}
-            </div>
-
-            <div className="flex-1 space-y-2">
-              {activeFeature === "hair" && (
-                <>
-                  <FeatureSelector
-                    title="Hair"
-                    options={hairOptions}
-                    selected={hair}
-                    onSelect={setHair}
-                    colorParam={`&hairColor=${hairColor}`}
-                  />
-                  <ColorPalette
-                    title="Hair Color"
-                    colors={hairColors}
-                    selected={hairColor}
-                    onSelect={setHairColor}
-                  />
-                </>
-              )}
-
-              {activeFeature === "mouth" && (
-                <FeatureSelector
-                  title="Mouth"
-                  options={mouthOptions}
-                  selected={mouth}
-                  onSelect={setMouth}
-                />
-              )}
-              {activeFeature === "nose" && (
-                <FeatureSelector
-                  title="Nose"
-                  options={noseOptions}
-                  selected={nose}
-                  onSelect={setNose}
-                />
-              )}
-              {activeFeature === "eyes" && (
-                <>
-                  <FeatureSelector
-                    title="Eyes"
-                    options={eyesOptions}
-                    selected={eyes}
-                    onSelect={setEyes}
-                  />
-                  <ColorPalette
-                    title="Eye Shadow Color"
-                    colors={eyeShadowColors}
-                    selected={eyeShadowColor}
-                    onSelect={setEyeShadowColor}
-                  />
-                </>
-              )}
-              {activeFeature === "eyebrows" && (
-                <>
-                  <FeatureSelector
-                    title="Eyebrows"
-                    options={eyebrowsOptions}
-                    selected={eyebrows}
-                    onSelect={setEyebrows}
-                    colorParam={`&eyebrowsColor=${eyebrowsColor}`}
-                  />
-                  <ColorPalette
-                    title="Eyebrows Color"
-                    colors={eyebrowsColors}
-                    selected={eyebrowsColor}
-                    onSelect={setEyebrowsColor}
-                  />
-                </>
-              )}
-
-              {activeFeature === "glasses" && (
-                <>
-                  <FeatureSelector
-                    title="Glasses"
-                    options={glassesOptions}
-                    selected={glasses}
-                    onSelect={setGlasses}
-                    colorParam={`&glassesColor=${glassesColor}`}
-                  />
-                  <ColorPalette
-                    title="Glasses Color"
-                    colors={glassesColors}
-                    selected={glassesColor}
-                    onSelect={setGlassesColor}
-                  />
-                </>
-              )}
-              {activeFeature === "facialHair" && (
-                <>
-                  <FeatureSelector
-                    title="Facial Hair"
-                    options={facialHairOptions}
-                    selected={facialHair}
-                    onSelect={setFacialHair}
-                    colorParam={`&facialHairColor=${facialHairColor}`}
-                  />
-                  <ColorPalette
-                    title="Facial Hair Color"
-                    colors={facialHairColors}
-                    selected={facialHairColor}
-                    onSelect={setFacialHairColor}
-                  />
-                </>
-              )}
-              {activeFeature === "shirt" && (
-                <>
-                  <FeatureSelector
-                    title="Shirt"
-                    options={shirtOptions}
-                    selected={shirt}
-                    onSelect={setShirt}
-                    colorParam={`&shirtColor=${shirtColor}`}
-                  />
-                  <ColorPalette
-                    title="Shirt Color"
-                    colors={shirtColors}
-                    selected={shirtColor}
-                    onSelect={setShirtColor}
-                  />
-                </>
-              )}
-
-              {activeFeature === "color" && (
-                <>
-                  <ColorPalette
-                    title="Skin Color"
-                    colors={skinColors}
-                    selected={skinColor}
-                    onSelect={setSkinColor}
-                  />
-
-                  <ColorPalette
-                    title="Background Color"
-                    colors={bgColors}
-                    selected={backgroundColor}
-                    onSelect={setBackgroundColor}
-                  />
-                </>
-              )}
-            </div>
-            <div className="w-full flex justify-end mt-2">
-              <Button onClick={handleSaveAvatar} className="cursor-pointer">
-                <Check />
-                Serve the Look{" "}
+              >
+                <span className="flex items-center gap-2">
+                  {btn.icon}
+                  <span>{btn.label}</span>
+                </span>
               </Button>
-            </div>
-          </CardContent>
-        </Card>
+            ))}
+          </div>
+          <Card className="">
+            <CardContent className="space-y-6 p-6">
+              {/* === Feature Tabs === */}
+              <div className="flex-1 space-y-2">
+                {activeFeature === "hair" && (
+                  <>
+                    <FeatureSelector
+                      title="Hair"
+                      options={hairOptions}
+                      selected={hair}
+                      onSelect={setHair}
+                      colorParam={`&hairColor=${hairColor}`}
+                    />
+                    <ColorPalette
+                      title="Hair Color"
+                      colors={hairColors}
+                      selected={hairColor}
+                      onSelect={setHairColor}
+                    />
+                  </>
+                )}
+
+                {activeFeature === "mouth" && (
+                  <FeatureSelector
+                    title="Mouth"
+                    options={mouthOptions}
+                    selected={mouth}
+                    onSelect={setMouth}
+                  />
+                )}
+                {activeFeature === "nose" && (
+                  <FeatureSelector
+                    title="Nose"
+                    options={noseOptions}
+                    selected={nose}
+                    onSelect={setNose}
+                  />
+                )}
+                {activeFeature === "eyes" && (
+                  <>
+                    <FeatureSelector
+                      title="Eyes"
+                      options={eyesOptions}
+                      selected={eyes}
+                      onSelect={setEyes}
+                    />
+                    <ColorPalette
+                      title="Eye Shadow Color"
+                      colors={eyeShadowColors}
+                      selected={eyeShadowColor}
+                      onSelect={setEyeShadowColor}
+                    />
+                  </>
+                )}
+                {activeFeature === "eyebrows" && (
+                  <>
+                    <FeatureSelector
+                      title="Eyebrows"
+                      options={eyebrowsOptions}
+                      selected={eyebrows}
+                      onSelect={setEyebrows}
+                      colorParam={`&eyebrowsColor=${eyebrowsColor}`}
+                    />
+                    <ColorPalette
+                      title="Eyebrows Color"
+                      colors={eyebrowsColors}
+                      selected={eyebrowsColor}
+                      onSelect={setEyebrowsColor}
+                    />
+                  </>
+                )}
+
+                {activeFeature === "glasses" && (
+                  <>
+                    <FeatureSelector
+                      title="Glasses"
+                      options={glassesOptions}
+                      selected={glasses}
+                      onSelect={setGlasses}
+                      colorParam={`&glassesColor=${glassesColor}`}
+                    />
+                    <ColorPalette
+                      title="Glasses Color"
+                      colors={glassesColors}
+                      selected={glassesColor}
+                      onSelect={setGlassesColor}
+                    />
+                  </>
+                )}
+                {activeFeature === "facialHair" && (
+                  <>
+                    <FeatureSelector
+                      title="Facial Hair"
+                      options={facialHairOptions}
+                      selected={facialHair}
+                      onSelect={setFacialHair}
+                      colorParam={`&facialHairColor=${facialHairColor}`}
+                    />
+                    <ColorPalette
+                      title="Facial Hair Color"
+                      colors={facialHairColors}
+                      selected={facialHairColor}
+                      onSelect={setFacialHairColor}
+                    />
+                  </>
+                )}
+                {activeFeature === "shirt" && (
+                  <>
+                    <FeatureSelector
+                      title="Shirt"
+                      options={shirtOptions}
+                      selected={shirt}
+                      onSelect={setShirt}
+                      colorParam={`&shirtColor=${shirtColor}`}
+                    />
+                    <ColorPalette
+                      title="Shirt Color"
+                      colors={shirtColors}
+                      selected={shirtColor}
+                      onSelect={setShirtColor}
+                    />
+                  </>
+                )}
+
+                {activeFeature === "color" && (
+                  <>
+                    <ColorPalette
+                      title="Skin Color"
+                      colors={skinColors}
+                      selected={skinColor}
+                      onSelect={setSkinColor}
+                    />
+
+                    <ColorPalette
+                      title="Background Color"
+                      colors={bgColors}
+                      selected={backgroundColor}
+                      onSelect={setBackgroundColor}
+                    />
+                  </>
+                )}
+              </div>
+              <div className="w-full flex justify-end mt-2">
+                <Button onClick={handleSaveAvatar} className="cursor-pointer">
+                  <Check />
+                  Serve the Look
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        {/* Switch Buttons */}
       </div>
       <Footer />
     </div>
@@ -475,7 +529,7 @@ const FeatureSelector = ({
   colorParam = "",
 }) => (
   <div className="w-full">
-    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-2">
       {options.map((opt) => {
         const paramName = title
           .replace(/\s+/g, "") // remove spaces
@@ -516,10 +570,10 @@ const ColorPalette = ({ title, colors, selected, onSelect }) => (
       {colors.map((color) => (
         <button
           key={color}
-          className={`cursor-pointer w-8 h-8 rounded border transition hover:ring-2 hover:ring-primary hover:border-primary ${
+          className={`cursor-pointer w-8 h-8 rounded-md border transition hover:ring-2 hover:ring-primary hover:border-primary ${
             selected === color
               ? "ring-2 ring-primary border-primary"
-              : "border-gray-300"
+              : "border-accent/90"
           }`}
           style={{ backgroundColor: `#${color}` }}
           onClick={() => onSelect(color)}

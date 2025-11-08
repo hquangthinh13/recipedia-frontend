@@ -45,10 +45,11 @@ const CreateRecipePage = () => {
   const [image, setImage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (!user) navigate("/login");
   useEffect(() => {
+    if (!user) navigate("/login");
     document.title = "Recipedia | Create Recipe";
   }, []);
+
   function previewFiles(file) {
     const reader = new FileReader();
     reader.readAsDataURL(file);

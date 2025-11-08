@@ -1,6 +1,4 @@
-"use client";
-
-import * as React from "react";
+import React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
@@ -38,11 +36,41 @@ const chartConfig = {
   },
 };
 
-export default function InteractionDashboard() {
+export default function UserInteractionDataCard() {
   const { user } = useAuth();
   const [range, setRange] = React.useState("7");
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const fillMissingDates = (rawData, range, userCreatedAt) => {
+    const today = new Date();
+    const result = [];
+
+    let startDate;
+
+    if (range === "all") {
+      // Use user.createdAt if available, otherwise fallback to 30 days ago
+      startDate = userCreatedAt ? new Date(userCreatedAt) : new Date();
+      if (!userCreatedAt) startDate.setDate(today.getDate() - 30);
+    } else {
+      const days = parseInt(range, 10);
+      startDate = new Date();
+      startDate.setDate(today.getDate() - (days - 1));
+    }
+
+    // Loop from startDate → today inclusive
+    for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
+      const isoDate = d.toISOString().split("T")[0];
+      const existing = rawData.find((item) => item.date.startsWith(isoDate));
+
+      result.push({
+        date: isoDate,
+        likes: existing?.likes ?? 0,
+        comments: existing?.comments ?? 0,
+      });
+    }
+
+    return result;
+  };
 
   const fetchData = React.useCallback(async () => {
     if (!user?.id) return;
@@ -51,7 +79,9 @@ export default function InteractionDashboard() {
       const { data } = await api.get(
         `/users/${user.id}/interactions-summary?range=${range}`
       );
-      setData(data.data || []);
+      const raw = data.data || [];
+      const filled = fillMissingDates(raw, range, user?.createdAt);
+      setData(filled);
     } catch (err) {
       console.error("Error fetching interactions summary:", err);
     } finally {
@@ -94,7 +124,7 @@ export default function InteractionDashboard() {
         </Select>
       </CardHeader>
 
-      <CardContent className="">
+      <CardContent className="pt-4">
         {loading ? (
           <div className="flex justify-center py-10">
             <Loader2 className="animate-spin w-8 h-8 text-primary" />

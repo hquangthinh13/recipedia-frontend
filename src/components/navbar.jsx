@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import logo from "@/assets/images/Recipedia-logo-square.svg";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { NotificationPopover } from "./notification-popover";
@@ -42,20 +42,27 @@ const Navbar = ({ needTimer }) => {
       <div className="mx-auto max-w-6xl p-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to={"/"} className="flex flex-1">
-            <img src={logo} alt="Recipedia Logo" className="h-12" />
-          </Link>
+          <div className="flex flex-1">
+            <img
+              src={logo}
+              alt="Recipedia Logo"
+              className="h-12 cursor-pointer"
+              onClick={() => navigate("/")}
+            />
+          </div>
           {needTimer && <Timer />}
           {/* Right section */}{" "}
           {user ? (
             <div className="flex flex-1 items-center gap-2 justify-end">
               {/* Create Recipe */}
-              <Link to={"/create"}>
-                <Button variant="ghost" className="cursor-pointer">
-                  <Plus className="" />
-                  Post
-                </Button>
-              </Link>
+              <Button
+                variant="ghost"
+                className="cursor-pointer"
+                onClick={() => navigate("/create")}
+              >
+                <Plus className="" />
+                Post
+              </Button>
               <NotificationPopover />
 
               <DropdownMenu>
@@ -121,18 +128,22 @@ const Navbar = ({ needTimer }) => {
             </div>
           ) : (
             <div className="flex flex-1 items-center gap-2 justify-end">
-              <Link to={"/login"}>
-                <Button variant="outline" className="cursor-pointer">
-                  {/* <LogIn /> */}
-                  Log in
-                </Button>
-              </Link>
-              <Link to={"/signup"}>
-                <Button variant="default" className="cursor-pointer">
-                  {/* <UserPlus /> */}
-                  Sign up
-                </Button>
-              </Link>
+              <Button
+                variant="outline"
+                className="cursor-pointer"
+                onClick={() => navigate("/login")}
+              >
+                {/* <LogIn /> */}
+                Log in
+              </Button>
+              <Button
+                variant="default"
+                className="cursor-pointer"
+                onClick={() => navigate("/signup")}
+              >
+                {/* <UserPlus /> */}
+                Sign up
+              </Button>
             </div>
           )}
         </div>

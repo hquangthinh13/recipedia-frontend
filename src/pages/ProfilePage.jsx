@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/page-footer";
 import RecipeCardHorizontal from "@/components/recipe-card-horizontal";
-import coverImage from "@/assets/images/overcooked0.jpg";
+import logo from "@/assets/images/Recipedia-logo-square.svg";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 import { Separator } from "@/components/ui/separator";
@@ -20,6 +20,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EditRecipeForm from "@/components/edit-recipe-form";
 import api from "@/lib/api";
@@ -29,6 +37,7 @@ import { getTotalLikes } from "@/lib/getTotalLikes";
 import { formatFollowerCount } from "@/lib/formatFollowerCount";
 import UserList from "@/components/user-list";
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [editOpen, setEditOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState(null);
@@ -126,8 +135,28 @@ const ProfilePage = () => {
     );
   if (!profile)
     return (
-      <div className="w-screen h-screen flex items-center justify-center">
-        <Spinner />
+      <div className="min-h-screen flex justify-center items-center">
+        <Empty className="h-full">
+          <EmptyHeader>
+            <EmptyMedia>
+              <Link to={"/"} className="flex flex-1">
+                <img src={logo} alt="Recipedia Logo" className="h-12" />
+              </Link>
+            </EmptyMedia>
+            <EmptyTitle>Kitchen not available</EmptyTitle>
+            <EmptyDescription>
+              We couldn’t load this user’s profile. It might have been removed
+              or made private.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <div className="flex gap-2">
+              <Button className="cursor-pointer" onClick={() => navigate("/")}>
+                Back to Home
+              </Button>
+            </div>
+          </EmptyContent>
+        </Empty>{" "}
       </div>
     );
 
@@ -319,11 +348,14 @@ const ProfilePage = () => {
 
       <Footer />
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent
+          aria-describedby="edit-recipe-desc"
+          className="max-w-3xl max-h-[90vh] overflow-y-auto"
+        >
           <DialogHeader>
-            <DialogTitle>Edit Recipe</DialogTitle>
+            <DialogTitle>Edit Recipe</DialogTitle>{" "}
+            <DialogDescription id="edit-recipe-desc"></DialogDescription>
           </DialogHeader>
-
           {editingRecipe && (
             <EditRecipeForm
               recipe={editingRecipe}
@@ -340,14 +372,20 @@ const ProfilePage = () => {
       </Dialog>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+        <DialogContent
+          aria-describedby="list-desc"
+          className="max-w-md max-h-[80vh] overflow-y-auto"
+        >
           <DialogHeader>
             <DialogTitle>
               {listType === "followers" ? "Followers" : "Following"}
             </DialogTitle>
 
             {/* This description now re-renders automatically */}
-            <DialogDescription key={`${listType}-${userList.length}`}>
+            <DialogDescription
+              id="list-desc"
+              key={`${listType}-${userList.length}`}
+            >
               {listType === "followers"
                 ? `${profile?.followersCount ?? 0} followers`
                 : `${profile?.followingCount ?? 0} following`}

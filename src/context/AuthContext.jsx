@@ -5,7 +5,7 @@ import api from "@/lib/api";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // { id, name, email, avatar }
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(() => localStorage.getItem("token")); // reactive
   const navigate = useNavigate();
@@ -27,8 +27,9 @@ export const AuthProvider = ({ children }) => {
           id: data.id,
           name: data.name,
           email: data.email,
-          avatar: data.avatar || null, // ✅ consistent everywhere
-          favorites: data.favorites || [], // ✅ store favorites
+          createdAt: data.createdAt,
+          avatar: data.avatar || null,
+          favorites: data.favorites || [],
         });
       } catch (err) {
         console.error("Auth fetch failed:", err?.response?.data || err.message);
@@ -54,7 +55,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setUser(null);
     setToken(null);
-    // navigate("/login");
+    navigate("/login");
   };
 
   return (

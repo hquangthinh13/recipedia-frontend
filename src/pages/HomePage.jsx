@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import api from "@/lib/api";
 import Pattern from "@/components/pattern";
 import Spinner from "@/components/spinner";
@@ -42,7 +41,10 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); //Loading recipes
+  const [isLoading01, setIsLoading01] = useState(false); //Loading trending recipes
+  const [isLoading02, setIsLoading02] = useState(false); //Loading top users
+
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const loadMoreRef = useRef(null); // sentinel for infinite scroll
@@ -59,20 +61,26 @@ const HomePage = () => {
 
   const fetchTopWeeklyRecipes = async () => {
     try {
+      setIsLoading01(true);
       const res = await api.get("/recipes/trending?n=12");
       console.log("Top trending recipes:", res.data);
       setTopWeeklyRecipes(res.data);
     } catch (error) {
       console.error("Error fetching top trending recipes:", error);
+    } finally {
+      setIsLoading01(false);
     }
   };
   const fetchTopUsers = async () => {
     try {
+      setIsLoading02(true);
       const res = await api.get("/users/top?limit=6");
       console.log("Top users:", res.data.topUsers);
       setTopUsers(res.data.topUsers);
     } catch (error) {
       console.error("Error fetching top users.", error);
+    } finally {
+      setIsLoading02(false);
     }
   };
   const fetchRecipes = async ({ append = false } = {}) => {
@@ -203,15 +211,17 @@ const HomePage = () => {
           index={1}
           title="Discover New Recipes"
         />
-        <Link to="/customize-avatar">
-          <HomeLinkCard index={2} title="Dress Your Chef" />
-        </Link>{" "}
-        {/* <Link to="/analytics">
-          <HomeLinkCard index={3} title="Chef's Hall of Fame" />
-        </Link> */}
-        <Link to="/analytics">
-          <HomeLinkCard index={3} title="Check Your Cooking Stats" />
-        </Link>
+        <HomeLinkCard
+          index={2}
+          title="Dress Your Chef"
+          onClick={() => navigate("/customize-avatar")}
+        />
+
+        <HomeLinkCard
+          index={3}
+          title="Check Your Cooking Stats"
+          onClick={() => navigate("/analytics")}
+        />
       </div>
       <Pattern />
 
@@ -246,14 +256,20 @@ const HomePage = () => {
           </div>
 
           <CarouselContent>
-            {topWeeklyRecipes.map((recipe) => (
-              <CarouselItem
-                className="md:basis-1/2 lg:basis-1/3"
-                key={recipe._id}
-              >
-                <RecipeCard isTrending={true} recipe={recipe} />
-              </CarouselItem>
-            ))}
+            {isLoading01 ? (
+              <div className="w-full h-32 flex items-center justify-center">
+                <Spinner />
+              </div>
+            ) : (
+              topWeeklyRecipes.map((recipe) => (
+                <CarouselItem
+                  className="md:basis-1/2 lg:basis-1/3"
+                  key={recipe._id}
+                >
+                  <RecipeCard isTrending={true} recipe={recipe} />
+                </CarouselItem>
+              ))
+            )}
           </CarouselContent>
         </Carousel>
       </div>
@@ -277,14 +293,20 @@ const HomePage = () => {
           </div>
 
           <CarouselContent>
-            {topUsers.map((user) => (
-              <CarouselItem
-                className="md:basis-1/2 lg:basis-1/3"
-                key={user._id}
-              >
-                <UserCard rank={user.rank} user={user} />
-              </CarouselItem>
-            ))}
+            {isLoading02 ? (
+              <div className="w-full h-32 flex items-center justify-center">
+                <Spinner />
+              </div>
+            ) : (
+              topUsers.map((user) => (
+                <CarouselItem
+                  className="md:basis-1/2 lg:basis-1/3"
+                  key={user._id}
+                >
+                  <UserCard rank={user.rank} user={user} />
+                </CarouselItem>
+              ))
+            )}
           </CarouselContent>
         </Carousel>
       </div>
