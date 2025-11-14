@@ -111,8 +111,6 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false, onDelete, onEdit }) => 
     }
   };
 
-  // const handleEdit = async () => {
-  // Keep favorite state in sync when user or recipe changes
   useEffect(() => {
     if (user?.favorites && recipe?._id) {
       const isFav = user.favorites.some((id) => id === recipe._id || id._id === recipe._id);

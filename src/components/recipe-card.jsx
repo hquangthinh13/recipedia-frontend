@@ -13,6 +13,7 @@ import { formatDate } from '@/lib/formatDate';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
+import { Badge } from '@/components/ui/badge';
 
 const RecipeCard = ({ isTrending, recipe }) => {
   const navigate = useNavigate();
@@ -107,6 +108,13 @@ const RecipeCard = ({ isTrending, recipe }) => {
           className=" h-36 w-full object-cover
              transition ease-in-out delay-150 duration-300 hover:scale-105"
         />
+
+        <div className="absolute top-4 left-4 flex text-center gap-2 items-center">
+          <Badge>{dishTypeLabels[recipe.dishType] ?? recipe.dishType}</Badge>
+          <Badge className="bg-white" variant="outline">
+            {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
+          </Badge>
+        </div>
         {isTrending && (
           <div className="absolute top-4 right-4 bg-primary text-white rounded-full p-1 flex text-center items-center shadow-xl">
             <TrendingUp className="w-4 h-4" />{' '}
@@ -167,21 +175,22 @@ const RecipeCard = ({ isTrending, recipe }) => {
         </Tooltip>
 
         {/* Dish type + Cooking time */}
-        <div className="flex justify-start items-center gap-3 text-sm text-gray-500 mb-4">
+        {/* <div className="flex justify-start items-center gap-2 mt-2 text-sm text-gray-500 mb-4">
+        
           <div className="flex items-center gap-2">
             <ChefHat className="h-4 w-4 text-gray-400 " />
             <span className="text-base text-gray-600 antialiased">
               {dishTypeLabels[recipe.dishType] ?? recipe.dishType}
             </span>
           </div>
-
+          
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-gray-400 " />
             <span className="text-base text-gray-600 antialiased">
               {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
             </span>
           </div>
-        </div>
+        </div> */}
         <Separator className="flex mt-4 mb-2" />
         {/* Buttons */}
         <div className=" w-full flex justify-center gap-3">

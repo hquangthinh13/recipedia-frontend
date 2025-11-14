@@ -33,7 +33,6 @@ const VerifyCodePage = () => {
   const [params] = useSearchParams();
   const email = params.get('email');
   const navigate = useNavigate();
-  const [code, setCode] = useState('');
   const [message, setMessage] = useState('');
   const [resending, setResending] = useState(false);
   const { login } = useAuth();
@@ -43,11 +42,13 @@ const VerifyCodePage = () => {
     defaultValues: { code: '' },
   });
   // --- Verify the code ---
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (values) => {
     try {
       setLoading(true);
-      const { data } = await api.post('/auth/verify-code', { email, code });
+      const { data } = await api.post('/auth/verify-code', {
+        email,
+        code: values.code, // ✅ use form value
+      });
       setLoading(false);
 
       setMessage(data.msg);
