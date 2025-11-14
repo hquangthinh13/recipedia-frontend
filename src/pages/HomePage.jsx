@@ -44,12 +44,12 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false); //Loading recipes
   const [isLoading01, setIsLoading01] = useState(false); //Loading trending recipes
   const [isLoading02, setIsLoading02] = useState(false); //Loading top users
-
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const loadMoreRef = useRef(null); // sentinel for infinite scroll
   const sectionRef = useRef(null);
   const PAGE_SIZE = 6;
+
   const scrollToSection = () => {
     requestAnimationFrame(() => {
       sectionRef.current?.scrollIntoView({
@@ -62,7 +62,7 @@ const HomePage = () => {
   const fetchTopWeeklyRecipes = async () => {
     try {
       setIsLoading01(true);
-      const res = await api.get('/recipes/trending?n=12');
+      const res = await api.get('/recipes/trending?n=6');
       console.log('Top trending recipes:', res.data);
       setTopWeeklyRecipes(res.data);
     } catch (error) {
@@ -145,25 +145,6 @@ const HomePage = () => {
     fetchTopUsers();
   }, []);
 
-  // useEffect(() => {
-  //   fetchRecipes({ append: page > 1 });
-  //   const token = localStorage.getItem('token');
-  //   if (!token) {
-  //     setLoading(false);
-  //     return;
-  //   }
-  //   api
-  //     .get('/auth/me', {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     })
-  //     .then(({ data }) => {
-  //       setUsername(data.name || '');
-  //     })
-  //     .catch((err) => {
-  //       console.error('Error verifying user:', err);
-  //     })
-  //     .finally(() => setLoading(false));
-  // }, [cookingTime, dishType, sort, page]);
   // 1) Auth + username only once
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -184,21 +165,32 @@ const HomePage = () => {
   }, [cookingTime, dishType, sort, page]);
 
   // Infinite scroll via IntersectionObserver
+  // Infinite scroll via IntersectionObserver
   useEffect(() => {
+    // Only start observing after the first batch is loaded
+    if (isLoading) return;
     if (!loadMoreRef.current) return;
     if (!hasMore) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         const first = entries[0];
-        if (first.isIntersecting && !isLoadingMore && !isLoading && hasMore) {
+        if (first.isIntersecting && !isLoadingMore && hasMore) {
           setPage((p) => p + 1);
         }
       },
-      { rootMargin: '0px' }, // prefetch a bit early
+      {
+        root: null, // viewport (default)
+        rootMargin: '0px', // you can use '200px' if you want earlier prefetch
+        threshold: 0,
+      },
     );
+
     observer.observe(loadMoreRef.current);
+
     return () => observer.disconnect();
   }, [isLoading, isLoadingMore, hasMore]);
+
   if (loading)
     return (
       <div className="w-screen h-screen flex items-center justify-center">
@@ -252,11 +244,11 @@ const HomePage = () => {
         >
           {/* Header row */}
           <div className="flex justify-between">
-            <h2 className="flex flex-1 text-2xl cursor-pointer font-bold mb-4 text-card-foreground items-center gap-1">
+            <h2 className="flex flex-1 text-2xl font-bold mb-4 text-card-foreground items-center gap-1">
               <Flame className="text-primary fill-primary" />
-              <Link className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
+              <p className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
                 Trending This Week
-              </Link>
+              </p>
             </h2>
 
             <div className="flex justify-end items-center mb-3 gap-2">
@@ -287,10 +279,10 @@ const HomePage = () => {
         <Carousel className="relative w-full">
           {/* Header row */}
           <div className="flex justify-between">
-            <h2 className="flex flex-1 text-2xl cursor-pointer font-bold mb-4 text-card-foreground items-center gap-1">
-              <Link className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
+            <h2 className="flex flex-1 text-2xl font-bold mb-4 text-card-foreground items-center gap-1">
+              <p className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
                 Chef's Hall of Fame
-              </Link>
+              </p>
             </h2>
 
             <div className="flex justify-end items-center mb-3 gap-2">
@@ -329,11 +321,11 @@ const HomePage = () => {
       >
         <h2
           ref={sectionRef}
-          className="scroll-mt-24 flex flex-1 text-2xl cursor-pointer font-bold mb-4 text-card-foreground items-center gap-1"
+          className="scroll-mt-24 flex flex-1 text-2xl font-bold mb-4 text-card-foreground items-center gap-1"
         >
-          <Link className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
+          <p className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
             Explore Recipes
-          </Link>
+          </p>
         </h2>
         <div className="flex flex-col md:flex-row flex-wrap justify-between gap-2 flex-1 mb-6">
           <TabsList className="flex h-fit flex-wrap justify-center md:justify-start gap-2">
@@ -450,25 +442,13 @@ const HomePage = () => {
             ))}
           </div>
         )}
-
-        {/* {recipes.length > 0 && (
-          <div className="flex justify-center my-4">
-            {hasMore ? (
-              <Button
-                variant="outline"
-                onClick={() => setPage((p) => p + 1)}
-                disabled={isLoadingMore}
-                className="w-full disabled:opacity-60"
-              >
-                {isLoadingMore ? 'Loading...' : 'Load more'}
-              </Button>
-            ) : (
-              <div className="text-xs text-muted-foreground "></div>
-            )}
+        {isLoadingMore && (
+          <div className="w-full h-32 flex items-center justify-center">
+            <Spinner />
           </div>
-        )} */}
+        )}
 
-        <div ref={loadMoreRef} style={{ height: 12 }} />
+        <div ref={loadMoreRef} className="h-3" />
       </Tabs>
       <Footer />
     </div>

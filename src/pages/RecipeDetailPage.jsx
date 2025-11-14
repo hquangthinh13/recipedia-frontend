@@ -6,6 +6,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { dishTypeLabels, cookingTimeLabels } from '@/lib/enumDisplayMap';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from '@/components/ui/button-group';
 import {
   Table,
   TableHeader,
@@ -40,6 +41,7 @@ import {
   X,
   ImageDown,
   FileDown,
+  SquareCheckBig,
 } from 'lucide-react';
 import {
   Pagination,
@@ -61,7 +63,7 @@ import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatDate } from '@/lib/formatDate';
-import { exportCardToPng, exportCardToPdf } from '@/lib/recipeExport';
+import { exportCardToPng, exportCardToPdf, exportIngredientsPdf } from '@/lib/recipeExport';
 
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 
@@ -73,6 +75,7 @@ const RecipeDetailPage = () => {
   const [commenting, setCommenting] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [exportingPDF, setExportingPDF] = useState(false);
+  const [exportingIngredient, setExportingIngredient] = useState(false);
 
   const [newComment, setNewComment] = useState('');
   const [isCommentFocused, setIsCommentFocused] = useState(false);
@@ -81,7 +84,7 @@ const RecipeDetailPage = () => {
   const location = useLocation(); // to read state from navigation
   const commentInputRef = useRef(null); // ref for textarea
   const [selected, setSelected] = useState('1X');
-  const options = ['½X', '1X', '2X'];
+  const options = ['¼X', '½X', '1X', '2X', '3X'];
   const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
   const authorName = recipe?.author?.name || 'Mysterious Chef';
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -91,7 +94,7 @@ const RecipeDetailPage = () => {
   // Add these to your component state (near other useState hooks)
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10); // page size
+  const [limit, setLimit] = useState(5); // page size
   const [totalPages, setTotalPages] = useState(1);
   // Helper to compute which page numbers to show (with ellipses)
   const getPageNumbers = () => {
@@ -183,6 +186,19 @@ const RecipeDetailPage = () => {
       setExportingPDF(false);
     }
   };
+
+  const handleExportIngredients = async () => {
+    setExportingIngredient(true);
+
+    await exportIngredientsPdf({
+      title: recipe.title,
+      author: recipe.author?.name || 'Unknown author',
+      ingredients: recipe.ingredients,
+    });
+
+    setExportingIngredient(false);
+  };
+
   const handleFavorite = async () => {
     if (!token) {
       toast.error('Please log in first');
@@ -312,11 +328,13 @@ const RecipeDetailPage = () => {
     if (!amount) return '';
 
     let factor = 1;
+    if (multiplier === '¼X') factor = 0.25;
     if (multiplier === '½X') factor = 0.5;
     if (multiplier === '1X') factor = 1;
     if (multiplier === '2X') factor = 2;
+    if (multiplier === '3X') factor = 3;
 
-    // Handle both numbers and strings like "1.5"
+    // Handle both numbers and strings
     const numericAmount = parseFloat(amount);
     if (isNaN(numericAmount)) return amount; // fallback if amount is not a number (e.g., "pinch")
 
@@ -338,30 +356,47 @@ const RecipeDetailPage = () => {
             </Button>
           </Link>
           <div className="flex flex-row gap-2">
-            <Button
-              disabled={exporting}
-              variant="outline"
-              onClick={handleExport}
-              className="cursor-pointer"
-            >
-              <ImageDown />
-              <div className="hidden md:flex lg:flex">
-                {' '}
-                {exporting ? 'Exporting...' : 'Export as Image'}
-              </div>
-            </Button>
-            <Button
-              disabled={exportingPDF}
-              variant="outline"
-              onClick={handleExportPDF}
-              className="cursor-pointer"
-            >
-              <FileDown />
-              <div className="hidden md:flex lg:flex">
-                {' '}
-                {exportingPDF ? 'Exporting...' : 'Export as PDF'}
-              </div>
-            </Button>
+            <ButtonGroup>
+              <Button
+                size="sm"
+                disabled={exporting}
+                variant="outline"
+                onClick={handleExport}
+                className="cursor-pointer"
+              >
+                <ImageDown />
+                <div className="hidden md:flex lg:flex">
+                  {' '}
+                  {exporting ? 'Exporting...' : 'Export as Image'}
+                </div>
+              </Button>
+              <Button
+                size="sm"
+                disabled={exportingPDF}
+                variant="outline"
+                onClick={handleExportPDF}
+                className="cursor-pointer"
+              >
+                <FileDown />
+                <div className="hidden md:flex lg:flex">
+                  {' '}
+                  {exportingPDF ? 'Exporting...' : 'Export as PDF'}
+                </div>
+              </Button>
+              <Button
+                size="sm"
+                disabled={exportingIngredient}
+                variant="outline"
+                onClick={handleExportIngredients}
+                className="cursor-pointer"
+              >
+                <SquareCheckBig />
+                <div className="hidden md:flex lg:flex">
+                  {' '}
+                  {exportingIngredient ? 'Exporting...' : 'Ingredients Checklist'}
+                </div>
+              </Button>{' '}
+            </ButtonGroup>
           </div>
         </div>
 
@@ -472,13 +507,13 @@ const RecipeDetailPage = () => {
                   <Utensils className="text-accent" />
                 </div>
                 {/* Switch Buttons */}
-                <div className="flex w-fit flex-row gap-0 overflow-hidden rounded-none border-2 border-[var(--accent)]">
+                <div className="flex w-fit flex-row overflow-hidden rounded-none border-2 border-[var(--accent)]">
                   {options.map((value) => (
                     <Button
                       key={value}
                       variant="ghost"
                       onClick={() => setSelected(value)}
-                      className={`cursor-pointer rounded-none 
+                      className={`cursor-pointer rounded-none flex
                     ${selected === value ? 'bg-[var(--accent)]' : ''}`}
                     >
                       {/* Only show check on the selected button */}
@@ -616,17 +651,7 @@ const RecipeDetailPage = () => {
                 {/* Comments Section */}
                 <Separator className="my-2" />
                 {/* Comment List */}
-                {/* <div className="mt-6">
-                  {comments.length > 0 ? (
-                    comments.map((comment) => (
-                      <UserComment key={comment._id} comment={comment} />
-                    ))
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No comments yet. Be the first to share your thoughts!
-                    </p>
-                  )}
-                </div> */}
+
                 <div className="mt-6">
                   {commentsLoading ? (
                     <Spinner />
@@ -645,8 +670,8 @@ const RecipeDetailPage = () => {
                       {totalPages > 1 && (
                         <div className="mt-4">
                           <Pagination>
-                            <PaginationContent>
-                              <PaginationItem>
+                            <PaginationContent className="flex-wrap">
+                              {/* <PaginationItem>
                                 <PaginationPrevious
                                   href="#"
                                   onClick={(e) => {
@@ -656,7 +681,7 @@ const RecipeDetailPage = () => {
                                   aria-disabled={page === 1}
                                   className={page === 1 ? 'pointer-events-none opacity-50' : ''}
                                 />
-                              </PaginationItem>
+                              </PaginationItem> */}
 
                               {getPageNumbers().map((p, idx) => {
                                 if (p === 'ellipsis-left' || p === 'ellipsis-right') {
@@ -682,7 +707,7 @@ const RecipeDetailPage = () => {
                                 );
                               })}
 
-                              <PaginationItem>
+                              {/* <PaginationItem>
                                 <PaginationNext
                                   href="#"
                                   onClick={(e) => {
@@ -694,7 +719,7 @@ const RecipeDetailPage = () => {
                                     page === totalPages ? 'pointer-events-none opacity-50' : ''
                                   }
                                 />
-                              </PaginationItem>
+                              </PaginationItem> */}
                             </PaginationContent>
                           </Pagination>
                         </div>

@@ -254,11 +254,11 @@ const ProfilePage = () => {
         </Card>
 
         <Tabs defaultValue="shared" className="mt-4 ">
-          <TabsList className="">
-            <TabsTrigger className="cursor-pointer" value="shared">
+          <TabsList className="flex flex-1 gap-2">
+            <TabsTrigger className="cursor-pointer flex flex-1" value="shared">
               Shared Recipes
             </TabsTrigger>
-            <TabsTrigger className="cursor-pointer" value="favorites">
+            <TabsTrigger className="cursor-pointer flex flex-1" value="favorites">
               Favorites
             </TabsTrigger>
           </TabsList>

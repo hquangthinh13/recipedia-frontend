@@ -2,10 +2,10 @@
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import { saveAs } from 'file-saver';
+import { createRoot } from 'react-dom/client';
+import { IngredientPdfRenderer } from '@/components/ingredient-pdf-renderer';
+import React from 'react';
 
-/**
- * Expand scrollable elements inside a root node.
- */
 function expandScrollables(root) {
   const scrollables = root.querySelectorAll('*');
 
@@ -21,6 +21,34 @@ function expandScrollables(root) {
       el.style.maxHeight = 'none';
       el.style.height = 'auto';
     }
+  });
+}
+
+export function exportIngredientsPdf({ title, author, ingredients }) {
+  return new Promise((resolve) => {
+    // Create hidden container
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    document.body.appendChild(container);
+
+    const root = createRoot(container);
+
+    const handleDone = () => {
+      root.unmount();
+      document.body.removeChild(container);
+      resolve();
+    };
+
+    root.render(
+      React.createElement(IngredientPdfRenderer, {
+        title,
+        author,
+        ingredients,
+        onDone: handleDone,
+      }),
+    );
   });
 }
 

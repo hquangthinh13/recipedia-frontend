@@ -179,7 +179,7 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false, onDelete, onEdit }) => 
                       variant="destructive"
                       onClick={handleDelete}
                     >
-                      Delete {deleting ? 'Deleting...' : 'Delete'}
+                      {deleting ? 'Deleting...' : 'Delete'}
                     </Button>
                   </DialogFooter>
                 </DialogContent>

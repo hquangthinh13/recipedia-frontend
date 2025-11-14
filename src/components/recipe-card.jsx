@@ -174,7 +174,6 @@ const RecipeCard = ({ isTrending, recipe }) => {
           </TooltipContent>
         </Tooltip>
 
-        {/* Dish type + Cooking time */}
         <div className="flex justify-start items-center gap-2 mt-0 text-sm text-gray-500 mb-4">
           <div className="font-normal text-gray-500 group-hover:text-current">
             <span>
@@ -186,19 +185,6 @@ const RecipeCard = ({ isTrending, recipe }) => {
               {commentCount || 0} {commentCount > 1 ? 'comments' : 'comment'}
             </span>
           </div>
-          {/* <div className="flex items-center gap-2">
-            <ChefHat className="h-4 w-4 text-gray-400 " />
-            <span className="text-base text-gray-600 antialiased">
-              {dishTypeLabels[recipe.dishType] ?? recipe.dishType}
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-gray-400 " />
-            <span className="text-base text-gray-600 antialiased">
-              {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
-            </span>
-          </div> */}
         </div>
         <Separator className="flex mt-4 mb-2" />
         {/* Buttons */}
