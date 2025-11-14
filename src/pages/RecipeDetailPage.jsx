@@ -1,17 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
-import * as htmlToImage from "html-to-image";
-import { saveAs } from "file-saver";
-import { Link, useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { dishTypeLabels, cookingTimeLabels } from "@/lib/enumDisplayMap";
-import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import React, { useEffect, useState, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { dishTypeLabels, cookingTimeLabels } from '@/lib/enumDisplayMap';
+import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   Table,
   TableHeader,
@@ -19,7 +13,7 @@ import {
   TableHead,
   TableBody,
   TableCell,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Empty,
   EmptyContent,
@@ -27,10 +21,10 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty";
-import { Textarea } from "@/components/ui/textarea";
-import Footer from "@/components/page-footer";
-import logo from "@/assets/images/Recipedia-logo-square.svg";
+} from '@/components/ui/empty';
+import { Textarea } from '@/components/ui/textarea';
+import Footer from '@/components/page-footer';
+import logo from '@/assets/images/Recipedia-logo-square.svg';
 import {
   Check,
   Clock,
@@ -45,7 +39,8 @@ import {
   MessageSquarePlus,
   X,
   ImageDown,
-} from "lucide-react";
+  FileDown,
+} from 'lucide-react';
 import {
   Pagination,
   PaginationContent,
@@ -54,18 +49,19 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
-import { ArrowLeft } from "lucide-react";
-import { useParams } from "react-router-dom";
-import api from "@/lib/api";
-import Navbar from "@/components/navbar";
-import UserComment from "@/components/user-comment";
-import Spinner from "@/components/spinner";
-import { MusicPlayer } from "@/components/music-player";
-import { useAuth } from "@/context/AuthContext";
-import { toast } from "sonner";
-import { Card, CardContent } from "@/components/ui/card";
-import { formatDate } from "@/lib/formatDate";
+} from '@/components/ui/pagination';
+import { ArrowLeft } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import api from '@/lib/api';
+import Navbar from '@/components/navbar';
+import UserComment from '@/components/user-comment';
+import Spinner from '@/components/spinner';
+import { MusicPlayer } from '@/components/music-player';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
+import { Card, CardContent } from '@/components/ui/card';
+import { formatDate } from '@/lib/formatDate';
+import { exportCardToPng, exportCardToPdf } from '@/lib/recipeExport';
 
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 
@@ -74,18 +70,21 @@ const RecipeDetailPage = () => {
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [newComment, setNewComment] = useState("");
+  const [commenting, setCommenting] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportingPDF, setExportingPDF] = useState(false);
+
+  const [newComment, setNewComment] = useState('');
   const [isCommentFocused, setIsCommentFocused] = useState(false);
   const { user, setUser } = useAuth();
   const [comments, setComments] = useState([]);
   const location = useLocation(); // to read state from navigation
   const commentInputRef = useRef(null); // ref for textarea
-  const [selected, setSelected] = useState("1X");
-  const options = ["½X", "1X", "2X"];
+  const [selected, setSelected] = useState('1X');
+  const options = ['½X', '1X', '2X'];
   const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
-  const authorName = recipe?.author?.name || "Mysterious Chef";
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const authorName = recipe?.author?.name || 'Mysterious Chef';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const [favorite, setFavorite] = useState(false);
   const cardRef = useRef(null);
 
@@ -105,9 +104,9 @@ const RecipeDetailPage = () => {
     const left = Math.max(2, current - delta);
     const right = Math.min(max - 1, current + delta);
 
-    if (left > 2) pages.push("ellipsis-left");
+    if (left > 2) pages.push('ellipsis-left');
     for (let p = left; p <= right; p++) pages.push(p);
-    if (right < max - 1) pages.push("ellipsis-right");
+    if (right < max - 1) pages.push('ellipsis-right');
     pages.push(max);
     return pages;
   };
@@ -126,20 +125,20 @@ const RecipeDetailPage = () => {
       const res = await api.get(`/recipes/${id}/comments`, {
         params: { page: pageToFetch, limit },
       });
-      console.log("Comments: ", res);
+      console.log('Comments: ', res);
       const list = res.data?.comments || res.data?.data || []; // flexible field name
       // prefer server totals; fallback to recipe.comments length if needed
       const totalCount =
-        typeof res.data?.totalCount === "number"
+        typeof res.data?.totalCount === 'number'
           ? res.data.totalCount
-          : typeof res.data?.total === "number"
-          ? res.data.total
-          : Array.isArray(recipe?.comments)
-          ? recipe.comments.length
-          : list.length;
+          : typeof res.data?.total === 'number'
+            ? res.data.total
+            : Array.isArray(recipe?.comments)
+              ? recipe.comments.length
+              : list.length;
 
       const serverTotalPages =
-        typeof res.data?.totalPages === "number"
+        typeof res.data?.totalPages === 'number'
           ? res.data.totalPages
           : Math.max(1, Math.ceil(totalCount / limit));
 
@@ -147,7 +146,7 @@ const RecipeDetailPage = () => {
       setTotalPages(serverTotalPages);
       setPage(pageToFetch);
     } catch (e) {
-      console.error("Failed to fetch comments:", e);
+      console.error('Failed to fetch comments:', e);
     } finally {
       setCommentsLoading(false);
     }
@@ -163,67 +162,30 @@ const RecipeDetailPage = () => {
     if (!cardRef.current) return;
 
     try {
-      // Wait for fonts & layout to be ready
-      await document.fonts.ready;
-
-      // Clone the card to avoid altering live layout
-      const clone = cardRef.current.cloneNode(true);
-
-      // Expand any scrollable content (like ingredients tables)
-      const scrollables = clone.querySelectorAll("*");
-      scrollables.forEach((el) => {
-        const computed = window.getComputedStyle(el);
-        if (
-          computed.overflow === "auto" ||
-          computed.overflowY === "auto" ||
-          computed.overflowY === "scroll"
-        ) {
-          el.style.overflow = "visible";
-          el.style.maxHeight = "none";
-          el.style.height = "auto";
-        }
-      });
-
-      // Create wrapper containers
-      const outerWrapper = document.createElement("div");
-      outerWrapper.style.display = "flex";
-      outerWrapper.style.justifyContent = "center";
-      outerWrapper.style.backgroundColor = "#fcfcfc";
-      outerWrapper.style.width = "fit-content";
-      outerWrapper.style.maxWidth = "100%";
-
-      const innerWrapper = document.createElement("div");
-      innerWrapper.style.width = "800px";
-      innerWrapper.style.maxWidth = "100%";
-      innerWrapper.style.padding = "8px";
-      innerWrapper.style.backgroundColor = "#fcfcfc";
-      innerWrapper.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
-      innerWrapper.style.borderRadius = "8px";
-
-      innerWrapper.appendChild(clone);
-      outerWrapper.appendChild(innerWrapper);
-      document.body.appendChild(outerWrapper);
-
-      // Export to PNG with consistent resolution
-      const dataUrl = await htmlToImage.toPng(outerWrapper, {
-        pixelRatio: 2,
-        backgroundColor: "#fcfcfc",
-        cacheBust: true, // ensures fresh assets
-      });
-
-      // Clean up temp elements
-      document.body.removeChild(outerWrapper);
-
-      // Trigger download
-      saveAs(dataUrl, `Recipedia - ${recipe.title || "recipe"}.png`);
+      setExporting(true);
+      await exportCardToPng(cardRef.current, `Recipedia - ${recipe.title || 'recipe'}.png`);
     } catch (error) {
-      console.error("Export failed:", error);
+      console.error('Export failed:', error);
+    } finally {
+      setExporting(false);
     }
   };
 
+  const handleExportPDF = async () => {
+    if (!cardRef.current) return;
+
+    try {
+      setExportingPDF(true);
+      await exportCardToPdf(cardRef.current, `Recipedia - ${recipe.title || 'recipe'}.pdf`);
+    } catch (error) {
+      console.error('PDF Export failed:', error);
+    } finally {
+      setExportingPDF(false);
+    }
+  };
   const handleFavorite = async () => {
     if (!token) {
-      toast.error("Please log in first");
+      toast.error('Please log in first');
       return;
     }
     try {
@@ -240,7 +202,7 @@ const RecipeDetailPage = () => {
         return { ...prev, favorites: updatedFavorites };
       });
     } catch (error) {
-      toast.error("Failed to update favorites");
+      toast.error('Failed to update favorites');
       console.error(error);
     }
   };
@@ -248,26 +210,30 @@ const RecipeDetailPage = () => {
   const handleCommentSubmit = async () => {
     if (!newComment.trim()) return;
     try {
+      setCommenting(true);
       const res = await api.post(
         `/recipes/${recipe._id}/comments`,
         { text: newComment },
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        },
       );
+      setCommenting(false);
 
       setComments((prev) => [...prev, res.data.comment]);
-      setNewComment("");
+      setNewComment('');
       setIsCommentFocused(false);
-      toast.success("Comment added!");
+      toast.success('Comment added!');
     } catch (error) {
-      console.error("Error posting comment:", error);
-      toast.error("Failed to add comment");
+      setCommenting(false);
+
+      console.error('Error posting comment:', error);
+      toast.error('Failed to add comment');
     }
   };
 
   const handleCommentCancel = () => {
-    setNewComment("");
+    setNewComment('');
     setIsCommentFocused(false);
   };
 
@@ -275,12 +241,12 @@ const RecipeDetailPage = () => {
     const fetchRecipe = async () => {
       try {
         const { data } = await api.get(`/recipes/${id}`);
-        console.log("Fetched recipe:", data);
+        console.log('Fetched recipe:', data);
         setRecipe(data);
         setComments(data.comments || []);
         document.title = `Recipedia | ${data.title}`;
       } catch (err) {
-        console.error("Error fetching recipe:", err);
+        console.error('Error fetching recipe:', err);
       } finally {
         setLoading(false);
       }
@@ -291,9 +257,7 @@ const RecipeDetailPage = () => {
   // Keep favorite state in sync when user or recipe changes
   useEffect(() => {
     if (user?.favorites && recipe?._id) {
-      const isFav = user.favorites.some(
-        (id) => id === recipe._id || id._id === recipe._id
-      );
+      const isFav = user.favorites.some((id) => id === recipe._id || id._id === recipe._id);
       setFavorite(isFav);
     }
   }, [user, recipe]);
@@ -302,8 +266,8 @@ const RecipeDetailPage = () => {
       // Smooth scroll and focus
       setTimeout(() => {
         commentInputRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
+          behavior: 'smooth',
+          block: 'center',
         });
         commentInputRef.current.focus();
       }, 300);
@@ -322,46 +286,35 @@ const RecipeDetailPage = () => {
         <Empty className="h-full">
           <EmptyHeader>
             <EmptyMedia>
-              <Link to={"/"} className="flex flex-1">
+              <Link to={'/'} className="flex flex-1">
                 <img src={logo} alt="Recipedia Logo" className="h-12" />
               </Link>
             </EmptyMedia>
             <EmptyTitle>Recipe not found</EmptyTitle>
-            <EmptyDescription>
-              The requested recipe doesn’t exist.
-            </EmptyDescription>
+            <EmptyDescription>The requested recipe doesn’t exist.</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <div className="flex gap-2">
-              <Button className="cursor-pointer" onClick={() => navigate("/")}>
+              <Button className="cursor-pointer" onClick={() => navigate('/')}>
                 Back to Home
               </Button>
-              {/* <Button
-                className="cursor-pointer"
-                onClick={() => navigate("/")}
-                variant="outline"
-              >
-                Back to Home
-              </Button> */}
             </div>
           </EmptyContent>
-        </Empty>{" "}
+        </Empty>{' '}
       </div>
     );
 
   // Ingredients (already an array of objects per schema)
-  const ingredients = Array.isArray(recipe.ingredients)
-    ? recipe.ingredients
-    : [];
+  const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
 
   // helper to scale ingredient amounts
   const scaleAmount = (amount, multiplier) => {
-    if (!amount) return "";
+    if (!amount) return '';
 
     let factor = 1;
-    if (multiplier === "½X") factor = 0.5;
-    if (multiplier === "1X") factor = 1;
-    if (multiplier === "2X") factor = 2;
+    if (multiplier === '½X') factor = 0.5;
+    if (multiplier === '1X') factor = 1;
+    if (multiplier === '2X') factor = 2;
 
     // Handle both numbers and strings like "1.5"
     const numericAmount = parseFloat(amount);
@@ -378,20 +331,38 @@ const RecipeDetailPage = () => {
       <Navbar needTimer={true} />
       <div className="mx-auto max-w-6xl mt-2 p-4">
         <div className="flex flex-row justify-between items-center mb-2">
-          <Link to={"/"}>
+          <Link to={'/'}>
             <Button variant="ghost" className="cursor-pointer">
               <ArrowLeft />
               <div className="hidden md:flex lg:flex">Back to Recipes</div>
             </Button>
           </Link>
-          <Button
-            variant="outline"
-            onClick={handleExport}
-            className="cursor-pointer"
-          >
-            <ImageDown />
-            <div className="hidden md:flex lg:flex">Save Recipe Card</div>
-          </Button>
+          <div className="flex flex-row gap-2">
+            <Button
+              disabled={exporting}
+              variant="outline"
+              onClick={handleExport}
+              className="cursor-pointer"
+            >
+              <ImageDown />
+              <div className="hidden md:flex lg:flex">
+                {' '}
+                {exporting ? 'Exporting...' : 'Export as Image'}
+              </div>
+            </Button>
+            <Button
+              disabled={exportingPDF}
+              variant="outline"
+              onClick={handleExportPDF}
+              className="cursor-pointer"
+            >
+              <FileDown />
+              <div className="hidden md:flex lg:flex">
+                {' '}
+                {exportingPDF ? 'Exporting...' : 'Export as PDF'}
+              </div>
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4">
@@ -429,8 +400,7 @@ const RecipeDetailPage = () => {
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4 text-gray-400 " />
                       <span className="text-base  text-gray-600 antialiased">
-                        {cookingTimeLabels[recipe.cookingTime] ??
-                          recipe.cookingTime}
+                        {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
                       </span>
                     </div>
 
@@ -458,10 +428,8 @@ const RecipeDetailPage = () => {
                   className="cursor-pointer"
                 >
                   <Bookmark
-                    className={`transition ${
-                      favorite && "fill-primary text-primary"
-                    }`}
-                  />{" "}
+                    className={`transition ${favorite && 'fill-primary text-primary'}`}
+                  />{' '}
                 </Button>
               </div>
               {/* Author + Date */}
@@ -477,7 +445,7 @@ const RecipeDetailPage = () => {
                   <div className="flex flex-col">
                     <Link to={`/profile/${recipe.author?._id}`}>
                       <div className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-[var(--card-foreground)]">
-                        {recipe.author?.name || "Mysterious Chef"}
+                        {recipe.author?.name || 'Mysterious Chef'}
                       </div>
                     </Link>
                     <Tooltip>
@@ -511,7 +479,7 @@ const RecipeDetailPage = () => {
                       variant="ghost"
                       onClick={() => setSelected(value)}
                       className={`cursor-pointer rounded-none 
-                    ${selected === value ? "bg-[var(--accent)]" : ""}`}
+                    ${selected === value ? 'bg-[var(--accent)]' : ''}`}
                     >
                       {/* Only show check on the selected button */}
                       {selected === value && <Check className="h-4 w-4" />}
@@ -521,8 +489,8 @@ const RecipeDetailPage = () => {
                 </div>
                 <div className="text-sm flex text-[var(--muted-foreground)] font-light items-center gap-1">
                   <BadgeInfo className="h-4 w-4" />
-                  Original recipe (1X) yields 4 servings. Adjust serving size to
-                  update ingredient amounts.
+                  Original recipe (1X) yields 4 servings. Adjust serving size to update ingredient
+                  amounts.
                 </div>
                 {/* Ingredients Table */}
                 <div className="flex rounded-none border mt-4">
@@ -530,12 +498,8 @@ const RecipeDetailPage = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="text-base ">Ingredient</TableHead>
-                        <TableHead className="w-24 text-right text-base ">
-                          Amount
-                        </TableHead>
-                        <TableHead className="w-24 text-center text-base ">
-                          Unit
-                        </TableHead>
+                        <TableHead className="w-24 text-right text-base ">Amount</TableHead>
+                        <TableHead className="w-24 text-center text-base ">Unit</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -604,14 +568,12 @@ const RecipeDetailPage = () => {
                           src={
                             user?.avatar ||
                             `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
-                              user?.name || "U"
+                              user?.name || 'U',
                             )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`
                           }
-                          alt={user?.name || "Your avatar"}
+                          alt={user?.name || 'Your avatar'}
                         />
-                        <AvatarFallback>
-                          {user?.name?.[0]?.toUpperCase() || "U"}
-                        </AvatarFallback>
+                        <AvatarFallback>{user?.name?.[0]?.toUpperCase() || 'U'}</AvatarFallback>
                       </Avatar>
 
                       <div className="flex-1">
@@ -622,7 +584,7 @@ const RecipeDetailPage = () => {
                           onChange={(e) => setNewComment(e.target.value)}
                           onFocus={() => setIsCommentFocused(true)}
                           className={`resize-none border-0 border-b-2 rounded-none focus:border-none transition-all duration-200 ${
-                            isCommentFocused ? "min-h-[80px]" : "min-h-[40px]"
+                            isCommentFocused ? 'min-h-[80px]' : 'min-h-[40px]'
                           }`}
                           rows={isCommentFocused ? 3 : 1}
                         />
@@ -633,17 +595,17 @@ const RecipeDetailPage = () => {
                               onClick={handleCommentCancel}
                               className="text-muted-foreground hover:text-foreground cursor-pointer"
                             >
-                              {" "}
+                              {' '}
                               <X />
                               Cancel
                             </Button>
                             <Button
                               onClick={handleCommentSubmit}
-                              disabled={!newComment.trim()}
+                              disabled={!newComment.trim() || commenting}
                               className="cursor-pointer"
                             >
                               <MessageSquarePlus />
-                              Comment
+                              {commenting ? 'Commenting...' : 'Comment'}
                             </Button>
                           </div>
                         )}
@@ -692,19 +654,12 @@ const RecipeDetailPage = () => {
                                     if (page > 1) fetchComments(page - 1);
                                   }}
                                   aria-disabled={page === 1}
-                                  className={
-                                    page === 1
-                                      ? "pointer-events-none opacity-50"
-                                      : ""
-                                  }
+                                  className={page === 1 ? 'pointer-events-none opacity-50' : ''}
                                 />
                               </PaginationItem>
 
                               {getPageNumbers().map((p, idx) => {
-                                if (
-                                  p === "ellipsis-left" ||
-                                  p === "ellipsis-right"
-                                ) {
+                                if (p === 'ellipsis-left' || p === 'ellipsis-right') {
                                   return (
                                     <PaginationItem key={`${p}-${idx}`}>
                                       <PaginationEllipsis />
@@ -732,14 +687,11 @@ const RecipeDetailPage = () => {
                                   href="#"
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    if (page < totalPages)
-                                      fetchComments(page + 1);
+                                    if (page < totalPages) fetchComments(page + 1);
                                   }}
                                   aria-disabled={page === totalPages}
                                   className={
-                                    page === totalPages
-                                      ? "pointer-events-none opacity-50"
-                                      : ""
+                                    page === totalPages ? 'pointer-events-none opacity-50' : ''
                                   }
                                 />
                               </PaginationItem>
@@ -755,7 +707,7 @@ const RecipeDetailPage = () => {
                   )}
                 </div>
               </CardContent>
-            </Card>{" "}
+            </Card>{' '}
           </div>
         </div>
       </div>

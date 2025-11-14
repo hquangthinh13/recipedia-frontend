@@ -3,7 +3,7 @@ import { z } from "zod";
 // Ingredient schema (matches IngredientSchema in Mongoose)
 export const IngredientFormSchema = z.object({
   name: z.string().trim().min(1),
-  amount: z.coerce.number().min(1),
+  amount: z.coerce.number().min(0),
   measurement: z.enum([
     "tsp",
     "tbsp",
@@ -30,7 +30,7 @@ export const RecipeFormSchema = z.object({
   title: z
     .string()
     .trim()
-    .min(10, { message: "Title must be at least 10 characters." }),
+    .min(5, { message: "Title must be at least 5 characters." }),
 
   // Cover image can be either a URL string or a File (from input type="file")
   coverImage: z.union([z.string().url(), z.instanceof(File)]),

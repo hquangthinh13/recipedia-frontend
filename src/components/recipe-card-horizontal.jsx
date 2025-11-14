@@ -1,29 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Clock,
-  Heart,
-  Bookmark,
-  MessageCircle,
-  ChefHat,
-  SquarePen,
-  Trash,
-} from "lucide-react";
-import { dishTypeLabels, cookingTimeLabels } from "@/lib/enumDisplayMap";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import api from "@/lib/api";
-import { toast } from "sonner";
-import { useAuth } from "@/context/AuthContext";
-import { formatDate } from "@/lib/formatDate";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Card, CardContent } from '@/components/ui/card';
+import { Clock, Heart, Bookmark, MessageCircle, ChefHat, SquarePen, Trash } from 'lucide-react';
+import { dishTypeLabels, cookingTimeLabels } from '@/lib/enumDisplayMap';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import api from '@/lib/api';
+import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
+import { formatDate } from '@/lib/formatDate';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   Dialog,
   DialogClose,
@@ -33,29 +21,23 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 
-const RecipeCardHorizontal = ({
-  recipe,
-  isOwner = false,
-  onDelete,
-  onEdit,
-}) => {
+const RecipeCardHorizontal = ({ recipe, isOwner = false, onDelete, onEdit }) => {
   const navigate = useNavigate();
   const commentCount = recipe.comments?.length || 0;
   const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
-  const authorName = recipe?.author?.name || "Mysterious Chef";
+  const authorName = recipe?.author?.name || 'Mysterious Chef';
   const { user, setUser } = useAuth();
   const userId = user?.id;
   const { token } = useAuth();
   const [liked, setLiked] = useState(recipe.likedByUser || false);
   const [likeCount, setLikeCount] = useState(recipe.likes?.length || 0);
   const [favorite, setFavorite] = useState(
-    user?.favorites?.some((id) => id === recipe._id || id._id === recipe._id) ||
-      false
+    user?.favorites?.some((id) => id === recipe._id || id._id === recipe._id) || false,
   );
-
+  const [deleting, setDeleting] = useState(false);
   useEffect(() => {
     if (!token) {
       setLiked(false);
@@ -70,8 +52,7 @@ const RecipeCardHorizontal = ({
     // recipe.likes is an array of ObjectIds
     const userHasLiked = recipe.likes.some(
       (id) =>
-        id.toString() === userId.toString() ||
-        (id._id && id._id.toString() === userId.toString())
+        id.toString() === userId.toString() || (id._id && id._id.toString() === userId.toString()),
     );
     setLiked(userHasLiked);
   }, [userId, recipe.likes]);
@@ -79,7 +60,7 @@ const RecipeCardHorizontal = ({
   const handleLike = async () => {
     // Only block when we definitively know the user isn't logged in
     if (!token) {
-      toast.error("Please log in to like recipes.");
+      toast.error('Please log in to like recipes.');
       return;
     }
     try {
@@ -87,14 +68,14 @@ const RecipeCardHorizontal = ({
       setLiked(res.data.likedByUser);
       setLikeCount(res.data.likesCount);
     } catch (error) {
-      toast.error("Failed to update like status");
+      toast.error('Failed to update like status');
       console.error(error);
     }
   };
 
   const handleFavorite = async () => {
     if (!token) {
-      toast.error("Please log in first.");
+      toast.error('Please log in first.');
       return;
     }
     try {
@@ -111,18 +92,21 @@ const RecipeCardHorizontal = ({
         return { ...prev, favorites: updatedFavorites };
       });
     } catch (error) {
-      toast.error("Failed to update favorites");
+      toast.error('Failed to update favorites');
       console.error(error);
     }
   };
 
   const handleDelete = async () => {
     try {
+      setDeleting(true);
       await api.delete(`/recipes/${recipe._id}`);
-      toast.success("Recipe deleted successfully");
+      setDeleting(false);
+      toast.success('Recipe deleted successfully');
       if (onDelete) onDelete(recipe._id); // tell parent to update
     } catch (error) {
-      toast.error("Failed to delete recipe");
+      setDeleting(false);
+      toast.error('Failed to delete recipe');
       console.error(error);
     }
   };
@@ -131,9 +115,7 @@ const RecipeCardHorizontal = ({
   // Keep favorite state in sync when user or recipe changes
   useEffect(() => {
     if (user?.favorites && recipe?._id) {
-      const isFav = user.favorites.some(
-        (id) => id === recipe._id || id._id === recipe._id
-      );
+      const isFav = user.favorites.some((id) => id === recipe._id || id._id === recipe._id);
       setFavorite(isFav);
     }
   }, [user, recipe]);
@@ -145,10 +127,7 @@ const RecipeCardHorizontal = ({
         {/* Author + Date */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Link
-              to={`/profile/${recipe.author?._id}`}
-              className="cursor-pointer"
-            >
+            <Link to={`/profile/${recipe.author?._id}`} className="cursor-pointer">
               <Avatar>
                 <AvatarImage src={avatarUrl} alt={authorName} />
                 <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
@@ -158,7 +137,7 @@ const RecipeCardHorizontal = ({
             <div className="flex flex-col">
               <Link to={`/profile/${recipe.author?._id}`}>
                 <div className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-[var(--card-foreground)]">
-                  {recipe.author?.name || "Mysterious Chef"}
+                  {recipe.author?.name || 'Mysterious Chef'}
                 </div>
               </Link>
               <div className="text-xs flex text-[var(--muted-foreground)] font-light">
@@ -179,11 +158,7 @@ const RecipeCardHorizontal = ({
 
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="cursor-pointer"
-                  >
+                  <Button size="icon" variant="ghost" className="cursor-pointer">
                     <Trash />
                   </Button>
                 </DialogTrigger>
@@ -201,11 +176,12 @@ const RecipeCardHorizontal = ({
                       </Button>
                     </DialogClose>
                     <Button
+                      disabled={deleting}
                       className="cursor-pointer"
                       variant="destructive"
                       onClick={handleDelete}
                     >
-                      Delete
+                      Delete {deleting ? 'Deleting...' : 'Delete'}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -223,23 +199,19 @@ const RecipeCardHorizontal = ({
             </div>
           ) : (
             <>
-              {" "}
+              {' '}
               <Button
                 size="icon"
                 variant="ghost"
                 className="cursor-pointer"
                 onClick={handleFavorite}
               >
-                <Bookmark
-                  className={`transition ${
-                    favorite && "fill-primary text-primary"
-                  }`}
-                />
+                <Bookmark className={`transition ${favorite && 'fill-primary text-primary'}`} />
               </Button>
             </>
           )}
         </div>
-        {/* Title */}{" "}
+        {/* Title */}{' '}
         <Link to={`/recipes/${recipe._id}`}>
           <h2 className="cursor-pointer hover:text-accent text-xl font-bold line-clamp-1 text-[var(--card-foreground)] mt-1 mb-0 antialiased">
             {recipe.title}
@@ -280,9 +252,7 @@ const RecipeCardHorizontal = ({
             variant="ghost"
             className="group cursor-pointer flex-1 flex"
           >
-            <Heart
-              className={`transition ${liked && "fill-primary text-primary"}`}
-            />{" "}
+            <Heart className={`transition ${liked && 'fill-primary text-primary'}`} />{' '}
             {/* {likeCount} */}
             <div className="font-normal text-gray-500 group-hover:text-current">
               <span>{likeCount || 0}</span>

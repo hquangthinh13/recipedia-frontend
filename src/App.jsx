@@ -1,19 +1,22 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage";
-import LogInPage from "./pages/LogInPage";
-import SignUpPage from "./pages/SignUpPage";
-import CreateRecipePage from "./pages/CreateRecipePage";
-import RecipeDetailPage from "./pages/RecipeDetailPage";
-import EmailVerificationPage from "./pages/EmailVerificationPage";
-import VerifyCodePage from "./pages/VerifyCodePage";
-import VerifyResetCodePage from "./pages/VerifyResetCodePage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import NewPasswordPage from "./pages/NewPasswordPage";
-import AvatarCustomizerPage from "./pages/AvatarCustomizerPage";
-import ProfilePage from "./pages/ProfilePage";
-import UserDashboard from "./pages/UserDashboard";
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 
+import HomePage from './pages/HomePage';
+
+import CreateRecipePage from './pages/CreateRecipePage';
+import RecipeDetailPage from './pages/RecipeDetailPage';
+
+import AvatarCustomizerPage from './pages/AvatarCustomizerPage';
+import ProfilePage from './pages/ProfilePage';
+import UserDashboard from './pages/UserDashboard';
+
+import LogInPage from './pages/authentication/LogInPage';
+import SignUpPage from './pages/authentication/SignUpPage';
+import EmailVerificationPage from './pages/authentication/EmailVerificationPage';
+import VerifyCodePage from './pages/authentication/VerifyCodePage';
+import VerifyResetCodePage from './pages/authentication/VerifyResetCodePage';
+import ForgotPasswordPage from './pages/authentication/ForgotPasswordPage';
+import NewPasswordPage from './pages/authentication/NewPasswordPage';
 const App = () => {
   return (
     <div>

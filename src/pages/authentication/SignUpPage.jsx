@@ -1,16 +1,15 @@
 // src/pages/SignUpPage.jsx
-import React, { useEffect } from "react";
-import api from "@/lib/api";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
-import loginImage from "@/assets/images/overcooked5.jpg";
-import logo from "@/assets/images/Recipedia-logo-square.svg";
-import { CookingPot } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React, { useEffect, useState } from 'react';
+import api from '@/lib/api';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+import loginImage from '@/assets/images/overcooked5.jpg';
+import logo from '@/assets/images/Recipedia-logo-square.svg';
+import { CookingPot } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -18,71 +17,67 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/form';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 // --- Schema ---
 const SignUpFormSchema = z
   .object({
-    name: z.string().trim().min(2, "Please enter your full name"),
-    email: z.string().trim().email("Enter a valid email"),
+    name: z.string().trim().min(2, 'Please enter your full name'),
+    email: z.string().trim().email('Enter a valid email'),
     password: z
       .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(72, "Password is too long"),
+      .min(8, 'Password must be at least 8 characters')
+      .max(72, 'Password is too long'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
   });
 
 const SignUpPage = () => {
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+
   useEffect(() => {
-    document.title = "Recipedia | Sign Up";
+    document.title = 'Recipedia | Sign Up';
   }, []);
   const form = useForm({
     resolver: zodResolver(SignUpFormSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
     },
   });
   const onSubmit = async (values) => {
     try {
-      const { data } = await api.post("/auth/signup", {
+      setLoading(true);
+
+      const { data } = await api.post('/auth/signup', {
         name: values.name,
         email: values.email,
         password: values.password,
       });
+      setLoading(false);
 
-      if (data.msg?.toLowerCase().includes("verification code")) {
+      if (data.msg?.toLowerCase().includes('verification code')) {
         navigate(`/verify-code?email=${encodeURIComponent(values.email)}`);
       }
     } catch (err) {
-      // 🔍 Extract message from backend response
-      const msg = err?.response?.data?.msg || "Something went wrong";
+      setLoading(false);
 
-      // 🧠 Handle specific messages to show per field
-      if (msg.toLowerCase().includes("user already exists")) {
-        form.setError("email", {
-          message: "This email is already registered.",
+      const msg = err?.response?.data?.msg || 'Something went wrong';
+      if (msg.toLowerCase().includes('user already exists')) {
+        form.setError('email', {
+          message: 'This email is already registered.',
         });
-      } else if (msg.toLowerCase().includes("password")) {
-        form.setError("password", { message: msg });
+      } else if (msg.toLowerCase().includes('password')) {
+        form.setError('password', { message: msg });
       } else {
-        // Default fallback (top-level error)
-        form.setError("root", { message: msg });
+        form.setError('root', { message: msg });
       }
     }
   };
@@ -90,16 +85,13 @@ const SignUpPage = () => {
   return (
     <div
       style={{ backgroundImage: `url(${loginImage})` }}
-      className="bg-cover bg-center flex min-h-svh flex-col items-center md:items-start justify-center gap-6 p-6 md:p-10"
+      className="bg-cover bg-center flex min-h-svh flex-col items-center md:items-start justify-center gap-6 p-4 md:p-10"
     >
       <div className="flex w-full mx-0 md:mx-18 lg:mx-18 max-w-sm flex-col gap-6">
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader className="text-center">
-              <Link
-                to={"/"}
-                className="flex items-center gap-2 self-center font-medium mb-2"
-              >
+              <Link to={'/'} className="flex items-center gap-2 self-center font-medium mb-2">
                 <img src={logo} alt="Recipedia Logo" className="h-9" />
                 Recipedia
               </Link>
@@ -108,11 +100,7 @@ const SignUpPage = () => {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  noValidate
-                  autoComplete="off"
-                >
+                <form onSubmit={form.handleSubmit(onSubmit)} noValidate autoComplete="off">
                   <div className="grid gap-6">
                     <div className="grid gap-6">
                       {/* Name */}
@@ -189,20 +177,18 @@ const SignUpPage = () => {
                     </div>
 
                     <Button
+                      disabled={loading}
                       type="submit"
                       variant="default"
-                      className="w-full cursor-pointer"
+                      className={`w-full cursor-pointer ${loading ? 'opacity-60' : ''}`}
                     >
-                      <CookingPot className="mr-2" />
-                      Create account
+                      <CookingPot />
+                      {loading ? 'Creating...' : 'Create account!'}
                     </Button>
 
                     <div className="text-center text-sm">
-                      Already have an account?{" "}
-                      <Link
-                        to="/login"
-                        className="underline underline-offset-4 hover:text-primary"
-                      >
+                      Already have an account?{' '}
+                      <Link to="/login" className="underline underline-offset-4 hover:text-primary">
                         Log in
                       </Link>
                     </div>

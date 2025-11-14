@@ -1,17 +1,17 @@
-import React, { useEffect, useRef } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import api from "@/lib/api";
-import Pattern from "@/components/pattern";
-import Spinner from "@/components/spinner";
-import { Flame } from "lucide-react";
-import Navbar from "@/components/navbar";
-import { useState } from "react";
-import RecipeCard from "@/components/recipe-card";
-import UserCard from "@/components/user-card";
-import HomeLinkCard from "@/components/home-link-card";
-import { Button } from "@/components/ui/button";
-import Footer from "@/components/page-footer";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import api from '@/lib/api';
+import Pattern from '@/components/pattern';
+import Spinner from '@/components/spinner';
+import { Flame, RotateCcw } from 'lucide-react';
+import Navbar from '@/components/navbar';
+import { useState } from 'react';
+import RecipeCard from '@/components/recipe-card';
+import UserCard from '@/components/user-card';
+import HomeLinkCard from '@/components/home-link-card';
+import { Button } from '@/components/ui/button';
+import Footer from '@/components/page-footer';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -19,25 +19,25 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import Autoplay from "embla-carousel-autoplay";
+} from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
 
 const HomePage = () => {
   const [recipes, setRecipes] = useState([]);
   const [topWeeklyRecipes, setTopWeeklyRecipes] = useState([]);
   const [topUsers, setTopUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState("");
-  const [cookingTime, setCookingTime] = useState("");
-  const [dishType, setDishType] = useState("");
-  const [sort, setSort] = useState("");
+  const [username, setUsername] = useState('');
+  const [cookingTime, setCookingTime] = useState('');
+  const [dishType, setDishType] = useState('');
+  const [sort, setSort] = useState('');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [page, setPage] = useState(1);
@@ -53,8 +53,8 @@ const HomePage = () => {
   const scrollToSection = () => {
     requestAnimationFrame(() => {
       sectionRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
+        behavior: 'smooth',
+        block: 'start',
       });
     });
   };
@@ -62,11 +62,11 @@ const HomePage = () => {
   const fetchTopWeeklyRecipes = async () => {
     try {
       setIsLoading01(true);
-      const res = await api.get("/recipes/trending?n=12");
-      console.log("Top trending recipes:", res.data);
+      const res = await api.get('/recipes/trending?n=12');
+      console.log('Top trending recipes:', res.data);
       setTopWeeklyRecipes(res.data);
     } catch (error) {
-      console.error("Error fetching top trending recipes:", error);
+      console.error('Error fetching top trending recipes:', error);
     } finally {
       setIsLoading01(false);
     }
@@ -74,11 +74,11 @@ const HomePage = () => {
   const fetchTopUsers = async () => {
     try {
       setIsLoading02(true);
-      const res = await api.get("/users/top?limit=6");
-      console.log("Top users:", res.data.topUsers);
+      const res = await api.get('/users/top?limit=6');
+      console.log('Top users:', res.data.topUsers);
       setTopUsers(res.data.topUsers);
     } catch (error) {
-      console.error("Error fetching top users.", error);
+      console.error('Error fetching top users.', error);
     } finally {
       setIsLoading02(false);
     }
@@ -89,19 +89,16 @@ const HomePage = () => {
       else setIsLoading(true);
 
       const qs = new URLSearchParams();
-      if (cookingTime) qs.set("cookingTime", cookingTime);
-      if (dishType) qs.set("dishType", dishType);
-      if (sort) qs.set("sort", sort);
+      if (cookingTime) qs.set('cookingTime', cookingTime);
+      if (dishType) qs.set('dishType', dishType);
+      if (sort) qs.set('sort', sort);
 
       // Update browser URL so it's shareable/bookmarkable
-      navigate(
-        { pathname: "/", search: `?${qs.toString()}` },
-        { replace: true }
-      );
+      navigate({ pathname: '/', search: `?${qs.toString()}` }, { replace: true });
 
       // Add pagination params for the API call only
-      qs.set("limit", String(PAGE_SIZE));
-      qs.set("page", String(page));
+      qs.set('limit', String(PAGE_SIZE));
+      qs.set('page', String(page));
 
       // Hit the API with the same query string
       const res = await api.get(`/recipes?${qs.toString()}`);
@@ -111,49 +108,63 @@ const HomePage = () => {
 
       if (append) {
         setRecipes((prev) => [...prev, ...batch]);
-        console.log("Appending recipes:", batch);
+        console.log('Appending recipes:', batch);
       } else {
         setRecipes(batch);
-        console.log("Fetched recipes:", batch);
+        console.log('Fetched recipes:', batch);
       }
     } catch (error) {
-      console.error("Error fetching recipes:", error);
+      console.error('Error fetching recipes:', error);
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
   };
 
+  const resetFilters = () => {
+    // Reset state
+    setCookingTime('');
+    setDishType('');
+    setSort('');
+    setPage(1);
+
+    // Clear URL query
+    // navigate('/', { replace: true });
+
+    // Fetch again with default options
+    fetchRecipes({ append: false });
+  };
+
   useEffect(() => {
-    document.title = "Recipedia | Home";
+    document.title = 'Recipedia | Home';
     // On first load, hydrate filters from URL (if present)
     // This runs only once; subsequent changes come from user actions.
-    const initialCooking = searchParams.get("cookingTime") || "";
-    const initialDish = searchParams.get("dishType") || "";
-    const initialSort = searchParams.get("sort") || "";
+    const initialCooking = searchParams.get('cookingTime') || '';
+    const initialDish = searchParams.get('dishType') || '';
+    const initialSort = searchParams.get('sort') || '';
     if (initialCooking) setCookingTime(initialCooking);
     if (initialDish) setDishType(initialDish);
     if (initialSort) setSort(initialSort);
+    fetchTopWeeklyRecipes();
+    fetchTopUsers();
   }, []);
 
   useEffect(() => {
-    fetchTopWeeklyRecipes();
     fetchRecipes({ append: page > 1 });
-    fetchTopUsers();
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (!token) {
       setLoading(false);
       return;
     }
     api
-      .get("/auth/me", {
+      .get('/auth/me', {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(({ data }) => {
-        setUsername(data.name || "");
+        setUsername(data.name || '');
       })
       .catch((err) => {
-        console.error("Error verifying user:", err);
+        console.error('Error verifying user:', err);
       })
       .finally(() => setLoading(false));
   }, [cookingTime, dishType, sort, page]); // refetch when filters change
@@ -176,7 +187,7 @@ const HomePage = () => {
           setPage((p) => p + 1);
         }
       },
-      { rootMargin: "0px" } // prefetch a bit early
+      { rootMargin: '0px' }, // prefetch a bit early
     );
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
@@ -194,33 +205,25 @@ const HomePage = () => {
         <div className="overflow-hidden relative flex w-auto h-fit px-4 items-center text-center">
           <div className="rounded-b-md relative container mx-auto p-4 max-w-6xl z-10 bg-primary">
             <h1 className="text-xl md:text-3xl font-bold text-white">
-              {username
-                ? `Welcome to Recipedia, ${username}!`
-                : "Welcome to Recipedia"}
+              {username ? `Welcome to Recipedia, ${username}!` : 'Welcome to Recipedia'}
             </h1>
-            <p className="text-sm md:text-md text-white">
-              Discover and share amazing recipes!
-            </p>
+            <p className="text-sm md:text-md text-white">Discover and share amazing recipes!</p>
           </div>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto my-2 px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-        <HomeLinkCard
-          onClick={scrollToSection}
-          index={1}
-          title="Discover New Recipes"
-        />
+        <HomeLinkCard onClick={scrollToSection} index={1} title="Discover New Recipes" />
         <HomeLinkCard
           index={2}
           title="Dress Your Chef"
-          onClick={() => navigate("/customize-avatar")}
+          onClick={() => navigate('/customize-avatar')}
         />
 
         <HomeLinkCard
           index={3}
           title="Check Your Cooking Stats"
-          onClick={() => navigate("/analytics")}
+          onClick={() => navigate('/analytics')}
         />
       </div>
       <Pattern />
@@ -262,10 +265,7 @@ const HomePage = () => {
               </div>
             ) : (
               topWeeklyRecipes.map((recipe) => (
-                <CarouselItem
-                  className="md:basis-1/2 lg:basis-1/3"
-                  key={recipe._id}
-                >
+                <CarouselItem className="md:basis-1/2 lg:basis-1/3" key={recipe._id}>
                   <RecipeCard isTrending={true} recipe={recipe} />
                 </CarouselItem>
               ))
@@ -299,10 +299,7 @@ const HomePage = () => {
               </div>
             ) : (
               topUsers.map((user) => (
-                <CarouselItem
-                  className="md:basis-1/2 lg:basis-1/3"
-                  key={user._id}
-                >
+                <CarouselItem className="md:basis-1/2 lg:basis-1/3" key={user._id}>
                   <UserCard rank={user.rank} user={user} />
                 </CarouselItem>
               ))
@@ -314,7 +311,7 @@ const HomePage = () => {
 
       <Tabs
         onValueChange={(val) => {
-          setDishType(val === "all" ? "" : val);
+          setDishType(val === 'all' ? '' : val);
         }}
         defaultValue="all"
         className="container w-full mx-auto max-w-6xl gap-2 p-4 mt-0 justify-center"
@@ -348,15 +345,13 @@ const HomePage = () => {
               Drink
             </TabsTrigger>
           </TabsList>
-          <div className="flex flex-row justify-between gap-12 md:gap-8 w-full sm:w-auto">
+          <div className="flex flex-row justify-between items-center w-full sm:w-auto">
             <div className="flex flex-1 flex-row gap-2 items-center">
-              <a className="flex text-xs uppercase text-muted-foreground whitespace-nowrap">
-                Time
-              </a>
+              <a className="flex text-xs uppercase text-muted-foreground whitespace-nowrap">Time</a>
               <Select
                 className=""
                 onValueChange={(val) => {
-                  setCookingTime(val === "all" ? "" : val);
+                  setCookingTime(val === 'all' ? '' : val);
                 }}
               >
                 <SelectTrigger className="flex flex-1 md:w-[150px] cursor-pointer ">
@@ -368,7 +363,7 @@ const HomePage = () => {
                       All
                     </SelectItem>
                     <SelectItem value="quick" className="cursor-pointer">
-                      {"<"} 30 minutes
+                      {'<'} 30 minutes
                     </SelectItem>
                     <SelectItem value="medium" className="cursor-pointer">
                       30–60 minutes
@@ -377,13 +372,13 @@ const HomePage = () => {
                       1-2 hours
                     </SelectItem>
                     <SelectItem value="veryLong" className="cursor-pointer">
-                      {">"} 2 hours
+                      {'>'} 2 hours
                     </SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-1 flex-row gap-2 items-center">
+            <div className="ml-4 flex flex-1 flex-row gap-2 items-center">
               <a className="flex text-xs uppercase text-muted-foreground whitespace-nowrap">
                 Sort by
               </a>
@@ -410,6 +405,14 @@ const HomePage = () => {
                 </SelectContent>
               </Select>
             </div>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="ml-4 cursor-pointer"
+              onClick={resetFilters}
+            >
+              <RotateCcw />
+            </Button>
           </div>
         </div>
         {recipes.length === 0 && !isLoading && (
@@ -439,7 +442,7 @@ const HomePage = () => {
                 disabled={isLoadingMore}
                 className="w-full disabled:opacity-60"
               >
-                {isLoadingMore ? "Loading..." : "Load more"}
+                {isLoadingMore ? 'Loading...' : 'Load more'}
               </Button>
             ) : (
               <div className="text-xs text-muted-foreground "></div>
@@ -447,7 +450,7 @@ const HomePage = () => {
           </div>
         )}
 
-        <div ref={loadMoreRef} style={{ height: 1 }} />
+        <div ref={loadMoreRef} style={{ height: 12 }} />
       </Tabs>
       <Footer />
     </div>

@@ -1,11 +1,11 @@
-import React, { use, useRef } from "react";
-import { useState, useEffect } from "react";
-import { Pause, RotateCcw, AlarmClock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import tick from "@/assets/sfx/tick.wav";
-import ring from "@/assets/sfx/ring.wav";
+import React, { useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { Pause, RotateCcw, AlarmClock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import tick from '@/assets/sfx/tick.wav';
+import ring from '@/assets/sfx/ring.wav';
 export function Timer() {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(1);
@@ -23,6 +23,7 @@ export function Timer() {
     tickSound.current.load();
     ringSound.current.load();
   }, []);
+
   const getTotalSeconds = () => {
     return hours * 3600 + minutes * 60 + seconds;
   };
@@ -51,10 +52,12 @@ export function Timer() {
 
     return () => clearInterval(interval);
   }, [isRunning, remaining]);
+
   useEffect(() => {
     const totalSeconds = getTotalSeconds();
     setRemaining(totalSeconds);
   }, [hours, minutes, seconds]);
+
   const toggle = () => setIsRunning(!isRunning);
 
   const reset = () => {
@@ -73,19 +76,13 @@ export function Timer() {
   };
 
   const handleMinutesChange = (e) => {
-    const value = Math.max(
-      0,
-      Math.min(60, Number.parseInt(e.target.value) || 0)
-    );
+    const value = Math.max(0, Math.min(60, Number.parseInt(e.target.value) || 0));
     setMinutes(value);
     setIsRunning(false);
   };
 
   const handleSecondsChange = (e) => {
-    const value = Math.max(
-      0,
-      Math.min(60, Number.parseInt(e.target.value) || 0)
-    );
+    const value = Math.max(0, Math.min(60, Number.parseInt(e.target.value) || 0));
     setSeconds(value);
     setIsRunning(false);
   };
@@ -96,13 +93,11 @@ export function Timer() {
     const secs = totalSeconds % 60;
 
     if (hrs > 0) {
-      return `${hrs.toString().padStart(2, "0")}:${mins
+      return `${hrs.toString().padStart(2, '0')}:${mins
         .toString()
-        .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+        .padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -123,7 +118,7 @@ export function Timer() {
             type="number"
             min="0"
             max="60"
-            value={minutes.toString().padStart(2, "0")}
+            value={minutes.toString().padStart(2, '0')}
             onChange={handleMinutesChange}
             disabled={isRunning}
             placeholder="m"
@@ -134,35 +129,19 @@ export function Timer() {
             type="number"
             min="0"
             max="60"
-            value={seconds.toString().padStart(2, "0")}
+            value={seconds.toString().padStart(2, '0')}
             onChange={handleSecondsChange}
             disabled={isRunning}
             placeholder="s"
             className="h-6 w-12 text-sm text-muted-foreground text-center px-1 font-normal"
           />
         </div>
-        <span className="text-sm text-primary font-medium min-w-12">
-          {formatTime(remaining)}
-        </span>{" "}
+        <span className="text-sm text-primary font-medium min-w-12">{formatTime(remaining)}</span>{' '}
         <div className="flex flex-row gap-2">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="cursor-pointer h-6 w-6"
-            onClick={toggle}
-          >
-            {isRunning ? (
-              <Pause className="h-3 w-3" />
-            ) : (
-              <AlarmClock className="h-3 w-3" />
-            )}
+          <Button size="icon" variant="ghost" className="cursor-pointer h-6 w-6" onClick={toggle}>
+            {isRunning ? <Pause className="h-3 w-3" /> : <AlarmClock className="h-3 w-3" />}
           </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="cursor-pointer h-6 w-6"
-            onClick={reset}
-          >
+          <Button size="icon" variant="ghost" className="cursor-pointer h-6 w-6" onClick={reset}>
             <RotateCcw className="h-3 w-3" />
           </Button>
         </div>

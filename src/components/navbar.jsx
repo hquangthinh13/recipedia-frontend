@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useMemo } from "react";
-import logo from "@/assets/images/Recipedia-logo-square.svg";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { NotificationPopover } from "./notification-popover";
-import { useAuth } from "@/context/AuthContext";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import React from 'react';
+import logo from '@/assets/images/Recipedia-logo-square.svg';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { NotificationPopover } from './notification-popover';
+import { useAuth } from '@/context/AuthContext';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,25 +13,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Timer } from "./timer";
-const getDicebearAvatar = (seed) =>
-  `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
-    seed || "U"
-  )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`;
-
-// stable random seed per session for guests
-function getGuestSeed() {
-  const key = "guestAvatarSeed";
-  let seed = sessionStorage.getItem(key);
-  if (!seed) {
-    // create a short random seed
-    const n = crypto.getRandomValues(new Uint32Array(1))[0];
-    seed = `guest-${n.toString(36)}`;
-    sessionStorage.setItem(key, seed);
-  }
-  return seed;
-}
+} from '@/components/ui/dropdown-menu';
+import { Timer } from './timer';
+const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 
 const Navbar = ({ needTimer }) => {
   const navigate = useNavigate();
@@ -47,18 +31,18 @@ const Navbar = ({ needTimer }) => {
               src={logo}
               alt="Recipedia Logo"
               className="h-12 cursor-pointer"
-              onClick={() => navigate("/")}
+              onClick={() => navigate('/')}
             />
           </div>
           {needTimer && <Timer />}
-          {/* Right section */}{" "}
+          {/* Right section */}{' '}
           {user ? (
             <div className="flex flex-1 items-center gap-2 justify-end">
               {/* Create Recipe */}
               <Button
                 variant="ghost"
                 className="cursor-pointer"
-                onClick={() => navigate("/create")}
+                onClick={() => navigate('/create')}
               >
                 <Plus className="" />
                 Post
@@ -69,24 +53,9 @@ const Navbar = ({ needTimer }) => {
                 <DropdownMenuTrigger asChild>
                   <Avatar className="cursor-pointer">
                     <AvatarImage
-                      src={
-                        user?.avatar ||
-                        getDicebearAvatar(
-                          user?.name || user?.email || getGuestSeed()
-                        )
-                      }
-                      alt={user?.name || user?.email || "Guest"}
+                      src={user?.avatar || FallBackAvatar}
+                      alt={user?.name || user?.email || 'Guest'}
                     />
-                    {/* Fallback uses DiceBear too */}
-                    <AvatarFallback className="p-0">
-                      <img
-                        alt="avatar-fallback"
-                        className="h-full w-full object-cover"
-                        src={getDicebearAvatar(
-                          user?.name || user?.email || getGuestSeed()
-                        )}
-                      />
-                    </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
 
@@ -104,19 +73,19 @@ const Navbar = ({ needTimer }) => {
 
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => navigate("/customize-avatar")}
+                    onClick={() => navigate('/customize-avatar')}
                   >
                     Dress Your Chef
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => navigate("/analytics")}
+                    onClick={() => navigate('/analytics')}
                   >
                     View Analytics
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => navigate("/change-password")}
+                    onClick={() => navigate('/change-password')}
                   >
                     Change Password
                   </DropdownMenuItem>
@@ -131,7 +100,7 @@ const Navbar = ({ needTimer }) => {
               <Button
                 variant="outline"
                 className="cursor-pointer"
-                onClick={() => navigate("/login")}
+                onClick={() => navigate('/login')}
               >
                 {/* <LogIn /> */}
                 Log in
@@ -139,7 +108,7 @@ const Navbar = ({ needTimer }) => {
               <Button
                 variant="default"
                 className="cursor-pointer"
-                onClick={() => navigate("/signup")}
+                onClick={() => navigate('/signup')}
               >
                 {/* <UserPlus /> */}
                 Sign up

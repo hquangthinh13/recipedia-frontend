@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import api from "@/lib/api";
-import Navbar from "@/components/navbar";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { useAuth } from "@/context/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
-import Footer from "@/components/page-footer";
-import PreviewUserCard from "@/components/preview-user-card";
-import { MusicPlayer } from "@/components/music-player";
+import React, { useEffect, useState } from 'react';
+import api from '@/lib/api';
+import Navbar from '@/components/navbar';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+import Footer from '@/components/page-footer';
+import PreviewUserCard from '@/components/preview-user-card';
+import { MusicPlayer } from '@/components/music-player';
 import {
   Scissors,
   Smile,
@@ -19,8 +19,8 @@ import {
   Wand,
   Check,
   Laugh,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+} from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Empty,
   EmptyContent,
@@ -28,50 +28,45 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty";
-import logo from "@/assets/images/Recipedia-logo-square.svg";
+} from '@/components/ui/empty';
+import logo from '@/assets/images/Recipedia-logo-square.svg';
 
 const AvatarCustomizerPage = () => {
   const navigate = useNavigate();
-  const { user, loading, setUser } = useAuth();
-  const [name, setName] = useState("Guest");
+  const { user, setUser } = useAuth();
+  const [name, setName] = useState('Guest');
   const [createdAt, setCreatedAt] = useState(null);
   // === Core states ===
-  const [skinColor, setSkinColor] = useState("f9c9b6");
-  const [backgroundColor, setBackgroundColor] = useState("ffd5dc");
-  const [hair, setHair] = useState("dannyPhantom");
-  const [hairColor, setHairColor] = useState("000000");
-  const [eyes, setEyes] = useState("eyes");
-  const [mouth, setMouth] = useState("smile");
-  const [shirt, setShirt] = useState("crew");
-  const [shirtColor, setShirtColor] = useState("ffffff");
-  const [eyebrows, setEyebrows] = useState("up");
-  const [eyebrowsColor, setEyebrowsColor] = useState("000000");
-  const [glasses, setGlasses] = useState("none");
-  const [glassesColor, setGlassesColor] = useState("000000");
-  const [facialHair, setFacialHair] = useState("none");
-  const [facialHairColor, setFacialHairColor] = useState("000000");
-  const [eyeShadowColor, setEyeShadowColor] = useState("ffffff");
-  const [nose, setNose] = useState("curve");
+  const [skinColor, setSkinColor] = useState('f9c9b6');
+  const [backgroundColor, setBackgroundColor] = useState('ffd5dc');
+  const [hair, setHair] = useState('dannyPhantom');
+  const [hairColor, setHairColor] = useState('000000');
+  const [eyes, setEyes] = useState('eyes');
+  const [mouth, setMouth] = useState('smile');
+  const [shirt, setShirt] = useState('crew');
+  const [shirtColor, setShirtColor] = useState('ffffff');
+  const [eyebrows, setEyebrows] = useState('up');
+  const [eyebrowsColor, setEyebrowsColor] = useState('000000');
+  const [glasses, setGlasses] = useState('none');
+  const [glassesColor, setGlassesColor] = useState('000000');
+  const [facialHair, setFacialHair] = useState('none');
+  const [facialHairColor, setFacialHairColor] = useState('000000');
+  const [eyeShadowColor, setEyeShadowColor] = useState('ffffff');
+  const [nose, setNose] = useState('curve');
   // === Current active section ===
-  const [activeFeature, setActiveFeature] = useState("hair");
+  const [activeFeature, setActiveFeature] = useState('hair');
 
   useEffect(() => {
-    document.title = "Recipedia | Dress Your Chef";
+    document.title = 'Recipedia | Dress Your Chef';
   }, []);
-  // useEffect(() => {
-  //   if (!loading && !user) {
-  //     navigate("/login", { replace: true });
-  //   }
-  // }, [loading, user, navigate]);
+
   useEffect(() => {
     if (user) {
-      setName(user.name ?? "Guest");
+      setName(user.name ?? 'Guest');
       setCreatedAt(user.createdAt ? new Date(user.createdAt) : null);
     }
   }, [user]);
-  const avatarUrl =
-    `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true
+  const avatarUrl = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true
   &baseColor=${skinColor}
   &backgroundColor=${backgroundColor}
   &hair=${hair}
@@ -85,206 +80,206 @@ const AvatarCustomizerPage = () => {
   &eyeShadowColor=${eyeShadowColor}
   &nose=${nose}
   ${
-    facialHair !== "none"
+    facialHair !== 'none'
       ? `&facialHair=${facialHair}&facialHairColor=${facialHairColor}&facialHairProbability=100`
       : `&facialHairProbability=0`
   }
     ${
-      glasses !== "none"
+      glasses !== 'none'
         ? `&glasses=${glasses}&glassesColor=${glassesColor}&glassesProbability=100`
         : `&glassesProbability=0`
     }
-  `.replace(/\s/g, "");
+  `.replace(/\s/g, '');
   const handleSaveAvatar = async () => {
     try {
-      console.log("Avatar URL being sent:", avatarUrl);
-      await api.post("/users/avatar", { avatarUrl });
-      toast.success("Chef’s kiss! Everything saved beautifully.");
+      console.log('Avatar URL being sent:', avatarUrl);
+      await api.post('/users/avatar', { avatarUrl });
+      toast.success('Chef’s kiss! Everything saved beautifully.');
       // force refresh user data from backend
       setUser((prev) => ({ ...prev, avatar: avatarUrl }));
-      setTimeout(() => navigate("/"), 2500);
+      setTimeout(() => navigate('/'), 2500);
     } catch (err) {
       console.error(err);
-      toast.error("Oops! Something’s burnt. Try again.");
+      toast.error('Oops! Something’s burnt. Try again.');
     }
   };
 
   // === Options ===
   const hairOptions = [
-    { id: "dannyPhantom", label: "Danny Phantom" },
-    { id: "dougFunny", label: "Doug" },
-    { id: "fonze", label: "Fonze" },
-    { id: "full", label: "Full" },
-    { id: "mrClean", label: "Mr. Clean" },
-    { id: "mrT", label: "Mr. T" },
-    { id: "pixie", label: "Pixie" },
-    { id: "turban", label: "Turban" },
+    { id: 'dannyPhantom', label: 'Danny Phantom' },
+    { id: 'dougFunny', label: 'Doug' },
+    { id: 'fonze', label: 'Fonze' },
+    { id: 'full', label: 'Full' },
+    { id: 'mrClean', label: 'Mr. Clean' },
+    { id: 'mrT', label: 'Mr. T' },
+    { id: 'pixie', label: 'Pixie' },
+    { id: 'turban', label: 'Turban' },
   ];
   const eyesOptions = [
-    { id: "eyes", label: "Default" },
-    { id: "eyesShadow", label: "Shadow" },
-    { id: "round", label: "Round" },
-    { id: "smiling", label: "Smiling" },
-    { id: "smilingShadow", label: "Smiling Shadow" },
+    { id: 'eyes', label: 'Default' },
+    { id: 'eyesShadow', label: 'Shadow' },
+    { id: 'round', label: 'Round' },
+    { id: 'smiling', label: 'Smiling' },
+    { id: 'smilingShadow', label: 'Smiling Shadow' },
   ];
   const noseOptions = [
-    { id: "curve", label: "Curve" },
-    { id: "pointed", label: "Pointed" },
-    { id: "tound", label: "Tound" },
+    { id: 'curve', label: 'Curve' },
+    { id: 'pointed', label: 'Pointed' },
+    { id: 'tound', label: 'Tound' },
   ];
   const mouthOptions = [
-    { id: "frown", label: "Frown" },
-    { id: "laughing", label: "Laughing" },
-    { id: "nervous", label: "Nervous" },
-    { id: "pucker", label: "Pucker" },
-    { id: "sad", label: "Sad" },
-    { id: "smile", label: "Smile" },
-    { id: "smirk", label: "Smirk" },
-    { id: "surprised", label: "Surprised" },
+    { id: 'frown', label: 'Frown' },
+    { id: 'laughing', label: 'Laughing' },
+    { id: 'nervous', label: 'Nervous' },
+    { id: 'pucker', label: 'Pucker' },
+    { id: 'sad', label: 'Sad' },
+    { id: 'smile', label: 'Smile' },
+    { id: 'smirk', label: 'Smirk' },
+    { id: 'surprised', label: 'Surprised' },
   ];
   const shirtOptions = [
-    { id: "crew", label: "Crew" },
-    { id: "collared", label: "Collared" },
-    { id: "open", label: "Open" },
+    { id: 'crew', label: 'Crew' },
+    { id: 'collared', label: 'Collared' },
+    { id: 'open', label: 'Open' },
   ];
   const eyebrowsOptions = [
-    { id: "down", label: "Down" },
-    { id: "eyelashesDown", label: "Eyelashes Down" },
-    { id: "eyelashesUp", label: "Eyelashes Up" },
-    { id: "up", label: "Up" },
+    { id: 'down', label: 'Down' },
+    { id: 'eyelashesDown', label: 'Eyelashes Down' },
+    { id: 'eyelashesUp', label: 'Eyelashes Up' },
+    { id: 'up', label: 'Up' },
   ];
   const glassesOptions = [
-    { id: "none", label: "None" },
+    { id: 'none', label: 'None' },
 
-    { id: "round", label: "Round" },
-    { id: "square", label: "Square" },
+    { id: 'round', label: 'Round' },
+    { id: 'square', label: 'Square' },
   ];
   const facialHairOptions = [
-    { id: "none", label: "None" },
-    { id: "beard", label: "Beard" },
-    { id: "scruff", label: "Scruff" },
+    { id: 'none', label: 'None' },
+    { id: 'beard', label: 'Beard' },
+    { id: 'scruff', label: 'Scruff' },
   ];
 
   // === Colors ===
   const skinColors = [
-    "FFCCCC", // light pink
-    "FFE6CC", // pale peach
-    "f9c9b6", // soft warm light
-    "E0AC69", // medium warm tan
-    "C68642", // golden brown
-    "ac6651", // reddish tan
-    "8d5524", // deep brown
-    "77311d", // darkest warm brown
-    "B4B4B4", // gray (neutral transition)
-    "80C878", // green tone
-    "96D2FF", // blue tone
+    'FFCCCC', // light pink
+    'FFE6CC', // pale peach
+    'f9c9b6', // soft warm light
+    'E0AC69', // medium warm tan
+    'C68642', // golden brown
+    'ac6651', // reddish tan
+    '8d5524', // deep brown
+    '77311d', // darkest warm brown
+    'B4B4B4', // gray (neutral transition)
+    '80C878', // green tone
+    '96D2FF', // blue tone
   ];
 
   const hairColors = [
-    "000000",
-    "6bd9e9",
-    "9287ff",
-    "77311d",
-    "b35340",
-    "ac6651",
-    "d2eff3",
-    "e0ddff",
-    "f4d150",
-    "f9c9b6",
-    "fc909f",
-    "feb47b",
-    "ff7e5f",
-    "ffeba4",
-    "ffedef",
-    "ffffff",
+    '000000',
+    '6bd9e9',
+    '9287ff',
+    '77311d',
+    'b35340',
+    'ac6651',
+    'd2eff3',
+    'e0ddff',
+    'f4d150',
+    'f9c9b6',
+    'fc909f',
+    'feb47b',
+    'ff7e5f',
+    'ffeba4',
+    'ffedef',
+    'ffffff',
   ];
   const facialHairColors = [
-    "000000",
-    "6bd9e9",
-    "9287ff",
-    "77311d",
-    "b35340",
-    "ac6651",
-    "d2eff3",
-    "e0ddff",
-    "f4d150",
-    "f9c9b6",
-    "fc909f",
-    "feb47b",
-    "ff7e5f",
-    "ffeba4",
-    "ffedef",
-    "ffffff",
+    '000000',
+    '6bd9e9',
+    '9287ff',
+    '77311d',
+    'b35340',
+    'ac6651',
+    'd2eff3',
+    'e0ddff',
+    'f4d150',
+    'f9c9b6',
+    'fc909f',
+    'feb47b',
+    'ff7e5f',
+    'ffeba4',
+    'ffedef',
+    'ffffff',
   ];
 
   const shirtColors = [
-    "000000",
-    "6bd9e9",
-    "9287ff",
-    "77311d",
-    "b35340",
-    "ac6651",
-    "d2eff3",
-    "e0ddff",
-    "f4d150",
-    "f9c9b6",
-    "fc909f",
-    "feb47b",
-    "ff7e5f",
-    "ffeba4",
-    "ffedef",
-    "ffffff",
+    '000000',
+    '6bd9e9',
+    '9287ff',
+    '77311d',
+    'b35340',
+    'ac6651',
+    'd2eff3',
+    'e0ddff',
+    'f4d150',
+    'f9c9b6',
+    'fc909f',
+    'feb47b',
+    'ff7e5f',
+    'ffeba4',
+    'ffedef',
+    'ffffff',
   ];
   const eyebrowsColors = [
-    "000000",
-    "6bd9e9",
-    "9287ff",
-    "77311d",
-    "ac6651",
-    "d2eff3",
-    "e0ddff",
-    "f4d150",
-    "f9c9b6",
-    "fc909f",
-    "ffeba4",
-    "ffedef",
-    "ffffff",
+    '000000',
+    '6bd9e9',
+    '9287ff',
+    '77311d',
+    'ac6651',
+    'd2eff3',
+    'e0ddff',
+    'f4d150',
+    'f9c9b6',
+    'fc909f',
+    'ffeba4',
+    'ffedef',
+    'ffffff',
   ];
   const glassesColors = [
-    "000000",
-    "6bd9e9",
-    "9287ff",
-    "77311d",
-    "b35340",
-    "ac6651",
-    "d2eff3",
-    "e0ddff",
-    "f4d150",
-    "f9c9b6",
-    "fc909f",
-    "feb47b",
-    "ff7e5f",
-    "ffeba4",
-    "ffedef",
-    "ffffff",
+    '000000',
+    '6bd9e9',
+    '9287ff',
+    '77311d',
+    'b35340',
+    'ac6651',
+    'd2eff3',
+    'e0ddff',
+    'f4d150',
+    'f9c9b6',
+    'fc909f',
+    'feb47b',
+    'ff7e5f',
+    'ffeba4',
+    'ffedef',
+    'ffffff',
   ];
-  const bgColors = ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf", "feb47b"];
-  const eyeShadowColors = ["d2eff3", "e0ddff", "ffeba4", "ffedef", "ffffff"];
+  const bgColors = ['b6e3f4', 'c0aede', 'd1d4f9', 'ffd5dc', 'ffdfbf', 'feb47b'];
+  const eyeShadowColors = ['d2eff3', 'e0ddff', 'ffeba4', 'ffedef', 'ffffff'];
   // === Button Feature Map ===
   const featureButtons = [
-    { id: "hair", label: "Hair", icon: <Scissors className="w-5 h-5" /> },
-    { id: "eyes", label: "Eyes", icon: <Eye className="w-5 h-5" /> },
-    { id: "eyebrows", label: "Eyebrows", icon: <Brush className="w-5 h-5" /> },
+    { id: 'hair', label: 'Hair', icon: <Scissors className="w-5 h-5" /> },
+    { id: 'eyes', label: 'Eyes', icon: <Eye className="w-5 h-5" /> },
+    { id: 'eyebrows', label: 'Eyebrows', icon: <Brush className="w-5 h-5" /> },
     {
-      id: "facialHair",
-      label: "Facial Hair",
+      id: 'facialHair',
+      label: 'Facial Hair',
       icon: <Wand className="w-5 h-5" />,
     },
-    { id: "glasses", label: "Glasses", icon: <Glasses className="w-5 h-5" /> },
-    { id: "nose", label: "Nose", icon: <Smile className="w-5 h-5" /> },
-    { id: "mouth", label: "Mouth", icon: <Laugh className="w-5 h-5" /> },
-    { id: "shirt", label: "Shirt", icon: <Shirt className="w-5 h-5" /> },
-    { id: "color", label: "Colors", icon: <Palette className="w-5 h-5" /> },
+    { id: 'glasses', label: 'Glasses', icon: <Glasses className="w-5 h-5" /> },
+    { id: 'nose', label: 'Nose', icon: <Smile className="w-5 h-5" /> },
+    { id: 'mouth', label: 'Mouth', icon: <Laugh className="w-5 h-5" /> },
+    { id: 'shirt', label: 'Shirt', icon: <Shirt className="w-5 h-5" /> },
+    { id: 'color', label: 'Colors', icon: <Palette className="w-5 h-5" /> },
   ];
   if (!user)
     return (
@@ -292,33 +287,24 @@ const AvatarCustomizerPage = () => {
         <Empty className="h-full">
           <EmptyHeader>
             <EmptyMedia>
-              <Link to={"/"} className="flex flex-1">
+              <Link to={'/'} className="flex flex-1">
                 <img src={logo} alt="Recipedia Logo" className="h-12" />
               </Link>
             </EmptyMedia>
             <EmptyTitle>Looks like you haven’t logged in yet</EmptyTitle>
-            <EmptyDescription>
-              Sign in to customize your own chef.
-            </EmptyDescription>
+            <EmptyDescription>Sign in to customize your own chef.</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <div className="flex gap-2">
-              <Button
-                className="cursor-pointer"
-                onClick={() => navigate("/login")}
-              >
+              <Button className="cursor-pointer" onClick={() => navigate('/login')}>
                 Login
               </Button>
-              <Button
-                className="cursor-pointer"
-                onClick={() => navigate("/")}
-                variant="outline"
-              >
+              <Button className="cursor-pointer" onClick={() => navigate('/')} variant="outline">
                 Back to Home
               </Button>
             </div>
           </EmptyContent>
-        </Empty>{" "}
+        </Empty>{' '}
       </div>
     );
   return (
@@ -326,11 +312,7 @@ const AvatarCustomizerPage = () => {
       <Navbar />
       <div className="flex flex-col lg:flex-row gap-4 max-w-6xl p-4 mx-auto mb-12">
         <div className="flex lg:w-lg flex-col-reverse lg:flex-col gap-4">
-          <PreviewUserCard
-            avatarUrl={avatarUrl}
-            name={name || "Guest"}
-            createdAt={createdAt}
-          />
+          <PreviewUserCard avatarUrl={avatarUrl} name={name || 'Guest'} createdAt={createdAt} />
           <MusicPlayer className="w-lg lg:w-fit" />
         </div>
 
@@ -351,8 +333,8 @@ const AvatarCustomizerPage = () => {
                   whitespace-nowrap transition-colors
                   ${
                     activeFeature === btn.id
-                      ? "bg-[var(--accent)] text-white"
-                      : "hover:bg-[var(--accent)]/20"
+                      ? 'bg-[var(--accent)] text-white'
+                      : 'hover:bg-[var(--accent)]/20'
                   }`}
               >
                 <span className="flex items-center gap-2">
@@ -366,7 +348,7 @@ const AvatarCustomizerPage = () => {
             <CardContent className="space-y-6 p-6">
               {/* === Feature Tabs === */}
               <div className="flex-1 space-y-2">
-                {activeFeature === "hair" && (
+                {activeFeature === 'hair' && (
                   <>
                     <FeatureSelector
                       title="Hair"
@@ -384,7 +366,7 @@ const AvatarCustomizerPage = () => {
                   </>
                 )}
 
-                {activeFeature === "mouth" && (
+                {activeFeature === 'mouth' && (
                   <FeatureSelector
                     title="Mouth"
                     options={mouthOptions}
@@ -392,7 +374,7 @@ const AvatarCustomizerPage = () => {
                     onSelect={setMouth}
                   />
                 )}
-                {activeFeature === "nose" && (
+                {activeFeature === 'nose' && (
                   <FeatureSelector
                     title="Nose"
                     options={noseOptions}
@@ -400,7 +382,7 @@ const AvatarCustomizerPage = () => {
                     onSelect={setNose}
                   />
                 )}
-                {activeFeature === "eyes" && (
+                {activeFeature === 'eyes' && (
                   <>
                     <FeatureSelector
                       title="Eyes"
@@ -416,7 +398,7 @@ const AvatarCustomizerPage = () => {
                     />
                   </>
                 )}
-                {activeFeature === "eyebrows" && (
+                {activeFeature === 'eyebrows' && (
                   <>
                     <FeatureSelector
                       title="Eyebrows"
@@ -434,7 +416,7 @@ const AvatarCustomizerPage = () => {
                   </>
                 )}
 
-                {activeFeature === "glasses" && (
+                {activeFeature === 'glasses' && (
                   <>
                     <FeatureSelector
                       title="Glasses"
@@ -451,7 +433,7 @@ const AvatarCustomizerPage = () => {
                     />
                   </>
                 )}
-                {activeFeature === "facialHair" && (
+                {activeFeature === 'facialHair' && (
                   <>
                     <FeatureSelector
                       title="Facial Hair"
@@ -468,7 +450,7 @@ const AvatarCustomizerPage = () => {
                     />
                   </>
                 )}
-                {activeFeature === "shirt" && (
+                {activeFeature === 'shirt' && (
                   <>
                     <FeatureSelector
                       title="Shirt"
@@ -486,7 +468,7 @@ const AvatarCustomizerPage = () => {
                   </>
                 )}
 
-                {activeFeature === "color" && (
+                {activeFeature === 'color' && (
                   <>
                     <ColorPalette
                       title="Skin Color"
@@ -521,18 +503,12 @@ const AvatarCustomizerPage = () => {
 };
 
 // === Keep your original FeatureSelector ===
-const FeatureSelector = ({
-  title,
-  options,
-  selected,
-  onSelect,
-  colorParam = "",
-}) => (
+const FeatureSelector = ({ title, options, selected, onSelect, colorParam = '' }) => (
   <div className="w-full">
     <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-2">
       {options.map((opt) => {
         const paramName = title
-          .replace(/\s+/g, "") // remove spaces
+          .replace(/\s+/g, '') // remove spaces
           .replace(/^./, (c) => c.toLowerCase()); // lowercase first letter
 
         return (
@@ -540,12 +516,12 @@ const FeatureSelector = ({
             key={opt.id}
             onClick={() => onSelect(opt.id)}
             className={`cursor-pointer border rounded-lg p-2 hover:border-primary transition ${
-              selected === opt.id ? "border-primary ring-2 ring-primary/30" : ""
+              selected === opt.id ? 'border-primary ring-2 ring-primary/30' : ''
             }`}
           >
             <img
               src={`https://api.dicebear.com/9.x/micah/svg?${
-                opt.id === "none"
+                opt.id === 'none'
                   ? `${paramName}Probability=0&flip=true`
                   : `${paramName}=${opt.id}${colorParam}&flip=true&${paramName}Probability=100`
               }`}
@@ -553,9 +529,7 @@ const FeatureSelector = ({
               className="w-12 h-12 mx-auto"
             />
 
-            <p className="text-xs text-muted-foreground text-center mt-1">
-              {opt.label}
-            </p>
+            <p className="text-xs text-muted-foreground text-center mt-1">{opt.label}</p>
           </button>
         );
       })}
@@ -571,9 +545,7 @@ const ColorPalette = ({ title, colors, selected, onSelect }) => (
         <button
           key={color}
           className={`cursor-pointer w-8 h-8 rounded-md border transition hover:ring-2 hover:ring-primary hover:border-primary ${
-            selected === color
-              ? "ring-2 ring-primary border-primary"
-              : "border-accent/90"
+            selected === color ? 'ring-2 ring-primary border-primary' : 'border-accent/90'
           }`}
           style={{ backgroundColor: `#${color}` }}
           onClick={() => onSelect(color)}
