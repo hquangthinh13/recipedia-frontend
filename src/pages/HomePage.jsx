@@ -122,17 +122,13 @@ const HomePage = () => {
   };
 
   const resetFilters = () => {
-    // Reset state
+    // reset state only
     setCookingTime('');
     setDishType('');
     setSort('');
     setPage(1);
-
-    // Clear URL query
-    // navigate('/', { replace: true });
-
-    // Fetch again with default options
-    fetchRecipes({ append: false });
+    setHasMore(true);
+    setRecipes([]);
   };
 
   useEffect(() => {
@@ -149,32 +145,43 @@ const HomePage = () => {
     fetchTopUsers();
   }, []);
 
+  // useEffect(() => {
+  //   fetchRecipes({ append: page > 1 });
+  //   const token = localStorage.getItem('token');
+  //   if (!token) {
+  //     setLoading(false);
+  //     return;
+  //   }
+  //   api
+  //     .get('/auth/me', {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     })
+  //     .then(({ data }) => {
+  //       setUsername(data.name || '');
+  //     })
+  //     .catch((err) => {
+  //       console.error('Error verifying user:', err);
+  //     })
+  //     .finally(() => setLoading(false));
+  // }, [cookingTime, dishType, sort, page]);
+  // 1) Auth + username only once
   useEffect(() => {
-    fetchRecipes({ append: page > 1 });
     const token = localStorage.getItem('token');
     if (!token) {
       setLoading(false);
       return;
     }
     api
-      .get('/auth/me', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(({ data }) => {
-        setUsername(data.name || '');
-      })
-      .catch((err) => {
-        console.error('Error verifying user:', err);
-      })
+      .get('/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+      .then(({ data }) => setUsername(data.name || ''))
+      .catch((err) => console.error('Error verifying user:', err))
       .finally(() => setLoading(false));
-  }, [cookingTime, dishType, sort, page]); // refetch when filters change
+  }, []);
 
-  // Reset paging when filters change (but not when page changes)
+  // 2) Recipes whenever filters/page change
   useEffect(() => {
-    setPage(1);
-    setHasMore(true);
-    setRecipes([]);
-  }, [cookingTime, dishType, sort]);
+    fetchRecipes({ append: page > 1 });
+  }, [cookingTime, dishType, sort, page]);
 
   // Infinite scroll via IntersectionObserver
   useEffect(() => {
@@ -310,7 +317,11 @@ const HomePage = () => {
       <Pattern />
 
       <Tabs
+        value={dishType || 'all'}
         onValueChange={(val) => {
+          setPage(1);
+          setHasMore(true);
+          setRecipes([]);
           setDishType(val === 'all' ? '' : val);
         }}
         defaultValue="all"
@@ -349,8 +360,11 @@ const HomePage = () => {
             <div className="flex flex-1 flex-row gap-2 items-center">
               <a className="flex text-xs uppercase text-muted-foreground whitespace-nowrap">Time</a>
               <Select
-                className=""
+                value={cookingTime || 'all'}
                 onValueChange={(val) => {
+                  setPage(1);
+                  setHasMore(true);
+                  setRecipes([]);
                   setCookingTime(val === 'all' ? '' : val);
                 }}
               >
@@ -383,7 +397,11 @@ const HomePage = () => {
                 Sort by
               </a>
               <Select
+                value={sort || 'newest'}
                 onValueChange={(val) => {
+                  setPage(1);
+                  setHasMore(true);
+                  setRecipes([]);
                   setSort(val);
                 }}
               >
@@ -433,7 +451,7 @@ const HomePage = () => {
           </div>
         )}
 
-        {recipes.length > 0 && (
+        {/* {recipes.length > 0 && (
           <div className="flex justify-center my-4">
             {hasMore ? (
               <Button
@@ -448,7 +466,7 @@ const HomePage = () => {
               <div className="text-xs text-muted-foreground "></div>
             )}
           </div>
-        )}
+        )} */}
 
         <div ref={loadMoreRef} style={{ height: 12 }} />
       </Tabs>

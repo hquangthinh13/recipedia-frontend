@@ -175,9 +175,18 @@ const RecipeCard = ({ isTrending, recipe }) => {
         </Tooltip>
 
         {/* Dish type + Cooking time */}
-        {/* <div className="flex justify-start items-center gap-2 mt-2 text-sm text-gray-500 mb-4">
-        
-          <div className="flex items-center gap-2">
+        <div className="flex justify-start items-center gap-2 mt-0 text-sm text-gray-500 mb-4">
+          <div className="font-normal text-gray-500 group-hover:text-current">
+            <span>
+              {likeCount || 0} {likeCount > 1 ? 'likes' : 'like'}
+            </span>
+          </div>{' '}
+          <div className="font-normal text-gray-500 group-hover:text-current">
+            <span>
+              {commentCount || 0} {commentCount > 1 ? 'comments' : 'comment'}
+            </span>
+          </div>
+          {/* <div className="flex items-center gap-2">
             <ChefHat className="h-4 w-4 text-gray-400 " />
             <span className="text-base text-gray-600 antialiased">
               {dishTypeLabels[recipe.dishType] ?? recipe.dishType}
@@ -189,16 +198,16 @@ const RecipeCard = ({ isTrending, recipe }) => {
             <span className="text-base text-gray-600 antialiased">
               {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
             </span>
-          </div>
-        </div> */}
+          </div> */}
+        </div>
         <Separator className="flex mt-4 mb-2" />
         {/* Buttons */}
         <div className=" w-full flex justify-center gap-3">
           <Button onClick={handleLike} variant="ghost" className="group cursor-pointer flex-1 flex">
             <Heart className={`transition ${liked && 'fill-primary text-primary'}`} />
-            <div className="font-normal text-gray-500 group-hover:text-current">
+            {/* <div className="font-normal text-gray-500 group-hover:text-current">
               <span>{likeCount || 0}</span>
-            </div>
+            </div> */}
           </Button>
 
           <Button
@@ -213,9 +222,9 @@ const RecipeCard = ({ isTrending, recipe }) => {
           >
             <MessageCircle className="" />
 
-            <div className="font-normal text-gray-500 group-hover:text-current">
+            {/* <div className="font-normal text-gray-500 group-hover:text-current">
               <span>{commentCount}</span>
-            </div>
+            </div> */}
           </Button>
         </div>
       </CardContent>
