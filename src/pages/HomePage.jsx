@@ -212,7 +212,7 @@ const HomePage = () => {
       </div>
 
       <div className="max-w-6xl mx-auto my-2 px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-        <HomeLinkCard onClick={scrollToSection} index={1} title="Discover New Recipes" />
+        <HomeLinkCard onClick={scrollToSection} index={1} title="Discover and Remix Recipes" />
         <HomeLinkCard
           index={2}
           title="Dress Your Chef"

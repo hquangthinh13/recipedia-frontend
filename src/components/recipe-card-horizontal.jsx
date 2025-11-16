@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
-import { Clock, Heart, Bookmark, MessageCircle, ChefHat, SquarePen, Trash } from 'lucide-react';
+import { Heart, Bookmark, MessageCircle, SquarePen, Trash, Repeat } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+
 import { dishTypeLabels, cookingTimeLabels } from '@/lib/enumDisplayMap';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import api from '@/lib/api';
@@ -34,6 +36,10 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false, onDelete, onEdit }) => 
   const { token } = useAuth();
   const [liked, setLiked] = useState(recipe.likedByUser || false);
   const [likeCount, setLikeCount] = useState(recipe.likes?.length || 0);
+  const remixCount = recipe.remixCount || 0;
+  const isRemix = recipe?.parentRecipe;
+  const [expanded, setExpanded] = useState(false);
+
   const [favorite, setFavorite] = useState(
     user?.favorites?.some((id) => id === recipe._id || id._id === recipe._id) || false,
   );
@@ -56,7 +62,15 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false, onDelete, onEdit }) => 
     );
     setLiked(userHasLiked);
   }, [userId, recipe.likes]);
+  const handleRemixClick = () => {
+    if (!user) {
+      toast.error('Please log in to remix this recipe');
+      navigate('/login', { state: { from: `/recipes/${recipe._id}` } });
+      return;
+    }
 
+    navigate(`/recipes/${recipe._id}/remix`);
+  };
   const handleLike = async () => {
     // Only block when we definitively know the user isn't logged in
     if (!token) {
@@ -211,26 +225,35 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false, onDelete, onEdit }) => 
         </div>
         {/* Title */}{' '}
         <Link to={`/recipes/${recipe._id}`}>
-          <h2 className="cursor-pointer hover:text-accent text-xl font-bold line-clamp-1 text-[var(--card-foreground)] mt-1 mb-0 antialiased">
+          <h2 className="cursor-pointer hover:text-accent text-2xl font-bold line-clamp-1 text-card-foreground mt-2 mb-0 antialiased">
             {recipe.title}
           </h2>
         </Link>
-        {/* Dish type + Cooking time */}
-        <div className="flex justify-start items-center gap-3 text-sm text-gray-500 mb-2">
-          <div className="flex items-center gap-2">
-            <ChefHat className="h-4 w-4 text-gray-400 " />
-            <span className="text-base text-gray-600 antialiased">
-              {dishTypeLabels[recipe.dishType] ?? recipe.dishType}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-gray-400 " />
-            <span className="text-base text-gray-600 antialiased">
-              {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
-            </span>
-          </div>
+        <div className="flex justify-start items-center gap-2 mt-2 text-sm mb-4">
+          <Badge variant="default">{dishTypeLabels[recipe.dishType] ?? recipe.dishType}</Badge>
+          <Badge variant="secondary">
+            {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
+          </Badge>
+          {/* secondary */}
+          {isRemix ? (
+            <Badge variant="outline">Remixed Recipe</Badge>
+          ) : (
+            <Badge variant="outline">Original Recipe</Badge>
+          )}
         </div>
+        <p
+          className={`text-md text-muted-foreground transition-all duration-300 whitespace-pre-line ${
+            expanded ? '' : 'line-clamp-4'
+          }`}
+        >
+          {recipe.instructions}
+        </p>{' '}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="inline cursor-pointer hover:text-accent text-md font-medium text-primary hover:underline mb-4"
+        >
+          {expanded ? 'Show less' : 'Read more'}
+        </button>
         {/* Cover image */}
         <Link to={`/recipes/${recipe._id}`}>
           <div className="cursor-pointer aspect-video overflow-hidden rounded-md">
@@ -244,21 +267,11 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false, onDelete, onEdit }) => 
         <Separator className="flex mt-4 mb-2" />
         {/* Buttons */}
         <div className=" w-full flex justify-center gap-3">
-          <Button
-            onClick={handleLike}
-            // size="icon"
-            variant="ghost"
-            className="group cursor-pointer flex-1 flex"
-          >
-            <Heart className={`transition ${liked && 'fill-primary text-primary'}`} />{' '}
-            {/* {likeCount} */}
-            <div className="font-normal text-gray-500 group-hover:text-current">
-              <span>{likeCount || 0}</span>
-            </div>
+          <Button onClick={handleLike} variant="ghost" className="group cursor-pointer flex-1 flex">
+            <Heart className={`transition ${liked && 'fill-primary text-primary'}`} />
           </Button>
 
           <Button
-            // size="icon"
             variant="ghost"
             className="group cursor-pointer flex-1 flex"
             onClick={() =>
@@ -268,11 +281,32 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false, onDelete, onEdit }) => 
             }
           >
             <MessageCircle className="" />
-
-            <div className="font-normal text-gray-500 group-hover:text-current">
-              <span>{commentCount}</span>
-            </div>
           </Button>
+
+          <Button
+            variant="ghost"
+            className="group cursor-pointer flex-1 flex"
+            onClick={handleRemixClick}
+          >
+            <Repeat className="" />
+          </Button>
+        </div>
+        <div className="flex justify-center items-center gap-2 mt-2 text-xs text-muted-foreground">
+          <div className="flex flex-1 font-normal justify-center  group-hover:text-current">
+            <span>
+              {likeCount || 0} {likeCount > 1 ? 'likes' : 'like'}
+            </span>
+          </div>{' '}
+          <div className="flex flex-1 justify-center font-normal group-hover:text-current">
+            <span>
+              {commentCount || 0} {commentCount > 1 ? 'comments' : 'comment'}
+            </span>
+          </div>
+          <div className="flex flex-1 justify-center font-normal group-hover:text-current">
+            <span>
+              {remixCount || 0} {remixCount > 1 ? 'remixes' : 'remix'}
+            </span>
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -177,11 +177,18 @@ export function NotificationPopover() {
                           ? 'commented:'
                           : n.type === 'follow'
                             ? 'started following you.'
-                            : ''}
+                            : n.type === 'remix'
+                              ? 'remixed your recipe.'
+                              : ''}
                     </span>
                     {n.type === 'like' && n.recipe?.title && (
                       <span className="block italic text-xs text-muted-foreground">
                         {n.recipe.title}
+                      </span>
+                    )}
+                    {n.type === 'remix' && n.parentRecipe?.title && (
+                      <span className="block italic text-xs text-muted-foreground">
+                        {n.parentRecipe.title}
                       </span>
                     )}
                     {n.type === 'comment' && n.commentText && (

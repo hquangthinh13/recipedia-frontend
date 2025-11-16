@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
-import { Clock, Heart, Bookmark, MessageCircle, ChefHat, TrendingUp } from 'lucide-react';
+import { Heart, Bookmark, MessageCircle, TrendingUp, Repeat } from 'lucide-react';
 import { dishTypeLabels, cookingTimeLabels } from '@/lib/enumDisplayMap';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import api from '@/lib/api';
@@ -11,23 +11,32 @@ import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { formatDate } from '@/lib/formatDate';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 import { Badge } from '@/components/ui/badge';
 
 const RecipeCard = ({ isTrending, recipe }) => {
   const navigate = useNavigate();
   const commentCount = recipe.comments?.length || 0;
-
+  const remixCount = recipe.remixCount || 0;
   const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
   const authorName = recipe?.author?.name || 'Mysterious Chef';
-
+  const isRemix = recipe?.parentRecipe;
   const { user, setUser } = useAuth();
+  const [expanded, setExpanded] = useState(false);
+
   const userId = user?.id;
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const [liked, setLiked] = useState(recipe.likedByUser || false);
   const [likeCount, setLikeCount] = useState(recipe.likes?.length || 0);
+  const handleRemixClick = () => {
+    if (!user) {
+      toast.error('Please log in to remix this recipe');
+      navigate('/login', { state: { from: `/recipes/${recipe._id}` } });
+      return;
+    }
 
+    navigate(`/recipes/${recipe._id}/remix`);
+  };
   useEffect(() => {
     if (!userId || !recipe?.likes) {
       setLiked(false);
@@ -99,27 +108,31 @@ const RecipeCard = ({ isTrending, recipe }) => {
     <Card className="mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out">
       {/* Cover image */}
       <div
-        className="cursor-pointer overflow-hidden relative"
+        className="group cursor-pointer overflow-hidden relative transition-all duration-300 ease-in-out"
         onClick={() => navigate(`/recipes/${recipe._id}`)}
       >
         <img
           src={recipe.coverImage}
           alt={recipe.title}
-          className=" h-36 w-full object-cover
-             transition ease-in-out delay-150 duration-300 hover:scale-105"
+          className="aspect-video w-full object-cover
+             transition ease-in-out delay-150 duration-300 group-hover:scale-105"
         />
-
-        <div className="absolute top-4 left-4 flex text-center gap-2 items-center">
-          <Badge>{dishTypeLabels[recipe.dishType] ?? recipe.dishType}</Badge>
-          <Badge className="bg-white" variant="outline">
-            {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
-          </Badge>
-        </div>
+        {/* <img src={avatarNoBg} className="h-32 absolute z-21 bottom-0 right-4"></img> */}
         {isTrending && (
-          <div className="absolute top-4 right-4 bg-primary text-white rounded-full p-1 flex text-center items-center shadow-xl">
-            <TrendingUp className="w-4 h-4" />{' '}
+          <div className="z-20 text-xs absolute top-4 left-4 bg-primary text-white rounded-full px-2 py-1 flex text-center items-center shadow-xl">
+            <TrendingUp className="w-4 h-4 mr-1" /> Hot Recipe
           </div>
         )}
+        {isTrending && (
+          <span
+            className="z-0 absolute inset-0 bg-gradient-to-tr via-accent/10 to-accent/50 brightness-100
+             transition-colors duration-500 group-hover:via-accent/30 group-hover:to-accent/50"
+          ></span>
+        )}
+        <span
+          className="z-0 absolute inset-0 bg-gradient-to-b via-black/0 to-black/50 brightness-100
+             transition-colors duration-500 group-hover:via-black/0 group-hover:to-black/20"
+        ></span>
       </div>
 
       {/* Content */}
@@ -138,11 +151,11 @@ const RecipeCard = ({ isTrending, recipe }) => {
             <div className="flex flex-col">
               <div
                 onClick={() => navigate(`/profile/${recipe.author?._id}`)}
-                className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-[var(--card-foreground)]"
+                className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-card-foreground"
               >
                 {recipe.author?.name || 'Mysterious Chef'}
               </div>
-              <div className="text-xs flex text-[var(--muted-foreground)] font-light">
+              <div className="text-xs flex text-muted-foreground font-light">
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span>{formatDate(recipe.createdAt)}</span>
@@ -164,7 +177,7 @@ const RecipeCard = ({ isTrending, recipe }) => {
           <TooltipTrigger asChild>
             <h2
               onClick={() => navigate(`/recipes/${recipe._id}`)}
-              className="cursor-pointer hover:text-accent text-xl font-bold line-clamp-1 text-[var(--card-foreground)] mt-1 mb-0 antialiased"
+              className="cursor-pointer hover:text-accent text-2xl font-bold line-clamp-1 text-card-foreground mt-2 mb-0 antialiased"
             >
               {recipe.title}
             </h2>
@@ -173,31 +186,39 @@ const RecipeCard = ({ isTrending, recipe }) => {
             <p> {recipe.title}</p>
           </TooltipContent>
         </Tooltip>
-
-        <div className="flex justify-start items-center gap-2 mt-0 text-sm text-gray-500 mb-4">
-          <div className="font-normal text-gray-500 group-hover:text-current">
-            <span>
-              {likeCount || 0} {likeCount > 1 ? 'likes' : 'like'}
-            </span>
-          </div>{' '}
-          <div className="font-normal text-gray-500 group-hover:text-current">
-            <span>
-              {commentCount || 0} {commentCount > 1 ? 'comments' : 'comment'}
-            </span>
-          </div>
+        <div className="flex justify-start items-center gap-2 mt-2 text-sm mb-4">
+          <Badge variant="default">{dishTypeLabels[recipe.dishType] ?? recipe.dishType}</Badge>
+          <Badge variant="secondary">
+            {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
+          </Badge>
+          {/* secondary */}
+          {isRemix ? (
+            <Badge variant="outline">Remixed Recipe</Badge>
+          ) : (
+            <Badge variant="outline">Original Recipe</Badge>
+          )}
         </div>
-        <Separator className="flex mt-4 mb-2" />
+        {!isTrending && (
+          <>
+            <p className="text-md text-muted-foreground transition-all duration-300 whitespace-pre-line line-clamp-2">
+              {recipe.instructions}
+            </p>
+            <button
+              onClick={() => navigate(`/recipes/${recipe._id}`)}
+              className="inline cursor-pointer hover:text-accent text-md font-medium text-primary hover:underline mb-4"
+            >
+              Read more
+            </button>
+          </>
+        )}
+        <Separator className="flex mt-2 mb-2" />
         {/* Buttons */}
         <div className=" w-full flex justify-center gap-3">
           <Button onClick={handleLike} variant="ghost" className="group cursor-pointer flex-1 flex">
             <Heart className={`transition ${liked && 'fill-primary text-primary'}`} />
-            {/* <div className="font-normal text-gray-500 group-hover:text-current">
-              <span>{likeCount || 0}</span>
-            </div> */}
           </Button>
 
           <Button
-            // size="icon"
             variant="ghost"
             className="group cursor-pointer flex-1 flex"
             onClick={() =>
@@ -207,11 +228,32 @@ const RecipeCard = ({ isTrending, recipe }) => {
             }
           >
             <MessageCircle className="" />
-
-            {/* <div className="font-normal text-gray-500 group-hover:text-current">
-              <span>{commentCount}</span>
-            </div> */}
           </Button>
+
+          <Button
+            variant="ghost"
+            className="group cursor-pointer flex-1 flex"
+            onClick={handleRemixClick}
+          >
+            <Repeat className="" />
+          </Button>
+        </div>
+        <div className="flex justify-center items-center gap-2 mt-2 text-xs text-muted-foreground">
+          <div className="flex flex-1 font-normal justify-center  group-hover:text-current">
+            <span>
+              {likeCount || 0} {likeCount > 1 ? 'likes' : 'like'}
+            </span>
+          </div>{' '}
+          <div className="flex flex-1 justify-center font-normal group-hover:text-current">
+            <span>
+              {commentCount || 0} {commentCount > 1 ? 'comments' : 'comment'}
+            </span>
+          </div>
+          <div className="flex flex-1 justify-center font-normal group-hover:text-current">
+            <span>
+              {remixCount || 0} {remixCount > 1 ? 'remixes' : 'remix'}
+            </span>
+          </div>
         </div>
       </CardContent>
     </Card>

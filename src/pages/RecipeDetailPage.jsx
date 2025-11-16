@@ -7,6 +7,10 @@ import { dishTypeLabels, cookingTimeLabels } from '@/lib/enumDisplayMap';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from '@/components/ui/button-group';
+import RecipeCard from '@/components/recipe-card';
+
+import RecipeCardRemix from '@/components/recipe-card-remix';
+
 import {
   Table,
   TableHeader,
@@ -23,6 +27,14 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import Footer from '@/components/page-footer';
 import logo from '@/assets/images/Recipedia-logo-square.svg';
@@ -42,6 +54,8 @@ import {
   ImageDown,
   FileDown,
   SquareCheckBig,
+  Repeat,
+  CircleStar,
 } from 'lucide-react';
 import {
   Pagination,
@@ -71,12 +85,13 @@ const RecipeDetailPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
+  const [parentRecipe, setParentRecipe] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [commenting, setCommenting] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [exportingPDF, setExportingPDF] = useState(false);
   const [exportingIngredient, setExportingIngredient] = useState(false);
-
   const [newComment, setNewComment] = useState('');
   const [isCommentFocused, setIsCommentFocused] = useState(false);
   const { user, setUser } = useAuth();
@@ -90,6 +105,7 @@ const RecipeDetailPage = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const [favorite, setFavorite] = useState(false);
   const cardRef = useRef(null);
+  const isRemix = recipe?.parentRecipe;
 
   // Add these to your component state (near other useState hooks)
   const [commentsLoading, setCommentsLoading] = useState(false);
@@ -119,6 +135,15 @@ const RecipeDetailPage = () => {
     if (comments.length === 1 && page > 1) {
       await fetchComments(page - 1);
     }
+  };
+  const handleRemixClick = () => {
+    if (!user) {
+      toast.error('Please log in to remix this recipe');
+      // navigate('/login', { state: { from: `/recipes/${id}` } });
+      return;
+    }
+
+    navigate(`/recipes/${id}/remix`);
   };
 
   // Fetch *paginated* comments (call this after the recipe loads)
@@ -259,6 +284,7 @@ const RecipeDetailPage = () => {
         const { data } = await api.get(`/recipes/${id}`);
         console.log('Fetched recipe:', data);
         setRecipe(data);
+        setParentRecipe(data.parentRecipe);
         setComments(data.comments || []);
         document.title = `Recipedia | ${data.title}`;
       } catch (err) {
@@ -355,48 +381,42 @@ const RecipeDetailPage = () => {
               <div className="hidden md:flex lg:flex">Back to Recipes</div>
             </Button>
           </Link>
+
           <div className="flex flex-row gap-2">
-            <ButtonGroup>
-              <Button
-                size="sm"
-                disabled={exporting}
-                variant="outline"
-                onClick={handleExport}
-                className="cursor-pointer"
-              >
-                <ImageDown />
-                <div className="hidden md:flex lg:flex">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  disabled={exporting || exportingPDF}
+                  variant="outline"
+                  className="cursor-pointer"
+                >
+                  <FileDown />
+                  Export Recipe
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={handleExport} className="cursor-pointer">
+                  Export as PNG
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportPDF} className="cursor-pointer">
                   {' '}
-                  {exporting ? 'Exporting...' : 'Export as Image'}
-                </div>
-              </Button>
-              <Button
-                size="sm"
-                disabled={exportingPDF}
-                variant="outline"
-                onClick={handleExportPDF}
-                className="cursor-pointer"
-              >
-                <FileDown />
-                <div className="hidden md:flex lg:flex">
-                  {' '}
-                  {exportingPDF ? 'Exporting...' : 'Export as PDF'}
-                </div>
-              </Button>
-              <Button
-                size="sm"
-                disabled={exportingIngredient}
-                variant="outline"
-                onClick={handleExportIngredients}
-                className="cursor-pointer"
-              >
-                <SquareCheckBig />
-                <div className="hidden md:flex lg:flex">
-                  {' '}
-                  {exportingIngredient ? 'Exporting...' : 'Ingredients Checklist'}
-                </div>
-              </Button>{' '}
-            </ButtonGroup>
+                  Export as PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button
+              disabled={exportingIngredient}
+              variant="outline"
+              onClick={handleExportIngredients}
+              className="cursor-pointer"
+            >
+              <SquareCheckBig />
+              <div className="hidden md:flex lg:flex">Export Shopping List</div>
+            </Button>
+            <Button variant="default" onClick={handleRemixClick} className="cursor-pointer">
+              <Repeat />
+              <div className="hidden md:flex lg:flex">Remix </div>
+            </Button>
           </div>
         </div>
 
@@ -413,46 +433,12 @@ const RecipeDetailPage = () => {
               </div>
             )}
             <CardContent className="space-y-6 p-6">
-              <div className="flex flex-row justify-between items-start">
-                {/* Left block */}
-                <div className="flex-col w-auto space-y-2 justify-start">
-                  {/* Title */}
-                  <div>
-                    <h2 className="text-3xl font-bold text-[var(--card-foreground)] antialiased">
-                      {recipe.title}
-                    </h2>
-                  </div>
-
-                  {/* Dish type + Cooking time */}
-                  <div className="md:flex md:flex-row grid grid-cols-2 justify-start items-start md:items-center gap-2 lg:gap-6 text-sm text-gray-500">
-                    <div className="flex items-center gap-2">
-                      <ChefHat className="h-4 w-4 text-gray-400 " />
-                      <span className="text-base text-gray-600 antialiased">
-                        {dishTypeLabels[recipe.dishType] ?? recipe.dishType}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-gray-400 " />
-                      <span className="text-base  text-gray-600 antialiased">
-                        {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Heart className="h-4 w-4 text-gray-400 " />
-                      <span className="text-base text-gray-600 antialiased">
-                        {recipe.likes.length}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <MessageCircle className="h-4 w-4 text-gray-400 " />
-                      <span className="text-base text-gray-600 antialiased">
-                        {recipe.comments.length}
-                      </span>
-                    </div>
-                  </div>
+              <div className="flex flex-row mb-2 justify-between items-center">
+                {/* Title */}
+                <div>
+                  <h2 className="text-3xl font-bold text-card-foreground antialiased">
+                    {recipe.title}
+                  </h2>
                 </div>
 
                 {/* Bookmark button on the right */}
@@ -467,6 +453,46 @@ const RecipeDetailPage = () => {
                   />{' '}
                 </Button>
               </div>
+              {/* Dish type + Cooking time */}
+              <div className="md:flex md:flex-1 md:flex-row grid grid-cols-3 justify-start items-start md:items-center gap-6 lg:gap-8 text-sm text-gray-500">
+                <div className="flex items-center gap-2">
+                  <ChefHat className="h-4 w-4 text-gray-400 " />
+                  <span className="text-base text-gray-600 antialiased">
+                    {dishTypeLabels[recipe.dishType] ?? recipe.dishType}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-gray-400 " />
+                  <span className="text-base  text-gray-600 antialiased">
+                    {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
+                  </span>
+                </div>
+
+                <div className="flex  items-center gap-2">
+                  <Heart className="h-4 w-4 text-gray-400 " />
+                  <span className="text-base text-gray-600 antialiased">{recipe.likes.length}</span>
+                </div>
+
+                <div className="flex  items-center gap-2">
+                  <MessageCircle className="h-4 w-4 text-gray-400 " />
+                  <span className="text-base text-gray-600 antialiased">
+                    {recipe.comments.length}
+                  </span>
+                </div>
+                <div className="flex   items-center gap-2">
+                  <CircleStar className="h-4 w-4 text-gray-400 " />
+                  <span className="text-base text-gray-600 antialiased">
+                    {isRemix ? 'Remixed' : 'Original'}
+                  </span>
+                </div>
+
+                <div className="flex  items-center gap-2">
+                  <Repeat className="h-4 w-4 text-gray-400 " />
+                  <span className="text-base text-gray-600 antialiased">{recipe.remixCount}</span>
+                </div>
+              </div>
+
               {/* Author + Date */}
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
@@ -582,6 +608,21 @@ const RecipeDetailPage = () => {
             </CardContent>
           </Card>
           <div className="flex flex-col gap-4">
+            {isRemix && (
+              <div className="lg:w-sm space-y-2">
+                {/* <Card className="mt-0 h-fit">
+                  <CardContent className="space-y-6 p-6"></CardContent>
+                </Card> */}
+                {/* Title */}
+                {/* <div className="flex justify-start items-center gap-2">
+                  <h2 className="text-2xl font-bold text-card-foreground antialiased">
+                    Remixed from
+                  </h2>
+                  <MessageSquareText className="text-accent" />
+                </div> */}
+                <RecipeCardRemix isTrending={false} recipe={parentRecipe} />{' '}
+              </div>
+            )}
             <div className="lg:w-sm">
               <MusicPlayer className="" />
             </div>
@@ -671,18 +712,6 @@ const RecipeDetailPage = () => {
                         <div className="mt-4">
                           <Pagination>
                             <PaginationContent className="flex-wrap">
-                              {/* <PaginationItem>
-                                <PaginationPrevious
-                                  href="#"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    if (page > 1) fetchComments(page - 1);
-                                  }}
-                                  aria-disabled={page === 1}
-                                  className={page === 1 ? 'pointer-events-none opacity-50' : ''}
-                                />
-                              </PaginationItem> */}
-
                               {getPageNumbers().map((p, idx) => {
                                 if (p === 'ellipsis-left' || p === 'ellipsis-right') {
                                   return (
@@ -706,20 +735,6 @@ const RecipeDetailPage = () => {
                                   </PaginationItem>
                                 );
                               })}
-
-                              {/* <PaginationItem>
-                                <PaginationNext
-                                  href="#"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    if (page < totalPages) fetchComments(page + 1);
-                                  }}
-                                  aria-disabled={page === totalPages}
-                                  className={
-                                    page === totalPages ? 'pointer-events-none opacity-50' : ''
-                                  }
-                                />
-                              </PaginationItem> */}
                             </PaginationContent>
                           </Pagination>
                         </div>

@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 
 import CreateRecipePage from './pages/CreateRecipePage';
 import RecipeDetailPage from './pages/RecipeDetailPage';
+import CreateRemixPage from '@/pages/CreateRemixPage';
 
 import AvatarCustomizerPage from './pages/AvatarCustomizerPage';
 import ProfilePage from './pages/ProfilePage';
@@ -23,6 +24,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/recipes/:id" element={<RecipeDetailPage />} />
+        <Route path="/recipes/:id/remix" element={<CreateRemixPage />} />
+
         <Route path="/login" element={<LogInPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/create" element={<CreateRecipePage />} />
