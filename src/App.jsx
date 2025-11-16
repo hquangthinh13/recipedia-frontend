@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import HomePage from './pages/HomePage';
 
@@ -21,9 +22,18 @@ import NewPasswordPage from './pages/authentication/NewPasswordPage';
 
 import { MusicPlayerHorizontal } from './components/music-player-horizontal';
 const App = () => {
+  const location = useLocation();
+  const path = location.pathname;
+  const hidePlayer =
+    path === '/login' ||
+    path === '/signup' ||
+    path === '/change-password' ||
+    path === '/verify-reset-code' ||
+    path === '/reset-password' ||
+    path.startsWith('/verify/');
   return (
     <div>
-      <MusicPlayerHorizontal></MusicPlayerHorizontal>
+      {!hidePlayer && <MusicPlayerHorizontal />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/recipes/:id" element={<RecipeDetailPage />} />

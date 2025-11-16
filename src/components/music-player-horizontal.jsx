@@ -66,7 +66,7 @@ export function MusicPlayerHorizontal({ playlist = songsList }) {
 
   const currentSong = songs[currentSongIndex];
   const nextSong = songs[(currentSongIndex + 1) % songs.length];
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [volume, setVolume] = useState(80); // NEW: volume 0–100
   const [showVolume, setShowVolume] = useState(false); // NEW: toggle slider
   const togglePlayPause = () => setIsPlaying((prev) => !prev);
