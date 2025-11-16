@@ -5,7 +5,8 @@ import { jsPDF } from 'jspdf';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import logo from '@/assets/images/Recipedia-logo-square.svg';
+const logo =
+  'https://res.cloudinary.com/dee339rpr/image/upload/v1763079993/Recipedia-logo-square_fjv9ch.svg';
 
 export function IngredientPdfRenderer({ title, author, ingredients, onDone }) {
   const ref = useRef(null);
