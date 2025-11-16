@@ -409,7 +409,7 @@ const CreateRecipePage = () => {
           <div className="flex flex-col gap-4 lg:w-sm">
             {' '}
             <RecipeCardPreview className="flex-1/4 flex" recipe={previewRecipe} />
-            <MusicPlayer className="w-lg lg:w-fit" />
+            {/* <MusicPlayer className="w-lg lg:w-fit" /> */}
           </div>
         </div>
       </div>{' '}

@@ -623,9 +623,9 @@ const RecipeDetailPage = () => {
                 <RecipeCardRemix isTrending={false} recipe={parentRecipe} />{' '}
               </div>
             )}
-            <div className="lg:w-sm">
+            {/* <div className="lg:w-sm">
               <MusicPlayer className="" />
-            </div>
+            </div> */}
             <Card className="lg:w-sm mt-0 h-fit">
               <CardContent className="space-y-6 p-6">
                 {/* Comments Section */}

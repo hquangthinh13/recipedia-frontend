@@ -112,7 +112,7 @@ const RecipeCardRemix = ({ isTrending, recipe }) => {
                   onClick={() => navigate(`/recipes/${recipe._id}`)}
                   className="cursor-pointer hover:text-accent text-xl font-bold line-clamp-1 text-card-foreground antialiased"
                 >
-                  {recipe.title} {recipe.title} {recipe.title} {recipe.title}
+                  {recipe.title}
                 </h2>
               </TooltipTrigger>
               <TooltipContent>

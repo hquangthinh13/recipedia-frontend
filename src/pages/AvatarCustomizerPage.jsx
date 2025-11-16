@@ -7,7 +7,6 @@ import { useAuth } from '@/context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import Footer from '@/components/page-footer';
 import PreviewUserCard from '@/components/preview-user-card';
-import { MusicPlayer } from '@/components/music-player';
 import {
   Scissors,
   Smile,
@@ -313,7 +312,7 @@ const AvatarCustomizerPage = () => {
       <div className="flex flex-col lg:flex-row gap-4 max-w-6xl p-4 mx-auto mb-12">
         <div className="flex lg:w-lg flex-col-reverse lg:flex-col gap-4">
           <PreviewUserCard avatarUrl={avatarUrl} name={name || 'Guest'} createdAt={createdAt} />
-          <MusicPlayer className="w-lg lg:w-fit" />
+          {/* <MusicPlayer className="w-lg lg:w-fit" /> */}
         </div>
 
         <div className="flex flex-col gap-2 flex-2/3 ">

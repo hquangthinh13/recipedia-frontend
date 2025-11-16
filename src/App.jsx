@@ -18,9 +18,12 @@ import VerifyCodePage from './pages/authentication/VerifyCodePage';
 import VerifyResetCodePage from './pages/authentication/VerifyResetCodePage';
 import ForgotPasswordPage from './pages/authentication/ForgotPasswordPage';
 import NewPasswordPage from './pages/authentication/NewPasswordPage';
+
+import { MusicPlayerHorizontal } from './components/music-player-horizontal';
 const App = () => {
   return (
     <div>
+      <MusicPlayerHorizontal></MusicPlayerHorizontal>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/recipes/:id" element={<RecipeDetailPage />} />

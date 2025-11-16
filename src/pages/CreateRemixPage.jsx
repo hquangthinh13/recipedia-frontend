@@ -8,7 +8,7 @@ import Spinner from '@/components/spinner';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/page-footer';
 import RecipeCardPreview from '@/components/recipe-card-preview';
-import { MusicPlayer } from '@/components/music-player';
+// import { MusicPlayer } from '@/components/music-player';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -524,7 +524,7 @@ const CreateRemixPage = () => {
 
           <div className="flex flex-col gap-4 lg:w-sm">
             <RecipeCardPreview className="flex-1/4 flex" isRemix={true} recipe={previewRecipe} />
-            <MusicPlayer className="w-lg lg:w-fit" />
+            {/* <MusicPlayer className="w-lg lg:w-fit" /> */}
           </div>
         </div>
       </div>
