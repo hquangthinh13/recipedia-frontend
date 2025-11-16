@@ -291,7 +291,7 @@ const HomePage = () => {
             </div>
           </div>
 
-          <CarouselContent>
+          <CarouselContent className="">
             {isLoading02 ? (
               <div className="w-full h-32 flex items-center justify-center">
                 <Spinner />

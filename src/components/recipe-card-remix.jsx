@@ -11,32 +11,7 @@ import { formatDate } from '@/lib/formatDate';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 import { Badge } from '@/components/ui/badge';
-function removeBackgroundColor(url) {
-  const u = new URL(url);
-  u.searchParams.delete('backgroundColor');
-  return u.toString();
-}
-function replaceFaceParams(url) {
-  const cleanedUrl = removeBackgroundColor(url);
-  const u = new URL(cleanedUrl);
-
-  // ----- Random mouth -----
-  const mouthStyles = ['laughing', 'surprised', 'smile', 'smirk'];
-  const randomMouth = mouthStyles[Math.floor(Math.random() * mouthStyles.length)];
-  u.searchParams.set('mouth', randomMouth);
-
-  // ----- Eyes logic -----
-  const currentEyes = u.searchParams.get('eyes');
-
-  if (currentEyes === 'eyes' || currentEyes === 'round') {
-    u.searchParams.set('eyes', 'smiling');
-  } else if (currentEyes === 'eyesShadow') {
-    u.searchParams.set('eyes', 'smilingShadow');
-  }
-  // Force fresh URL every time
-  u.searchParams.set('_rnd', Math.random().toString(36).slice(2));
-  return u.toString();
-}
+import { removeBackgroundColor, replaceFaceParams } from '@/lib/avatarModifier';
 
 import {
   DropdownMenu,
@@ -216,7 +191,6 @@ const RecipeCardRemix = ({ isTrending, recipe }) => {
           />
           <img
             src={faceUrl}
-            // onMouseEnter={() => setFaceUrl(replaceFaceParams(avatarUrl))}
             className="absolute inset-0 w-full h-full object-cover transition-opacity duration-10 opacity-0 group-hover:opacity-100"
             alt="Smiling avatar"
           />
