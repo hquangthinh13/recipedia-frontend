@@ -19,13 +19,17 @@ import Track1 from '@/assets/songs/12DP.mp3';
 import Track1Art from '@/assets/songs/12DP.jpg';
 import Track2 from '@/assets/songs/MysteriousPower.mp3';
 import Track2Art from '@/assets/songs/MysteriousPower.jpg';
-import Track5 from '@/assets/songs/Dong.mp3';
-import Track5Art from '@/assets/songs/Dong.jpeg';
+
 import Track3 from '@/assets/songs/TheFateOfOphelia.mp3';
 import Track3Art from '@/assets/songs/TheFateOfOphelia.webp';
 import Track4 from '@/assets/songs/Wood.mp3';
 import Track4Art from '@/assets/songs/TheFateOfOphelia.webp';
+import Track5 from '@/assets/songs/Dong.mp3';
+import Track5Art from '@/assets/songs/Dong.jpeg';
+import Track6 from '@/assets/songs/ALittleLove.mp3';
+import Track6Art from '@/assets/songs/ALittleLove.jpg';
 const songsList = [
+  { title: 'A Little Love', artist: 'Fiona Fung', src: Track6, artwork: Track6Art },
   { title: 'Dong', artist: 'Power Station', src: Track5, artwork: Track5Art },
   {
     title: 'Barbie in the 12 Dancing Princesses Theme',
@@ -94,7 +98,7 @@ export function MusicPlayerHorizontal({ playlist = songsList }) {
     fixed bottom-0 right-0 left-0 mx-auto z-50 
     px-4 py-2
     transition-all duration-300 max-w-6xl opacity-95 hover:opacity-100
-    ${collapsed && 'w-lg'}
+    ${collapsed && 'max-w-lg'}
   `}
     >
       <Card className="w-full mt-0 h-fit">
@@ -117,10 +121,10 @@ export function MusicPlayerHorizontal({ playlist = songsList }) {
                 onTimeUpdate={() => setCurrentTime(audioRef.current.currentTime)}
                 onLoadedMetadata={() => setDuration(audioRef.current.duration)}
               />{' '}
-              <div className="flex flex-col overflow-hidden">
+              <div className="flex flex-col flex-1 overflow-hidden">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="text-md overflow-hidden line-clamp-1 text-card-foreground font-semibold relative after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
+                    <span className="text-md w-fit overflow-hidden line-clamp-1 text-card-foreground font-semibold relative after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[3px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full">
                       {currentSong.title}
                     </span>
                   </TooltipTrigger>
@@ -188,7 +192,7 @@ export function MusicPlayerHorizontal({ playlist = songsList }) {
             )}{' '}
             <div className="flex flex-1/5 justify-end gap-2">
               {collapsed && (
-                <div className="flex items-center justify-center gap-4">
+                <div className="flex items-center justify-center gap-2">
                   <Button
                     size="icon-sm"
                     variant="ghost"

@@ -406,9 +406,9 @@ const CreateRecipePage = () => {
               </Form>
             </CardContent>
           </Card>{' '}
-          <div className="flex flex-col gap-4 lg:w-sm">
+          <div className="flex flex-col gap-4 w-full lg:w-sm">
             {' '}
-            <RecipeCardPreview className="flex-1/4 flex" recipe={previewRecipe} />
+            <RecipeCardPreview className="w-lg lg:w-fit" recipe={previewRecipe} />
             {/* <MusicPlayer className="w-lg lg:w-fit" /> */}
           </div>
         </div>

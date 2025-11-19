@@ -186,7 +186,7 @@ const RecipeCard = ({ isTrending, recipe }) => {
             <p> {recipe.title}</p>
           </TooltipContent>
         </Tooltip>
-        <div className="flex justify-start items-center gap-2 mt-2 text-sm mb-4">
+        <div className="flex flex-wrap justify-start items-center gap-2 mt-2 text-sm mb-4">
           <Badge variant="default">{dishTypeLabels[recipe.dishType] ?? recipe.dishType}</Badge>
           <Badge variant="secondary">
             {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}

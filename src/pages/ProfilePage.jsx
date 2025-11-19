@@ -218,9 +218,6 @@ const ProfilePage = () => {
                   <span className="text-muted-foreground text-sm leading-2">likes</span>
                 </div>
               </div>
-              {/* Stats */}
-              {/* Buttons */}
-              {/* Owner vs Visitor Actions */}
               <div className="mt-4 flex flex-row gap-4 justify-center">
                 {!isOwner && (
                   //  (
@@ -249,7 +246,6 @@ const ProfilePage = () => {
                 )}
               </div>
             </div>
-            {/* Content directly below the grouped block */}
           </CardContent>
         </Card>
 
@@ -318,8 +314,6 @@ const ProfilePage = () => {
                             setEditOpen(true);
                           }}
                           onDelete={(id) => {
-                            // probably you also want to update favRecipes here,
-                            // but I'm leaving your logic as-is and just fixing isOwner.
                             setRecipes((prev) => prev.filter((rec) => rec._id !== id));
                           }}
                         />
@@ -338,8 +332,6 @@ const ProfilePage = () => {
           </TabsContent>
         </Tabs>
       </div>
-      {/* </div> */}
-      {/* Kitchen Section */}
 
       <Footer />
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
@@ -363,7 +355,6 @@ const ProfilePage = () => {
           )}
         </DialogContent>
       </Dialog>
-
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
           aria-describedby="list-desc"

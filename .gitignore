@@ -33,3 +33,6 @@ src/assets/songs/VuTruCoBay.jpg
 src/assets/songs/VuTruCoBay.mp3
 src/pages/AvatarCustomizerPage_draft.jsx
 src/components/temp.jsx
+
+*storybook.log
+storybook-static

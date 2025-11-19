@@ -390,8 +390,7 @@ const RecipeDetailPage = () => {
                   variant="outline"
                   className="cursor-pointer"
                 >
-                  <FileDown />
-                  Export Recipe
+                  <FileDown /> <div className="hidden md:flex lg:flex"> Export Recipe</div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
