@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '@/components/navbar';
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/page-footer';
 import RecipeCardPreview from '@/components/recipe-card-preview';
@@ -33,7 +32,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { UNIT_GROUPS } from '@/lib/unit-groups';
+import { unitGroups } from '@/lib/unitGroups';
 
 const CreateRecipePage = () => {
   const navigate = useNavigate();
@@ -128,7 +127,6 @@ const CreateRecipePage = () => {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
       <div className="mx-auto max-w-6xl mt-2 p-4">
         <Link to={'/'}>
           <Button variant="ghost" className="cursor-pointer">
@@ -268,7 +266,7 @@ const CreateRecipePage = () => {
                                         </SelectTrigger>
                                       </FormControl>
                                       <SelectContent className="max-h-60 overflow-y-auto">
-                                        {UNIT_GROUPS.map((group) => (
+                                        {unitGroups.map((group) => (
                                           <SelectGroup key={group.label}>
                                             <SelectLabel>{group.label}</SelectLabel>
                                             {group.options.map((opt) => (

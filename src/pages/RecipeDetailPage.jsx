@@ -6,8 +6,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { dishTypeLabels, cookingTimeLabels } from '@/lib/enumDisplayMap';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from '@/components/ui/button-group';
-import RecipeCard from '@/components/recipe-card';
+import Navbar from '@/components/navbar';
 
 import RecipeCardRemix from '@/components/recipe-card-remix';
 
@@ -69,7 +68,6 @@ import {
 import { ArrowLeft } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import api from '@/lib/api';
-import Navbar from '@/components/navbar';
 import UserComment from '@/components/user-comment';
 import Spinner from '@/components/spinner';
 import { MusicPlayer } from '@/components/music-player';
@@ -385,36 +383,76 @@ const RecipeDetailPage = () => {
           <div className="flex flex-row gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  disabled={exporting || exportingPDF}
-                  variant="outline"
-                  className="cursor-pointer"
-                >
-                  <FileDown /> <div className="hidden md:flex lg:flex"> Export Recipe</div>
-                </Button>
+                <div className="flex">
+                  {/* Desktop button */}
+                  <Button
+                    disabled={exporting || exportingPDF}
+                    variant="outline"
+                    className="cursor-pointer hidden md:flex"
+                  >
+                    <FileDown /> Export Recipe
+                  </Button>
+
+                  {/* Mobile button */}
+                  <Button
+                    disabled={exporting || exportingPDF}
+                    variant="outline"
+                    size="icon"
+                    className="cursor-pointer flex md:hidden"
+                  >
+                    <FileDown />
+                  </Button>
+                </div>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent>
                 <DropdownMenuItem onClick={handleExport} className="cursor-pointer">
                   Export as PNG
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleExportPDF} className="cursor-pointer">
-                  {' '}
                   Export as PDF
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            {/* Export Shopping List */}
             <Button
               disabled={exportingIngredient}
               variant="outline"
               onClick={handleExportIngredients}
-              className="cursor-pointer"
+              className="cursor-pointer hidden md:flex"
             >
               <SquareCheckBig />
-              <div className="hidden md:flex lg:flex">Export Shopping List</div>
+              Export Shopping List
             </Button>
-            <Button variant="default" onClick={handleRemixClick} className="cursor-pointer">
+
+            <Button
+              disabled={exportingIngredient}
+              variant="outline"
+              size="icon"
+              onClick={handleExportIngredients}
+              className="cursor-pointer flex md:hidden"
+            >
+              <SquareCheckBig />
+            </Button>
+
+            {/* Remix */}
+
+            <Button
+              variant="default"
+              onClick={handleRemixClick}
+              className="hidden md:flex cursor-pointer"
+            >
               <Repeat />
-              <div className="hidden md:flex lg:flex">Remix </div>
+              Remix
+            </Button>
+
+            <Button
+              variant="default"
+              onClick={handleRemixClick}
+              size="icon"
+              className="flex md:hidden cursor-pointer"
+            >
+              <Repeat />
             </Button>
           </div>
         </div>
@@ -453,7 +491,7 @@ const RecipeDetailPage = () => {
                 </Button>
               </div>
               {/* Dish type + Cooking time */}
-              <div className="md:flex md:flex-1 md:flex-row grid grid-cols-3 justify-start items-start md:items-center gap-6 lg:gap-8 text-sm text-gray-500">
+              <div className="md:flex md:flex-1 md:flex-row grid grid-cols-2 justify-start items-start md:items-center gap-6 lg:gap-8 text-sm text-gray-500">
                 <div className="flex items-center gap-2">
                   <ChefHat className="h-4 w-4 text-gray-400 " />
                   <span className="text-base text-gray-600 antialiased">

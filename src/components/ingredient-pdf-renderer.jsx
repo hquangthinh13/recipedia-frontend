@@ -7,7 +7,20 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 const logo =
   'https://res.cloudinary.com/dee339rpr/image/upload/v1763079993/Recipedia-logo-square_fjv9ch.svg';
+async function waitForImages(container) {
+  const imgs = Array.from(container.querySelectorAll('img'));
 
+  await Promise.all(
+    imgs.map(
+      (img) =>
+        new Promise((resolve) => {
+          if (img.complete) return resolve();
+          img.onload = resolve;
+          img.onerror = resolve; // resolve to avoid hanging PDF
+        }),
+    ),
+  );
+}
 export function IngredientPdfRenderer({ title, author, ingredients, onDone }) {
   const ref = useRef(null);
 
@@ -16,11 +29,15 @@ export function IngredientPdfRenderer({ title, author, ingredients, onDone }) {
       if (!ref.current) return;
 
       try {
-        // Wait for fonts (optional, but helps text render correctly)
+        // Wait for fonts
         if (document.fonts && document.fonts.ready) {
           await document.fonts.ready;
         }
 
+        // --- WAIT FOR IMAGES (IMPORTANT) ---
+        await waitForImages(ref.current);
+
+        // Now it's safe to capture PNG
         const dataUrl = await htmlToImage.toPng(ref.current, {
           cacheBust: true,
           backgroundColor: '#ffffff',

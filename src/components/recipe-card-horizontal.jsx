@@ -133,7 +133,7 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false, onDelete, onEdit }) => 
   }, [user, recipe]);
 
   return (
-    <Card className="mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out">
+    <Card className="mx-auto h-fit w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out">
       {/* Content */}
       <CardContent className="p-4 h-fit">
         {/* Author + Date */}

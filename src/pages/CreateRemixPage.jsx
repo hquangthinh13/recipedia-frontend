@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { toast } from 'sonner';
 import Spinner from '@/components/spinner';
-import Navbar from '@/components/navbar';
 import Footer from '@/components/page-footer';
 import RecipeCardPreview from '@/components/recipe-card-preview';
 // import { MusicPlayer } from '@/components/music-player';
@@ -43,7 +42,7 @@ import { ArrowLeft, CookingPot, Italic, Plus, Trash2 } from 'lucide-react';
 import logo from '@/assets/images/Recipedia-logo-square.svg';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
-import { UNIT_GROUPS } from '@/lib/unit-groups';
+import { unitGroups } from '@/lib/unitGroups';
 import { RecipeFormSchema } from '@/formSchema/recipeFormSchema';
 
 const CreateRemixPage = () => {
@@ -222,7 +221,6 @@ const CreateRemixPage = () => {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
       <div className="mx-auto max-w-6xl mt-2 p-4">
         <Link to={`/recipes/${parentId}`}>
           <Button variant="ghost" className="cursor-pointer">
@@ -365,7 +363,7 @@ const CreateRemixPage = () => {
                                         </SelectTrigger>
                                       </FormControl>
                                       <SelectContent className="max-h-60 overflow-y-auto">
-                                        {UNIT_GROUPS.map((group) => (
+                                        {unitGroups.map((group) => (
                                           <SelectGroup key={group.label}>
                                             <SelectLabel>{group.label}</SelectLabel>
                                             {group.options.map((opt) => (

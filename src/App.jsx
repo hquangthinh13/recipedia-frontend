@@ -4,9 +4,10 @@ import { useLocation } from 'react-router-dom';
 
 import HomePage from './pages/HomePage';
 
+import FeedPage from './pages/FeedPage';
 import CreateRecipePage from './pages/CreateRecipePage';
 import RecipeDetailPage from './pages/RecipeDetailPage';
-import CreateRemixPage from '@/pages/CreateRemixPage';
+import CreateRemixPage from './pages/CreateRemixPage';
 
 import AvatarCustomizerPage from './pages/AvatarCustomizerPage';
 import ProfilePage from './pages/ProfilePage';
@@ -20,11 +21,22 @@ import VerifyResetCodePage from './pages/authentication/VerifyResetCodePage';
 import ForgotPasswordPage from './pages/authentication/ForgotPasswordPage';
 import NewPasswordPage from './pages/authentication/NewPasswordPage';
 
+import ScrollToTopButton from '@/components/scroll-to-top-button';
+import Navbar from '@/components/navbar';
 import { MusicPlayerHorizontal } from './components/music-player-horizontal';
 const App = () => {
   const location = useLocation();
   const path = location.pathname;
-  const hidePlayer =
+  const hideNavbar =
+    path === '/login' ||
+    path === '/signup' ||
+    path === '/change-password' ||
+    path === '/verify-reset-code' ||
+    path === '/reset-password' ||
+    path.startsWith('/recipes/') ||
+    path.startsWith('/verify/');
+
+  const hideMP =
     path === '/login' ||
     path === '/signup' ||
     path === '/change-password' ||
@@ -33,9 +45,11 @@ const App = () => {
     path.startsWith('/verify/');
   return (
     <div>
-      {!hidePlayer && <MusicPlayerHorizontal />}
+      {!hideNavbar && <Navbar />}
+      {!hideMP && <MusicPlayerHorizontal />}
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/recipes" element={<FeedPage />} />
         <Route path="/recipes/:id" element={<RecipeDetailPage />} />
         <Route path="/recipes/:id/remix" element={<CreateRemixPage />} />
 
@@ -51,6 +65,8 @@ const App = () => {
         <Route path="/profile/:id" element={<ProfilePage />} />
         <Route path="/analytics" element={<UserDashboard />} />
       </Routes>
+
+      <ScrollToTopButton />
     </div>
   );
 };

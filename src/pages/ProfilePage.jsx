@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
-import Navbar from '@/components/navbar';
 import Footer from '@/components/page-footer';
 import RecipeCardHorizontal from '@/components/recipe-card-horizontal';
 import logo from '@/assets/images/Recipedia-logo-square.svg';
@@ -161,8 +160,6 @@ const ProfilePage = () => {
     : 'Unknown';
   return (
     <div className="min-h-screen">
-      <Navbar />
-
       {/* Kitchen Section */}
       <div className="flex mt-2 flex-col mx-auto max-w-lg px-4 py-4">
         <Card>
@@ -179,7 +176,7 @@ const ProfilePage = () => {
                   <AvatarImage src={profile.avatar || FallBackAvatar} alt={profile.name} />
                 </Avatar>
               </div>
-              <h2 className="pt-2 text-3xl font-bold text-[var(--card-foreground)] antialiased">
+              <h2 className="pt-2 text-3xl font-bold text-card-foreground antialiased">
                 {profile.name}{' '}
               </h2>
               <span className=" text-muted-foreground text-sm leading-2">Joined {joinedDate}</span>{' '}
@@ -202,7 +199,7 @@ const ProfilePage = () => {
                 <div className="w-16 flex flex-col gap-0 items-center justify-center">
                   <span
                     onClick={() => handleOpenList('followers')}
-                    className="text-lg font-bold text-[var(--card-foreground)] cursor-pointer hover:text-accent"
+                    className="text-lg font-bold text-card-foreground cursor-pointer hover:text-accent"
                   >
                     {formatFollowerCount(profile.followersCount)}
                   </span>
@@ -212,7 +209,7 @@ const ProfilePage = () => {
                 <Separator orientation="vertical" className="h-6" />
                 {/* Likes */}
                 <div className="w-16 flex flex-col gap-0 items-center justify-center">
-                  <span className="text-lg font-bold text-[var(--card-foreground)] cursor-pointer hover:text-accent">
+                  <span className="text-lg font-bold text-card-foreground cursor-pointer hover:text-accent">
                     {totalLikes}
                   </span>
                   <span className="text-muted-foreground text-sm leading-2">likes</span>

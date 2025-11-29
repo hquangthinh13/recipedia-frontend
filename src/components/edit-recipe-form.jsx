@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, CookingPot, Trash2 } from 'lucide-react';
-import { UNIT_GROUPS } from '@/lib/unit-groups';
+import { unitGroups } from '@/lib/unitGroups';
 
 const EditRecipeForm = ({ recipe, onClose, onUpdated }) => {
   const [file, setFile] = useState(null);
@@ -205,7 +205,7 @@ const EditRecipeForm = ({ recipe, onClose, onUpdated }) => {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent className="max-h-60 overflow-y-auto">
-                                {UNIT_GROUPS.map((group) => (
+                                {unitGroups.map((group) => (
                                   <SelectGroup key={group.label}>
                                     <SelectLabel>{group.label}</SelectLabel>
                                     {group.options.map((opt) => (

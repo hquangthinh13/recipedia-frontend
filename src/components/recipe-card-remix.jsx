@@ -21,10 +21,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-const RecipeCardRemix = ({ isTrending, recipe }) => {
+const RecipeCardRemix = ({ recipe }) => {
   const navigate = useNavigate();
-  const commentCount = recipe.comments?.length || 0;
-  const remixCount = recipe.remixCount || 0;
   const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
   const avatarNoBg = removeBackgroundColor(avatarUrl);
   const [faceUrl, setFaceUrl] = useState(replaceFaceParams(avatarUrl));
@@ -35,7 +33,6 @@ const RecipeCardRemix = ({ isTrending, recipe }) => {
   const userId = user?.id;
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const [liked, setLiked] = useState(recipe.likedByUser || false);
-  const [likeCount, setLikeCount] = useState(recipe.likes?.length || 0);
   const handleRemixClick = () => {
     if (!user) {
       toast.error('Please log in to remix this recipe');
@@ -141,9 +138,9 @@ const RecipeCardRemix = ({ isTrending, recipe }) => {
           <div className="flex flex-row gap-1 items-center">
             <div
               onClick={() => navigate(`/profile/${recipe.author?._id}`)}
-              className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-[var(--card-foreground)]"
+              className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-card-foreground"
             >
-              {recipe.author?.name || 'Mysterious Chef'}
+              {authorName || 'Mysterious Chef'}
             </div>{' '}
             <span className="text-muted-foreground">•</span>
             <div className="text-xs flex text-muted-foreground font-light">

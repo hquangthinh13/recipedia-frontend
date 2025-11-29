@@ -27,12 +27,9 @@ dist-ssr
 src/assets/images/pho.jpg
 src/assets/images/image1.jpg
 src/assets/images/image3.jpg
-src/assets/songs/FavouriteDaughter.jpeg
-src/assets/songs/FavouriteDaughter.mp3
-src/assets/songs/VuTruCoBay.jpg
-src/assets/songs/VuTruCoBay.mp3
 src/pages/AvatarCustomizerPage_draft.jsx
 src/components/temp.jsx
-
+.eslintrc.cjs
+eslint.config.js
 *storybook.log
 storybook-static

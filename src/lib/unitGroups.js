@@ -1,4 +1,4 @@
-export const UNIT_GROUPS = [
+export const unitGroups = [
   {
     label: 'Volume',
     options: [

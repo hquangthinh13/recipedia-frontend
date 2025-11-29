@@ -1,12 +1,11 @@
-import React, { useEffect } from "react";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/page-footer";
-import UserInteractionDataCard from "@/components/user-interaction-data-card";
-import AnalyticsCard from "@/components/analytics-card";
-import { useAuth } from "@/context/AuthContext";
-import logo from "@/assets/images/Recipedia-logo-square.svg";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import React, { useEffect } from 'react';
+import Footer from '@/components/page-footer';
+import UserInteractionDataCard from '@/components/user-interaction-data-card';
+import AnalyticsCard from '@/components/analytics-card';
+import { useAuth } from '@/context/AuthContext';
+import logo from '@/assets/images/Recipedia-logo-square.svg';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import {
   Empty,
   EmptyContent,
@@ -14,14 +13,14 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/ui/empty";
+} from '@/components/ui/empty';
 
 const UserDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Recipedia | Analytics";
+    document.title = 'Recipedia | Analytics';
   }, []);
   if (!user)
     return (
@@ -29,8 +28,8 @@ const UserDashboard = () => {
         <Empty className="h-full">
           <EmptyHeader>
             <EmptyMedia>
-              {" "}
-              <Link to={"/"} className="flex flex-1">
+              {' '}
+              <Link to={'/'} className="flex flex-1">
                 <img src={logo} alt="Recipedia Logo" className="h-12" />
               </Link>
             </EmptyMedia>
@@ -41,29 +40,21 @@ const UserDashboard = () => {
           </EmptyHeader>
           <EmptyContent>
             <div className="flex gap-2">
-              <Button
-                className="cursor-pointer"
-                onClick={() => navigate("/login")}
-              >
+              <Button className="cursor-pointer" onClick={() => navigate('/login')}>
                 Login
               </Button>
-              <Button
-                className="cursor-pointer"
-                onClick={() => navigate("/")}
-                variant="outline"
-              >
+              <Button className="cursor-pointer" onClick={() => navigate('/')} variant="outline">
                 Back to Home
               </Button>
             </div>
           </EmptyContent>
-        </Empty>{" "}
+        </Empty>{' '}
       </div>
     );
   return (
     <div className="min-h-screen">
-      <Navbar />
       <div className="flex mt-2 flex-col mx-auto max-w-6xl px-4 py-4 gap-4">
-        <UserInteractionDataCard />{" "}
+        <UserInteractionDataCard />{' '}
         <div className="flex flex-row gap-4">
           <AnalyticsCard className="flex flex-1" type="like" />
           <AnalyticsCard className="flex flex-1" type="comment" />

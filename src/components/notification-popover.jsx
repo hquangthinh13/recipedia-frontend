@@ -6,7 +6,11 @@ import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { formatDate } from '@/lib/formatDate';
-import Spinner from '@/components/spinner';
+import { LoaderCircle } from 'lucide-react';
+
+const SmallSpinner = ({ className, ...props }) => {
+  return <LoaderCircle className={`animate-spin text-primary ${className}`} {...props} />;
+};
 
 const PAGE_SIZE = 5;
 
@@ -19,6 +23,7 @@ export function NotificationPopover() {
   const [marking, setMarking] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const loadingPageRef = useRef(null);
 
   const scrollContainerRef = useRef(null);
   const loadMoreRef = useRef(null);
@@ -26,7 +31,7 @@ export function NotificationPopover() {
   const unreadCount = notifications.filter((n) => n.isRead === false).length;
 
   const fetchNotifications = useCallback(
-    async ({ append = false } = {}) => {
+    async ({ pageToLoad, append = false } = {}) => {
       if (!user || !token) return;
       try {
         if (append) setIsLoadingMore(true);
@@ -34,7 +39,7 @@ export function NotificationPopover() {
 
         const qs = new URLSearchParams();
         qs.set('limit', String(PAGE_SIZE));
-        qs.set('page', String(page));
+        qs.set('page', String(pageToLoad));
 
         const { data } = await api.get(`/users/notifications?${qs.toString()}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -43,13 +48,15 @@ export function NotificationPopover() {
         const batch = data || [];
         setHasMore(batch.length === PAGE_SIZE);
 
-        if (append) {
-          setNotifications((prev) => [...prev, ...batch]);
-        } else {
-          setNotifications(batch);
-        }
+        setNotifications((prev) => {
+          if (!append) return batch;
 
-        console.log('Fetched notifications page', page, batch);
+          const existingIds = new Set(prev.map((n) => n._id));
+          const newOnes = batch.filter((n) => !existingIds.has(n._id));
+          return [...prev, ...newOnes];
+        });
+
+        console.log('Fetched notifications page', pageToLoad, 'len:', batch.length);
       } catch (e) {
         console.error('Failed to fetch notifications:', e);
       } finally {
@@ -57,7 +64,7 @@ export function NotificationPopover() {
         setIsLoadingMore(false);
       }
     },
-    [user, token, page],
+    [user, token],
   );
 
   // Reset pagination when user/token changes
@@ -70,9 +77,11 @@ export function NotificationPopover() {
 
   // Fetch whenever page changes (like HomePage recipes)
   useEffect(() => {
-    if (!user || !token) return;
-    fetchNotifications({ append: page > 1 });
-  }, [user, token, page, fetchNotifications]);
+    if (!user || !token || !open) return;
+    setPage(1);
+    setHasMore(true);
+    fetchNotifications({ pageToLoad: 1, append: false });
+  }, [user, token, open, fetchNotifications]);
 
   // Infinite scroll inside the popover scroll container
   useEffect(() => {
@@ -83,8 +92,18 @@ export function NotificationPopover() {
     const observer = new IntersectionObserver(
       (entries) => {
         const first = entries[0];
-        if (first.isIntersecting && !isLoadingMore && !loading && hasMore) {
-          setPage((p) => p + 1);
+        if (
+          first.isIntersecting &&
+          !isLoadingMore &&
+          !loading &&
+          hasMore &&
+          loadingPageRef.current == null
+        ) {
+          setPage((prev) => {
+            const next = prev + 1;
+            fetchNotifications({ pageToLoad: next, append: true });
+            return next;
+          });
         }
       },
       {
@@ -97,7 +116,7 @@ export function NotificationPopover() {
     observer.observe(loadMoreRef.current);
 
     return () => observer.disconnect();
-  }, [open, hasMore, isLoadingMore, loading]);
+  }, [open, hasMore, isLoadingMore, loading, fetchNotifications]);
 
   // Mark all as read when the popover opens (same behavior as before)
   const markAllRead = useCallback(async () => {
@@ -144,7 +163,7 @@ export function NotificationPopover() {
 
         {loading && page === 1 ? (
           <div className="flex items-center justify-center py-4">
-            <Spinner />
+            <SmallSpinner />
           </div>
         ) : notifications.length === 0 ? (
           <div className="p-4 text-center text-sm text-muted-foreground">No notifications</div>
@@ -209,7 +228,7 @@ export function NotificationPopover() {
 
             {isLoadingMore && (
               <div className="flex items-center justify-center py-2">
-                <Spinner />
+                <SmallSpinner />
               </div>
             )}
           </div>

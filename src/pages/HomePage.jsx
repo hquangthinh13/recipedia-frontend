@@ -1,11 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import api from '@/lib/api';
 import Pattern from '@/components/pattern';
 import Spinner from '@/components/spinner';
 import { Flame, RotateCcw } from 'lucide-react';
-import Navbar from '@/components/navbar';
-import { useState } from 'react';
 import RecipeCard from '@/components/recipe-card';
 import UserCard from '@/components/user-card';
 import HomeLinkCard from '@/components/home-link-card';
@@ -165,7 +163,6 @@ const HomePage = () => {
   }, [cookingTime, dishType, sort, page]);
 
   // Infinite scroll via IntersectionObserver
-  // Infinite scroll via IntersectionObserver
   useEffect(() => {
     // Only start observing after the first batch is loaded
     if (isLoading) return;
@@ -199,7 +196,6 @@ const HomePage = () => {
     );
   return (
     <div className="min-h-screen">
-      <Navbar />
       <div className="px-0 pt-0 max-w-6xl mx-auto">
         <div className="overflow-hidden relative flex w-auto h-fit px-4 items-center text-center">
           <div className="rounded-b-md relative container mx-auto p-4 max-w-6xl z-10 bg-primary">
@@ -212,7 +208,11 @@ const HomePage = () => {
       </div>
 
       <div className="max-w-6xl mx-auto my-2 px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-        <HomeLinkCard onClick={scrollToSection} index={1} title="Discover and Remix Recipes" />
+        <HomeLinkCard
+          onClick={() => navigate('/recipes')}
+          index={1}
+          title="Discover and Remix Recipes"
+        />
         <HomeLinkCard
           index={2}
           title="Dress Your Chef"

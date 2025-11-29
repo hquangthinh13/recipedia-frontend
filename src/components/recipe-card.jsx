@@ -22,7 +22,6 @@ const RecipeCard = ({ isTrending, recipe }) => {
   const authorName = recipe?.author?.name || 'Mysterious Chef';
   const isRemix = recipe?.parentRecipe;
   const { user, setUser } = useAuth();
-  const [expanded, setExpanded] = useState(false);
 
   const userId = user?.id;
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -105,7 +104,7 @@ const RecipeCard = ({ isTrending, recipe }) => {
   }, [user, recipe]);
 
   return (
-    <Card className="mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out">
+    <Card className="mx-auto w-full h-full flex flex-col  hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out">
       {/* Cover image */}
       <div
         className="group cursor-pointer overflow-hidden relative transition-all duration-300 ease-in-out"
@@ -125,134 +124,149 @@ const RecipeCard = ({ isTrending, recipe }) => {
         )}
         {isTrending && (
           <span
-            className="z-0 absolute inset-0 bg-gradient-to-tr via-accent/10 to-accent/50 brightness-100
+            className="z-0 absolute inset-0 bg-linear-to-tr via-accent/10 to-accent/50 brightness-100
              transition-colors duration-500 group-hover:via-accent/30 group-hover:to-accent/50"
           ></span>
         )}
         <span
-          className="z-0 absolute inset-0 bg-gradient-to-b via-black/0 to-black/50 brightness-100
+          className="z-0 absolute inset-0 bg-linear-to-b via-black/0 to-black/50 brightness-100
              transition-colors duration-500 group-hover:via-black/0 group-hover:to-black/20"
         ></span>
       </div>
 
       {/* Content */}
-      <CardContent className="p-4 h-fit">
-        {/* Author + Date */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Avatar
-              className="cursor-pointer"
-              onClick={() => navigate(`/profile/${recipe.author?._id}`)}
-            >
-              <AvatarImage src={avatarUrl} alt={authorName} />
-              <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
-            </Avatar>
+      <CardContent className="flex flex-1 flex-col p-4">
+        <div className="flex flex-1 flex-col justify-between">
+          <div>
+            {/* Author + Date */}
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Avatar
+                  className="cursor-pointer"
+                  onClick={() => navigate(`/profile/${recipe.author?._id}`)}
+                >
+                  <AvatarImage src={avatarUrl} alt={authorName} />
+                  <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
+                </Avatar>
 
-            <div className="flex flex-col">
-              <div
-                onClick={() => navigate(`/profile/${recipe.author?._id}`)}
-                className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-card-foreground"
-              >
-                {recipe.author?.name || 'Mysterious Chef'}
+                <div className="flex flex-col">
+                  <div
+                    onClick={() => navigate(`/profile/${recipe.author?._id}`)}
+                    className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-card-foreground"
+                  >
+                    {recipe.author?.name || 'Mysterious Chef'}
+                  </div>
+                  <div className="text-xs flex text-muted-foreground font-light">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>{formatDate(recipe.createdAt)}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{new Date(recipe.createdAt).toLocaleString()}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </div>
               </div>
-              <div className="text-xs flex text-muted-foreground font-light">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span>{formatDate(recipe.createdAt)}</span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{new Date(recipe.createdAt).toLocaleString()}</p>
-                  </TooltipContent>
-                </Tooltip>
+
+              <Button
+                size="icon"
+                variant="ghost"
+                className="cursor-pointer"
+                onClick={handleFavorite}
+              >
+                <Bookmark className={`transition ${favorite && 'fill-primary text-primary'}`} />
+              </Button>
+            </div>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <h2
+                  onClick={() => navigate(`/recipes/${recipe._id}`)}
+                  className="cursor-pointer hover:text-accent text-2xl font-bold line-clamp-1 text-card-foreground mt-2 mb-0 antialiased"
+                >
+                  {recipe.title}
+                </h2>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p> {recipe.title}</p>
+              </TooltipContent>
+            </Tooltip>
+            <div className="flex flex-wrap justify-start items-center gap-2 mt-2 text-sm mb-4">
+              <Badge variant="default">{dishTypeLabels[recipe.dishType] ?? recipe.dishType}</Badge>
+              <Badge variant="secondary">
+                {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
+              </Badge>
+              {/* secondary */}
+              {isRemix ? (
+                <Badge variant="outline">Remixed Recipe</Badge>
+              ) : (
+                <Badge variant="outline">Original Recipe</Badge>
+              )}
+            </div>
+            {!isTrending && (
+              <>
+                <p className="text-md text-muted-foreground transition-all duration-300 whitespace-pre-line line-clamp-2">
+                  {recipe.instructions}
+                </p>
+                <button
+                  onClick={() => navigate(`/recipes/${recipe._id}`)}
+                  className="inline cursor-pointer hover:text-accent text-md font-medium text-primary hover:underline mb-4"
+                >
+                  Read more
+                </button>
+              </>
+            )}
+          </div>
+          <div className="flex flex-col justify-end">
+            <Separator className="flex mt-2 mb-2" />
+            {/* Buttons */}
+            <div className=" w-full flex justify-center gap-3">
+              <Button
+                onClick={handleLike}
+                variant="ghost"
+                className="group cursor-pointer flex-1 flex"
+              >
+                <Heart className={`transition ${liked && 'fill-primary text-primary'}`} />
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="group cursor-pointer flex-1 flex"
+                onClick={() =>
+                  navigate(`/recipes/${recipe._id}`, {
+                    state: { scrollToComment: true },
+                  })
+                }
+              >
+                <MessageCircle className="" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="group cursor-pointer flex-1 flex"
+                onClick={handleRemixClick}
+              >
+                <Repeat className="" />
+              </Button>
+            </div>
+            <div className="flex justify-center items-center gap-2 mt-2 text-xs text-muted-foreground">
+              <div className="flex flex-1 font-normal justify-center  group-hover:text-current">
+                <span>
+                  {likeCount || 0} {likeCount > 1 ? 'likes' : 'like'}
+                </span>
+              </div>{' '}
+              <div className="flex flex-1 justify-center font-normal group-hover:text-current">
+                <span>
+                  {commentCount || 0} {commentCount > 1 ? 'comments' : 'comment'}
+                </span>
+              </div>
+              <div className="flex flex-1 justify-center font-normal group-hover:text-current">
+                <span>
+                  {remixCount || 0} {remixCount > 1 ? 'remixes' : 'remix'}
+                </span>
               </div>
             </div>
-          </div>
-
-          <Button size="icon" variant="ghost" className="cursor-pointer" onClick={handleFavorite}>
-            <Bookmark className={`transition ${favorite && 'fill-primary text-primary'}`} />
-          </Button>
-        </div>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <h2
-              onClick={() => navigate(`/recipes/${recipe._id}`)}
-              className="cursor-pointer hover:text-accent text-2xl font-bold line-clamp-1 text-card-foreground mt-2 mb-0 antialiased"
-            >
-              {recipe.title}
-            </h2>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p> {recipe.title}</p>
-          </TooltipContent>
-        </Tooltip>
-        <div className="flex flex-wrap justify-start items-center gap-2 mt-2 text-sm mb-4">
-          <Badge variant="default">{dishTypeLabels[recipe.dishType] ?? recipe.dishType}</Badge>
-          <Badge variant="secondary">
-            {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
-          </Badge>
-          {/* secondary */}
-          {isRemix ? (
-            <Badge variant="outline">Remixed Recipe</Badge>
-          ) : (
-            <Badge variant="outline">Original Recipe</Badge>
-          )}
-        </div>
-        {!isTrending && (
-          <>
-            <p className="text-md text-muted-foreground transition-all duration-300 whitespace-pre-line line-clamp-2">
-              {recipe.instructions}
-            </p>
-            <button
-              onClick={() => navigate(`/recipes/${recipe._id}`)}
-              className="inline cursor-pointer hover:text-accent text-md font-medium text-primary hover:underline mb-4"
-            >
-              Read more
-            </button>
-          </>
-        )}
-        <Separator className="flex mt-2 mb-2" />
-        {/* Buttons */}
-        <div className=" w-full flex justify-center gap-3">
-          <Button onClick={handleLike} variant="ghost" className="group cursor-pointer flex-1 flex">
-            <Heart className={`transition ${liked && 'fill-primary text-primary'}`} />
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="group cursor-pointer flex-1 flex"
-            onClick={() =>
-              navigate(`/recipes/${recipe._id}`, {
-                state: { scrollToComment: true },
-              })
-            }
-          >
-            <MessageCircle className="" />
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="group cursor-pointer flex-1 flex"
-            onClick={handleRemixClick}
-          >
-            <Repeat className="" />
-          </Button>
-        </div>
-        <div className="flex justify-center items-center gap-2 mt-2 text-xs text-muted-foreground">
-          <div className="flex flex-1 font-normal justify-center  group-hover:text-current">
-            <span>
-              {likeCount || 0} {likeCount > 1 ? 'likes' : 'like'}
-            </span>
-          </div>{' '}
-          <div className="flex flex-1 justify-center font-normal group-hover:text-current">
-            <span>
-              {commentCount || 0} {commentCount > 1 ? 'comments' : 'comment'}
-            </span>
-          </div>
-          <div className="flex flex-1 justify-center font-normal group-hover:text-current">
-            <span>
-              {remixCount || 0} {remixCount > 1 ? 'remixes' : 'remix'}
-            </span>
           </div>
         </div>
       </CardContent>

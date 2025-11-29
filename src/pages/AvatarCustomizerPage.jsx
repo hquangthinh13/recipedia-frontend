@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import api from '@/lib/api';
-import Navbar from '@/components/navbar';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
@@ -308,7 +307,6 @@ const AvatarCustomizerPage = () => {
     );
   return (
     <div className="min-h-screen">
-      <Navbar />
       <div className="flex flex-col lg:flex-row gap-4 max-w-6xl p-4 mx-auto mb-12">
         <div className="flex lg:w-lg flex-col-reverse lg:flex-col gap-4">
           <PreviewUserCard avatarUrl={avatarUrl} name={name || 'Guest'} createdAt={createdAt} />

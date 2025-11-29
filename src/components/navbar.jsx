@@ -26,6 +26,7 @@ import {
   CommandShortcut,
 } from '@/components/ui/command';
 import { Timer } from './timer';
+import SearchBar from '/src/components/searchbar.jsx';
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 
 const Navbar = ({ needTimer }) => {
@@ -45,7 +46,7 @@ const Navbar = ({ needTimer }) => {
               onClick={() => navigate('/')}
             />
           </div>
-          {needTimer && <Timer />}
+          {needTimer ? <Timer /> : <SearchBar />}
           {/* Right section */}{' '}
           {user ? (
             <div className="flex flex-1 items-center gap-2 justify-end">

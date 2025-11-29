@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import tick from '@/assets/sfx/tick.wav';
 import ring from '@/assets/sfx/ring.wav';
+
 export function Timer() {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(1);
@@ -14,7 +15,9 @@ export function Timer() {
   const [isRunning, setIsRunning] = useState(false);
   const tickSound = useRef(null);
   const ringSound = useRef(null);
-
+  const getTotalSeconds = () => {
+    return hours * 3600 + minutes * 60 + seconds;
+  };
   useEffect(() => {
     tickSound.current = new Audio(tick);
     ringSound.current = new Audio(ring);
@@ -23,10 +26,6 @@ export function Timer() {
     tickSound.current.load();
     ringSound.current.load();
   }, []);
-
-  const getTotalSeconds = () => {
-    return hours * 3600 + minutes * 60 + seconds;
-  };
 
   useEffect(() => {
     if (!isRunning || remaining <= 0) {
