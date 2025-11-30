@@ -30,7 +30,7 @@ const RecipeCard = ({ isTrending, recipe }) => {
   const handleRemixClick = () => {
     if (!user) {
       toast.error('Please log in to remix this recipe');
-      navigate('/login', { state: { from: `/recipes/${recipe._id}` } });
+      // navigate('/login', { state: { from: `/recipes/${recipe._id}` } });
       return;
     }
 
@@ -73,7 +73,7 @@ const RecipeCard = ({ isTrending, recipe }) => {
 
   const handleFavorite = async () => {
     if (!token) {
-      toast.error('Please log in first.');
+      toast.error('Please log in to save this recipe.');
       return;
     }
     try {

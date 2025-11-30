@@ -4,7 +4,7 @@ import { formatDate } from '@/lib/formatDate';
 import { Separator } from '@/components/ui/separator';
 import { Link } from 'react-router-dom';
 import { formatFollowerCount } from '@/lib/formatFollowerCount';
-import { Soup, Heart, Users, Trophy } from 'lucide-react';
+import { Soup, Heart, Users } from 'lucide-react';
 import { removeBackgroundColor, flip, replaceFaceParams } from '@/lib/avatarModifier';
 
 function getChefTitle(rank) {
@@ -28,7 +28,7 @@ function getChefTitle(rank) {
 
 const UserCard = ({ user }) => {
   return (
-    <Card className="relative flex flex-row justify-center items-end mx-auto w-full hover:shadow-lg transition delay-150 duration-300 ease-in-out">
+    <Card className="relative h-fit flex flex-row justify-center items-end mx-auto w-full hover:shadow-lg transition delay-150 duration-300 ease-in-out">
       <div className="flex items-center">
         <div className="flex z-20 w-36 h-36 relative group mt-4 ml-2">
           <img

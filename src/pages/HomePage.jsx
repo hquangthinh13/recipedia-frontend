@@ -8,7 +8,6 @@ import RecipeCard from '@/components/recipe-card';
 import UserCard from '@/components/user-card';
 import HomeLinkCard from '@/components/home-link-card';
 import { Button } from '@/components/ui/button';
-import Footer from '@/components/page-footer';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
@@ -450,7 +449,6 @@ const HomePage = () => {
 
         <div ref={loadMoreRef} className="h-3" />
       </Tabs>
-      <Footer />
     </div>
   );
 };

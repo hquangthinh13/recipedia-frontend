@@ -57,21 +57,8 @@ export function MusicPlayerHorizontal({ playlist = songsList }) {
     fixed bottom-0 right-0 left-0 mx-auto z-100 py-2 w-full opacity-95 hover:opacity-100 pointer-events-none
   `}
     >
-      {/* <DndContext
-        className="pointer-events-none"
-        onDragEnd={(event) => {
-          const { delta } = event;
-
-          // If you only want horizontal movement at the bottom, ignore delta.y:
-          setPlayerPos((prev) => ({
-            x: prev.x + delta.x,
-            y: prev.y, // keep y fixed at bottom
-          }));
-        }}
-      > */}
-      {/* <DraggablePlayer position={playerPos}> */}
       <div
-        className={` mx-auto max-w-6xl px-4  justify-end flex ${!collapsed && ''}  }
+        className={` mx-auto max-w-6xl px-4  justify-start flex ${!collapsed && ''}  }
 `}
       >
         <Card
@@ -223,8 +210,6 @@ export function MusicPlayerHorizontal({ playlist = songsList }) {
           </CardContent>
         </Card>{' '}
       </div>
-      {/* </DraggablePlayer>
-       </DndContext> */}
     </header>
   );
 }

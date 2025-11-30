@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import Footer from '@/components/page-footer';
 import RecipeCardPreview from '@/components/recipe-card-preview';
 import { MusicPlayer } from '@/components/music-player';
 import { useAuth } from '@/context/AuthContext';
@@ -42,7 +41,6 @@ const CreateRecipePage = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // if (!user) navigate('/login');
     document.title = 'Recipedia | Create Recipe';
   }, []);
 
@@ -131,10 +129,10 @@ const CreateRecipePage = () => {
         <Link to={'/'}>
           <Button variant="ghost" className="cursor-pointer">
             <ArrowLeft />
-            <div className="hidden md:flex lg:flex">Back to Recipes</div>
+            <div className="hidden md:flex lg:flex">Home</div>
           </Button>
         </Link>
-        <div className="flex lg:flex-row flex-col gap-4 items-start mt-2">
+        <div className="flex lg:flex-row flex-col gap-4 items-start mt-4">
           <Card className="flex-2/3">
             <CardHeader>
               <CardTitle>Create your Recipe</CardTitle>
@@ -411,7 +409,6 @@ const CreateRecipePage = () => {
           </div>
         </div>
       </div>{' '}
-      <Footer />
     </div>
   );
 };

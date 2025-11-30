@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import Footer from '@/components/page-footer';
 import PreviewUserCard from '@/components/preview-user-card';
 import {
   Scissors,
@@ -494,12 +493,10 @@ const AvatarCustomizerPage = () => {
         </div>
         {/* Switch Buttons */}
       </div>
-      <Footer />
     </div>
   );
 };
 
-// === Keep your original FeatureSelector ===
 const FeatureSelector = ({ title, options, selected, onSelect, colorParam = '' }) => (
   <div className="w-full">
     <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-2">

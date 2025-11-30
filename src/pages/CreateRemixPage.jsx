@@ -1,13 +1,10 @@
-// src/pages/CreateRemixPage.jsx
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { toast } from 'sonner';
 import Spinner from '@/components/spinner';
-import Footer from '@/components/page-footer';
 import RecipeCardPreview from '@/components/recipe-card-preview';
-// import { MusicPlayer } from '@/components/music-player';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -526,7 +523,6 @@ const CreateRemixPage = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

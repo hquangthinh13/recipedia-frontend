@@ -35,7 +35,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
-import Footer from '@/components/page-footer';
 import logo from '@/assets/images/Recipedia-logo-square.svg';
 import {
   Check,
@@ -372,11 +371,11 @@ const RecipeDetailPage = () => {
     <div className="min-h-screen">
       <Navbar needTimer={true} />
       <div className="mx-auto max-w-6xl mt-2 p-4">
-        <div className="flex flex-row justify-between items-center mb-2">
+        <div className="flex flex-row justify-between items-center mb-4">
           <Link to={'/'}>
             <Button variant="ghost" className="cursor-pointer">
               <ArrowLeft />
-              <div className="hidden md:flex lg:flex">Back to Recipes</div>
+              <div className="hidden md:flex lg:flex">Home</div>
             </Button>
           </Link>
 
@@ -542,7 +541,7 @@ const RecipeDetailPage = () => {
 
                   <div className="flex flex-col">
                     <Link to={`/profile/${recipe.author?._id}`}>
-                      <div className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-[var(--card-foreground)]">
+                      <div className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-card-foreground">
                         {recipe.author?.name || 'Mysterious Chef'}
                       </div>
                     </Link>
@@ -564,20 +563,20 @@ const RecipeDetailPage = () => {
               <div className="space-y-2">
                 {/* Title */}
                 <div className="flex justify-start items-center gap-2">
-                  <h2 className="text-2xl font-bold text-[var(--card-foreground)] antialiased">
+                  <h2 className="text-2xl font-bold text-card-foreground antialiased">
                     Ingredients
                   </h2>
                   <Utensils className="text-accent" />
                 </div>
                 {/* Switch Buttons */}
-                <div className="flex w-fit flex-row overflow-hidden rounded-none border-2 border-[var(--accent)]">
+                <div className="flex w-fit flex-row overflow-hidden rounded-none border-2 border-accent">
                   {options.map((value) => (
                     <Button
                       key={value}
                       variant="ghost"
                       onClick={() => setSelected(value)}
                       className={`cursor-pointer rounded-none flex
-                    ${selected === value ? 'bg-[var(--accent)]' : ''}`}
+                    ${selected === value ? 'bg-accent' : ''}`}
                     >
                       {/* Only show check on the selected button */}
                       {selected === value && <Check className="h-4 w-4" />}
@@ -585,7 +584,7 @@ const RecipeDetailPage = () => {
                     </Button>
                   ))}
                 </div>
-                <div className="text-sm flex text-[var(--muted-foreground)] font-light items-center gap-1">
+                <div className="text-sm flex text-muted-foreground font-light items-center gap-1">
                   <BadgeInfo className="h-4 w-4" />
                   Original recipe (1X) yields 4 servings. Adjust serving size to update ingredient
                   amounts.
@@ -624,7 +623,7 @@ const RecipeDetailPage = () => {
               <div className="space-y-2">
                 {/* Title */}
                 <div className="flex justify-start items-center gap-2">
-                  <h2 className="text-2xl font-bold text-[var(--card-foreground)] antialiased">
+                  <h2 className="text-2xl font-bold text-card-foreground antialiased">
                     Cooking Instructions
                   </h2>
                   <Microwave className="text-accent" />
@@ -647,22 +646,9 @@ const RecipeDetailPage = () => {
           <div className="flex flex-col gap-4">
             {isRemix && (
               <div className="lg:w-sm space-y-2">
-                {/* <Card className="mt-0 h-fit">
-                  <CardContent className="space-y-6 p-6"></CardContent>
-                </Card> */}
-                {/* Title */}
-                {/* <div className="flex justify-start items-center gap-2">
-                  <h2 className="text-2xl font-bold text-card-foreground antialiased">
-                    Remixed from
-                  </h2>
-                  <MessageSquareText className="text-accent" />
-                </div> */}
                 <RecipeCardRemix isTrending={false} recipe={parentRecipe} />{' '}
               </div>
             )}
-            {/* <div className="lg:w-sm">
-              <MusicPlayer className="" />
-            </div> */}
             <Card className="lg:w-sm mt-0 h-fit">
               <CardContent className="space-y-6 p-6">
                 {/* Comments Section */}
@@ -788,7 +774,6 @@ const RecipeDetailPage = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

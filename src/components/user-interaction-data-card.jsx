@@ -1,44 +1,38 @@
-import React from "react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import React from 'react';
+import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
+} from '@/components/ui/chart';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useAuth } from "@/context/AuthContext";
-import api from "@/lib/api";
-import { Loader2 } from "lucide-react";
+} from '@/components/ui/select';
+import { useAuth } from '@/context/AuthContext';
+import api from '@/lib/api';
+import { Loader2 } from 'lucide-react';
 
 const chartConfig = {
   likes: {
-    label: "Likes",
-    color: "var(--chart-1)",
+    label: 'Likes',
+    color: 'var(--chart-1)',
   },
   comments: {
-    label: "Comments",
-    color: "var(--chart-2)",
+    label: 'Comments',
+    color: 'var(--chart-2)',
   },
 };
 
 export default function UserInteractionDataCard() {
   const { user } = useAuth();
-  const [range, setRange] = React.useState("7");
+  const [range, setRange] = React.useState('7');
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const fillMissingDates = (rawData, range, userCreatedAt) => {
@@ -47,7 +41,7 @@ export default function UserInteractionDataCard() {
 
     let startDate;
 
-    if (range === "all") {
+    if (range === 'all') {
       // Use user.createdAt if available, otherwise fallback to 30 days ago
       startDate = userCreatedAt ? new Date(userCreatedAt) : new Date();
       if (!userCreatedAt) startDate.setDate(today.getDate() - 30);
@@ -59,7 +53,7 @@ export default function UserInteractionDataCard() {
 
     // Loop from startDate → today inclusive
     for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
-      const isoDate = d.toISOString().split("T")[0];
+      const isoDate = d.toISOString().split('T')[0];
       const existing = rawData.find((item) => item.date.startsWith(isoDate));
 
       result.push({
@@ -76,14 +70,12 @@ export default function UserInteractionDataCard() {
     if (!user?.id) return;
     setLoading(true);
     try {
-      const { data } = await api.get(
-        `/users/${user.id}/interactions-summary?range=${range}`
-      );
+      const { data } = await api.get(`/users/${user.id}/interactions-summary?range=${range}`);
       const raw = data.data || [];
       const filled = fillMissingDates(raw, range, user?.createdAt);
       setData(filled);
     } catch (err) {
-      console.error("Error fetching interactions summary:", err);
+      console.error('Error fetching interactions summary:', err);
     } finally {
       setLoading(false);
     }
@@ -94,13 +86,11 @@ export default function UserInteractionDataCard() {
   }, [fetchData]);
 
   return (
-    <Card className="">
+    <Card className="w-full h-full flex flex-col">
       <CardHeader className="flex items-center gap-2 space-y-0 border-b flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>User Interactions</CardTitle>
-          <CardDescription>
-            Likes and comments across your recipes
-          </CardDescription>
+          <CardDescription>Likes and comments across your recipes</CardDescription>
         </div>
 
         <Select value={range} onValueChange={setRange}>
@@ -130,35 +120,16 @@ export default function UserInteractionDataCard() {
             <Loader2 className="animate-spin w-8 h-8 text-primary" />
           </div>
         ) : (
-          <ChartContainer
-            config={chartConfig}
-            className="aspect-auto h-[250px] w-full"
-          >
+          <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="fillLikes" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-likes)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-likes)"
-                    stopOpacity={0.1}
-                  />
+                  <stop offset="5%" stopColor="var(--color-likes)" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="var(--color-likes)" stopOpacity={0.1} />
                 </linearGradient>
                 <linearGradient id="fillComments" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-comments)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-comments)"
-                    stopOpacity={0.1}
-                  />
+                  <stop offset="5%" stopColor="var(--color-comments)" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="var(--color-comments)" stopOpacity={0.1} />
                 </linearGradient>
               </defs>
 
@@ -171,9 +142,9 @@ export default function UserInteractionDataCard() {
                 minTickGap={24}
                 tickFormatter={(value) => {
                   const date = new Date(value);
-                  return date.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
+                  return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
                   });
                 }}
               />
@@ -185,9 +156,9 @@ export default function UserInteractionDataCard() {
                     className="bg-white border shadow-sm rounded-lg"
                     config={chartConfig}
                     labelFormatter={(value) => {
-                      return new Date(value).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
+                      return new Date(value).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
                       });
                     }}
                     indicator="dot"

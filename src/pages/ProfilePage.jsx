@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
-import Footer from '@/components/page-footer';
 import RecipeCardHorizontal from '@/components/recipe-card-horizontal';
 import logo from '@/assets/images/Recipedia-logo-square.svg';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
@@ -330,7 +329,6 @@ const ProfilePage = () => {
         </Tabs>
       </div>
 
-      <Footer />
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent
           aria-describedby="edit-recipe-desc"
