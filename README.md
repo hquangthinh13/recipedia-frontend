@@ -5,7 +5,6 @@ The modern user interface for Recipedia, built with the latest web technologies 
 ## Key Features
 
 * **Modern UI/UX:** Built with Shadcn UI (Radix Primitives) and Tailwind CSS v4 for a polished look.
-* **Smooth Animations:** Powered by Framer Motion and GSAP for engaging interactions.
 * **Data Visualization:** Interactive charts using Recharts and powerful data tables via TanStack Table.
 * **Utilities:** Export recipes to PDF or Image.
 * **Robust Forms:** Type-safe form handling with React Hook Form and Zod validation.
