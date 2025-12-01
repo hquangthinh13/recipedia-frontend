@@ -35,7 +35,7 @@ api.interceptors.response.use(
     const status = error.response?.status;
 
     if (status === 429) {
-      const msg = error.response?.data?.message || 'Too many requests, try again later.';
+      const msg = error.response?.data?.message || 'Too many requests, try again later';
       if (!showingRateLimitToast) {
         showingRateLimitToast = true;
         toast.error(msg, {
@@ -51,7 +51,7 @@ api.interceptors.response.use(
     if (status === 401 || status === 403) {
       localStorage.removeItem('token');
       // window.location.href = '/login';
-      toast.error('Session expired. Please log in again.');
+      toast.error('Session expired. Please log in again');
     }
 
     return Promise.reject(error);

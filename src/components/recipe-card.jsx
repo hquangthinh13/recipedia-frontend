@@ -58,7 +58,7 @@ const RecipeCard = ({ isTrending, recipe }) => {
   const handleLike = async () => {
     // Only block when we definitively know the user isn't logged in
     if (!token) {
-      toast.error('Please log in to like recipes.');
+      toast.error('Please log in to like recipes');
       return;
     }
     try {
@@ -73,7 +73,7 @@ const RecipeCard = ({ isTrending, recipe }) => {
 
   const handleFavorite = async () => {
     if (!token) {
-      toast.error('Please log in to save this recipe.');
+      toast.error('Please log in to save this recipe');
       return;
     }
     try {

@@ -74,7 +74,7 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false, onDelete, onEdit }) => 
   const handleLike = async () => {
     // Only block when we definitively know the user isn't logged in
     if (!token) {
-      toast.error('Please log in to like recipes.');
+      toast.error('Please log in to like recipes');
       return;
     }
     try {
@@ -89,7 +89,7 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false, onDelete, onEdit }) => 
 
   const handleFavorite = async () => {
     if (!token) {
-      toast.error('Please log in first.');
+      toast.error('Please log in first');
       return;
     }
     try {

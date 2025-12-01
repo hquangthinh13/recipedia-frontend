@@ -44,6 +44,8 @@ const ProfilePage = () => {
   const [recipes, setRecipes] = useState([]);
   const [favRecipes, setFavRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [following, setFollowing] = useState(false);
+
   const isOwner = authUser?._id === id || authUser?.id === id;
   const totalLikes = getTotalLikes(recipes);
   const [open, setOpen] = useState(false);
@@ -86,12 +88,13 @@ const ProfilePage = () => {
   };
   const handleFollowToggle = async () => {
     if (!token) {
-      toast.error('Please log in to follow this chef.');
+      toast.error('Please log in to follow this chef');
       return;
     }
     try {
+      setFollowing(true);
       const res = await api.post(`/users/${id}/follow`);
-
+      toast.success(res.data.msg);
       // Update button and counts
       setIsFollowing(res.data.isFollowing);
       setProfile((prev) => ({
@@ -100,6 +103,9 @@ const ProfilePage = () => {
       }));
     } catch (err) {
       console.error('Follow toggle failed:', err);
+      toast.error('Failed to update follow status');
+    } finally {
+      setFollowing(false);
     }
   };
 
@@ -162,11 +168,6 @@ const ProfilePage = () => {
       {/* Kitchen Section */}
       <div className="flex mt-2 flex-col mx-auto max-w-lg px-4 py-4">
         <Card>
-          {/* <img
-            src={coverImage}
-            alt={profile.name}
-            className="object-cover w-full h-24 cursor-pointer hover:brightness-95 transition duration-300"
-          /> */}
           <CardContent className="p-4 space-y-4">
             {/* Content directly below the grouped block */}
             <div className="text-center">
@@ -185,7 +186,7 @@ const ProfilePage = () => {
                 <div className="w-16 flex flex-col gap-0 items-center justify-center">
                   <span
                     onClick={() => handleOpenList('following')}
-                    className="text-lg font-bold text-[var(--card-foreground)] cursor-pointer hover:text-accent"
+                    className="text-lg font-bold text-card-foreground cursor-pointer hover:text-accent"
                   >
                     {formatFollowerCount(profile.followingCount)}
                   </span>
@@ -216,14 +217,9 @@ const ProfilePage = () => {
               </div>
               <div className="mt-4 flex flex-row gap-4 justify-center">
                 {!isOwner && (
-                  //  (
-                  // <Button className="cursor-pointer">
-                  //   <SquarePen />
-                  //   Edit Profile
-                  // </Button>
-                  // ) :
                   <Button
                     className="cursor-pointer"
+                    disabled={following}
                     onClick={handleFollowToggle}
                     variant={isFollowing ? 'secondary' : 'default'}
                   >

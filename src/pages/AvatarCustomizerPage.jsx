@@ -91,13 +91,13 @@ const AvatarCustomizerPage = () => {
     try {
       console.log('Avatar URL being sent:', avatarUrl);
       await api.post('/users/avatar', { avatarUrl });
-      toast.success('Chef’s kiss! Everything saved beautifully.');
+      toast.success('Chef’s kiss! Everything saved beautifully');
       // force refresh user data from backend
       setUser((prev) => ({ ...prev, avatar: avatarUrl }));
       setTimeout(() => navigate('/'), 2500);
     } catch (err) {
       console.error(err);
-      toast.error('Oops! Something’s burnt. Try again.');
+      toast.error('Oops! Something’s burnt. Try again!');
     }
   };
 

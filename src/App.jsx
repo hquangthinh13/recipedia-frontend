@@ -34,7 +34,7 @@ const App = () => {
     path === '/verify-reset-code' ||
     path === '/reset-password' ||
     path.startsWith('/recipes/') ||
-    path.startsWith('/verify/');
+    path.startsWith('/verify');
 
   const hideMP =
     path === '/login' ||
@@ -42,7 +42,7 @@ const App = () => {
     path === '/change-password' ||
     path === '/verify-reset-code' ||
     path === '/reset-password' ||
-    path.startsWith('/verify/');
+    path.startsWith('/verify');
   return (
     <div>
       {!hideNavbar && <Navbar />}

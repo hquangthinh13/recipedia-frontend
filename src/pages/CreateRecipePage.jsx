@@ -67,24 +67,24 @@ const CreateRecipePage = () => {
   const watchedTitle = form.watch('title');
   const watchedDishType = form.watch('dishType');
   const watchedCookingTime = form.watch('cookingTime');
+  const watchedInstructions = form.watch('instructions');
 
   // Build a "fake" recipe object for preview
   const previewRecipe = {
-    _id: 'preview', // anything, won't be used because isPreview = true
-    title: watchedTitle || 'Preview recipe',
-    coverImage: image || '', // from state
-    dishType: watchedDishType || 'main',
-    cookingTime: watchedCookingTime || 'medium',
+    title: watchedTitle || null,
+    coverImage: image || null,
+    dishType: watchedDishType || null,
+    cookingTime: watchedCookingTime || null,
+    instructions: watchedInstructions || null,
+
     author: {
       _id: user?.id,
       name: user?.name,
       avatar: user?.avatar,
     },
     createdAt: new Date().toISOString(),
-    likes: [],
-    comments: [],
-    likedByUser: false,
   };
+
   // Dynamic ingredients
   const { fields, append, remove } = useFieldArray({
     name: 'ingredients',
@@ -364,7 +364,7 @@ const CreateRecipePage = () => {
                               field.onChange(file ?? null);
                               // Validate MIME type
                               if (!file.type.startsWith('image/')) {
-                                toast.error('Please upload a valid image file.');
+                                toast.error('Please upload a valid image file');
                                 e.target.value = ''; // reset input
                                 return;
                               }

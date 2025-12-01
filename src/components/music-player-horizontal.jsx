@@ -58,7 +58,7 @@ export function MusicPlayerHorizontal({ playlist = songsList }) {
   `}
     >
       <div
-        className={` mx-auto max-w-6xl px-4  justify-start flex ${!collapsed && ''}  }
+        className={` mx-auto max-w-6xl px-4  justify-end flex ${!collapsed && ''}  }
 `}
       >
         <Card
@@ -68,7 +68,9 @@ export function MusicPlayerHorizontal({ playlist = songsList }) {
             <div className="flex flex-row w-full justify-between items-center gap-4">
               {/* Album artwork */}
               <div className="flex flex-1/5 gap-2 items-center">
-                <div className="flex aspect-square h-14 justify-start items-start">
+                <div
+                  className={`flex aspect-square justify-start items-start ${collapsed ? 'h-10' : 'h-14'}`}
+                >
                   <img
                     src={currentSong.artwork}
                     alt={currentSong.title}
@@ -97,7 +99,7 @@ export function MusicPlayerHorizontal({ playlist = songsList }) {
                   <p className="text-muted-foreground line-clamp-1 text-xs leading-tight">
                     {currentSong.artist}
                   </p>
-                  {collapsed && (
+                  {/* {collapsed && (
                     <Slider
                       value={[currentTime]}
                       max={duration || 0}
@@ -108,7 +110,7 @@ export function MusicPlayerHorizontal({ playlist = songsList }) {
                       }}
                       className="mt-2 flex-1 cursor-grab transition-opacity duration-300 opacity-70 hover:opacity-100 [&>span]:h-1 [&_[role=slider]]:opacity-0 [&_[role=slider]]:pointer-events-auto"
                     />
-                  )}
+                  )} */}
                 </div>
               </div>
               {/* Middle: controls + slider (hidden when collapsed) */}

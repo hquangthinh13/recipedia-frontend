@@ -261,7 +261,7 @@ const RecipeDetailPage = () => {
       setComments((prev) => [...prev, res.data.comment]);
       setNewComment('');
       setIsCommentFocused(false);
-      toast.success('Comment added!');
+      toast.success('Comment posted!');
     } catch (error) {
       setCommenting(false);
 

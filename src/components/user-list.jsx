@@ -1,23 +1,25 @@
-import React, { useState } from "react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { UserPlus, UserMinus } from "lucide-react";
-import api from "@/lib/api";
-import { useAuth } from "@/context/AuthContext";
-
+import React, { useState } from 'react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { UserPlus, UserMinus } from 'lucide-react';
+import api from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 const UserList = ({ users: initialUsers, type, isOwner, onDeltaFollowing }) => {
   const { user: authUser } = useAuth();
   const [users, setUsers] = useState(initialUsers || []);
-
+  const [loading, setLoading] = useState(false);
   const toggleFollow = async (row) => {
     try {
+      setLoading(true);
       const res = await api.post(`/users/${row._id}/follow`);
       const nowFollowing = !!res.data.isFollowing;
+      toast.success(`${res.data.msg}`);
 
       // OWNER VIEW
       if (isOwner) {
-        if (type === "following") {
+        if (type === 'following') {
           // owner sees their own following list; unfollow should remove the row
           if (!nowFollowing) {
             setUsers((prev) => prev.filter((u) => u._id !== row._id));
@@ -27,9 +29,7 @@ const UserList = ({ users: initialUsers, type, isOwner, onDeltaFollowing }) => {
         }
         // type === "followers": owner can follow back/unfollow in place
         setUsers((prev) =>
-          prev.map((u) =>
-            u._id === row._id ? { ...u, isFollowing: nowFollowing } : u
-          )
+          prev.map((u) => (u._id === row._id ? { ...u, isFollowing: nowFollowing } : u)),
         );
         onDeltaFollowing?.(nowFollowing ? +1 : -1); // owner’s followingCount +/- accordingly
         return;
@@ -40,13 +40,14 @@ const UserList = ({ users: initialUsers, type, isOwner, onDeltaFollowing }) => {
       // - Do not remove rows (it’s not your list).
       // - Just flip your relation icon in-place; never touch viewed profile’s counts.
       setUsers((prev) =>
-        prev.map((u) =>
-          u._id === row._id ? { ...u, isFollowing: nowFollowing } : u
-        )
+        prev.map((u) => (u._id === row._id ? { ...u, isFollowing: nowFollowing } : u)),
       );
       // No onDeltaFollowing here — viewed profile header must not change.
     } catch (e) {
-      console.error("Follow/unfollow failed:", e);
+      console.error('Follow/unfollow failed:', e);
+      toast.error('Failed to update follow status');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,7 +58,7 @@ const UserList = ({ users: initialUsers, type, isOwner, onDeltaFollowing }) => {
         const avatarUrl =
           u.avatar ||
           `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(
-            u.name || "U"
+            u.name || 'U',
           )}&backgroundColor=ffd5dc,ffdfbf&rounded=true`;
 
         // Button rules
@@ -65,7 +66,7 @@ const UserList = ({ users: initialUsers, type, isOwner, onDeltaFollowing }) => {
         let showMinus = false;
 
         if (isOwner) {
-          if (type === "following") {
+          if (type === 'following') {
             // Every row is followed by owner → only UNFOLLOW
             showMinus = true;
           } else {
@@ -87,15 +88,13 @@ const UserList = ({ users: initialUsers, type, isOwner, onDeltaFollowing }) => {
             <div className="flex items-center gap-3">
               <Link to={`/profile/${u._id}`} className="w-10 h-10">
                 <Avatar>
-                  <AvatarImage src={avatarUrl} alt={u.name || "User"} />
-                  <AvatarFallback>
-                    {u.name?.[0]?.toUpperCase() || "U"}
-                  </AvatarFallback>
+                  <AvatarImage src={avatarUrl} alt={u.name || 'User'} />
+                  <AvatarFallback>{u.name?.[0]?.toUpperCase() || 'U'}</AvatarFallback>
                 </Avatar>
               </Link>
               <Link to={`/profile/${u._id}`}>
                 <p className="font-medium text-sm text-foreground hover:text-accent">
-                  {u.name || "Mysterious Chef"}
+                  {u.name || 'Mysterious Chef'}
                 </p>
               </Link>
             </div>
@@ -106,6 +105,7 @@ const UserList = ({ users: initialUsers, type, isOwner, onDeltaFollowing }) => {
                   <Button
                     size="icon"
                     variant="ghost"
+                    disabled={loading}
                     onClick={() => toggleFollow(u)}
                     title="Follow"
                     className="cursor-pointer"
@@ -117,6 +117,7 @@ const UserList = ({ users: initialUsers, type, isOwner, onDeltaFollowing }) => {
                   <Button
                     size="icon"
                     variant="ghost"
+                    disabled={loading}
                     onClick={() => toggleFollow(u)}
                     title="Unfollow"
                     className="cursor-pointer"

@@ -458,7 +458,7 @@ const CreateRemixPage = () => {
                               if (!file) return;
 
                               if (!file.type.startsWith('image/')) {
-                                toast.error('Please upload a valid image file.');
+                                toast.error('Please upload a valid image file');
                                 e.target.value = '';
                                 return;
                               }

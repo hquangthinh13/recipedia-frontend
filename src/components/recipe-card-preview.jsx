@@ -10,27 +10,55 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import PreviewImg from '@/assets/images/overcooked0.jpg';
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const RecipeCardPreview = ({ recipe, isRemix = false }) => {
+  const showTitle = !!recipe?.title;
+  const showImage = !!recipe?.coverImage;
+  const showDishType = !!recipe?.dishType;
+  const showCookingTime = !!recipe?.cookingTime;
+
   const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
   const authorName = recipe?.author?.name || 'Mysterious Chef';
-
+  const createdAt = recipe?.createdAt || new Date().toISOString();
   return (
     <Card className="mx-auto w-full hover:shadow-lg transition overflow-hidden delay-150 duration-300 ease-in-out">
       {/* Cover image */}
-      <div className="cursor-pointer overflow-hidden relative">
-        <img
-          src={recipe.coverImage || PreviewImg}
-          alt={recipe.title}
-          className=" h-36 w-full object-cover
+      {/* <div className="cursor-pointer overflow-hidden relative">
+        {!showImage ? (
+          <Skeleton className="h-36 w-full" />
+        ) : (
+          <>
+            <img
+              src={recipe.coverImage || PreviewImg}
+              alt={recipe.title}
+              className=" h-36 w-full object-cover
              transition ease-in-out delay-150 duration-300 hover:scale-105"
-        />{' '}
-        <span
-          className="z-0 absolute inset-0 bg-gradient-to-b via-black/0 to-black/50 brightness-100
+            />{' '}
+            <span
+              className="z-0 absolute inset-0 bg-gradient-to-b via-black/0 to-black/50 brightness-100
              transition-colors duration-500 group-hover:via-black/0 group-hover:to-black/20"
-        ></span>
+            />
+          </>
+        )}
       </div>
-
+     */}
+      {/* COVER IMAGE */}
+      {showImage ? (
+        <div className="group overflow-hidden relative">
+          <img
+            src={recipe.coverImage}
+            alt={recipe.title || 'Preview'}
+            className="h-36 w-full object-cover group-hover:scale-105 transition-transform duration-300 "
+          />{' '}
+          <span
+            className="z-0 absolute inset-0 bg-gradient-to-b via-black/0 to-black/50 brightness-100
+             transition-colors duration-500 group-hover:via-black/0 group-hover:to-black/20"
+          />
+        </div>
+      ) : (
+        <Skeleton className="h-36 w-full rounded-b-none" />
+      )}
       {/* Content */}
       <CardContent className="p-4 h-fit">
         {/* Author + Date */}
@@ -42,16 +70,16 @@ const RecipeCardPreview = ({ recipe, isRemix = false }) => {
             </Avatar>
 
             <div className="flex flex-col">
-              <div className="cursor-pointer hover:text-accent text-sm flex line-clamp-1 font-medium text-card-foreground">
-                {recipe.author?.name || 'Mysterious Chef'}
+              <div className="text-sm flex line-clamp-1 font-medium text-card-foreground">
+                {authorName}{' '}
               </div>
-              <div className="text-xs flex text-[var(--muted-foreground)] font-light">
+              <div className="text-xs flex text-muted-foreground font-light">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span>{formatDate(recipe.createdAt)}</span>
+                    <span>{formatDate(createdAt)}</span>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{new Date(recipe.createdAt).toLocaleString()}</p>
+                    <p>{new Date(createdAt).toLocaleString()}</p>
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -62,15 +90,25 @@ const RecipeCardPreview = ({ recipe, isRemix = false }) => {
             <Bookmark className={`transition`} />
           </Button>
         </div>
-        <h2 className="cursor-pointer hover:text-accent text-2xl font-bold line-clamp-1 text-[var(--card-foreground)] mt-2 mb-4 antialiased">
-          {recipe.title}
-        </h2>
+        {!showTitle ? (
+          <Skeleton className="h-8 w-full mt-2 mb-4" />
+        ) : (
+          <h2 className="text-2xl font-bold line-clamp-1 text-card-foreground mt-2 mb-4 antialiased">
+            {recipe.title}
+          </h2>
+        )}
+
         <div className="flex justify-start items-center gap-2 mt-2 text-sm mb-4">
-          <Badge variant="default">{dishTypeLabels[recipe.dishType] ?? recipe.dishType}</Badge>
-          <Badge variant="secondary">
-            {cookingTimeLabels[recipe.cookingTime] ?? recipe.cookingTime}
-          </Badge>
-          {/* secondary */}
+          {showDishType ? (
+            <Badge>{dishTypeLabels[recipe.dishType]}</Badge>
+          ) : (
+            <Skeleton className="h-5 w-24 rounded-2xl" />
+          )}
+          {showCookingTime ? (
+            <Badge variant="secondary">{cookingTimeLabels[recipe.cookingTime]}</Badge>
+          ) : (
+            <Skeleton className="h-5 w-16  rounded-2xl" />
+          )}
           {isRemix ? (
             <Badge variant="outline">Remixed Recipe</Badge>
           ) : (

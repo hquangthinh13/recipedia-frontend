@@ -63,7 +63,7 @@ const RecipeCardRemix = ({ recipe }) => {
 
   const handleFavorite = async () => {
     if (!token) {
-      toast.error('Please log in first.');
+      toast.error('Please log in first');
       return;
     }
     try {
