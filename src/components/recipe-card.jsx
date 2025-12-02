@@ -34,7 +34,8 @@ const RecipeCard = ({ isTrending, recipe }) => {
       return;
     }
 
-    navigate(`/recipes/${recipe._id}/remix`);
+    // navigate(`/recipes/${recipe._id}/remix`);
+    navigate(`/remix/${recipe._id}`);
   };
   useEffect(() => {
     if (!userId || !recipe?.likes) {

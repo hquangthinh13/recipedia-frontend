@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import Spinner from '@/components/spinner';
+import { Spinner } from '@/components/spinner';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import RecipeCard from '@/components/recipe-card';
 import RecipeCardHorizontal from '@/components/recipe-card-horizontal';

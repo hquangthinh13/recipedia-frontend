@@ -3,7 +3,6 @@ import api from '@/lib/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import RecipeCardPreview from '@/components/recipe-card-preview';
-import { MusicPlayer } from '@/components/music-player';
 import { useAuth } from '@/context/AuthContext';
 import { Plus, CookingPot, ArrowLeft, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -125,7 +124,7 @@ const CreateRecipePage = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto max-w-6xl mt-2 p-4">
+      <div className="mx-auto max-w-6xl mt-2 mb-24 p-4">
         <Link to={'/'}>
           <Button variant="ghost" className="cursor-pointer">
             <ArrowLeft />
@@ -368,6 +367,13 @@ const CreateRecipePage = () => {
                                 e.target.value = ''; // reset input
                                 return;
                               }
+                              // Validate file size (example: 10 MB max)
+                              const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+                              if (file.size > MAX_SIZE) {
+                                toast.error('Image must be smaller than 10MB');
+                                e.target.value = ''; // reset input
+                                return;
+                              }
                               setfile(file);
                               if (file) previewFiles(file);
                             }}
@@ -375,8 +381,8 @@ const CreateRecipePage = () => {
                         </FormControl>
                         {/* <FormMessage /> */}
                         <FormDescription>
-                          Upload a high-quality image — most image formats are accepted (JPG, PNG,
-                          WEBP, HEIC, etc.).{' '}
+                          Upload a high-quality image (JPG, PNG, WEBP, HEIC, etc.). File size must
+                          be under 10MB.
                         </FormDescription>
                       </FormItem>
                     )}

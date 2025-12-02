@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { toast } from 'sonner';
-import Spinner from '@/components/spinner';
+import { Spinner } from '@/components/spinner';
 import RecipeCardPreview from '@/components/recipe-card-preview';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,6 +41,7 @@ import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { unitGroups } from '@/lib/unitGroups';
 import { RecipeFormSchema } from '@/formSchema/recipeFormSchema';
+import Navbar from '@/components/navbar';
 
 const CreateRemixPage = () => {
   const navigate = useNavigate();
@@ -145,6 +146,7 @@ const CreateRemixPage = () => {
   }, [parentId, form, navigate]);
 
   const onSubmit = async (values) => {
+    console.log('values in onSubmit', values);
     try {
       setLoading(true);
 
@@ -172,7 +174,7 @@ const CreateRemixPage = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+      console.log('remix', res);
       toast.success('Your remix is served!');
       navigate(`/recipes/${res.data.recipe._id}`);
     } catch (error) {
@@ -218,6 +220,7 @@ const CreateRemixPage = () => {
 
   return (
     <div className="min-h-screen">
+      {/* <Navbar /> */}
       <div className="mx-auto max-w-6xl mt-2 p-4">
         <Link to={`/recipes/${parentId}`}>
           <Button variant="ghost" className="cursor-pointer">
@@ -455,21 +458,27 @@ const CreateRemixPage = () => {
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               field.onChange(file ?? null);
-                              if (!file) return;
-
+                              // Validate MIME type
                               if (!file.type.startsWith('image/')) {
                                 toast.error('Please upload a valid image file');
-                                e.target.value = '';
+                                e.target.value = ''; // reset input
                                 return;
                               }
-                              setFile(file);
-                              previewFiles(file);
+                              // Validate file size (example: 10 MB max)
+                              const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+                              if (file.size > MAX_SIZE) {
+                                toast.error('Image must be smaller than 10MB');
+                                e.target.value = ''; // reset input
+                                return;
+                              }
+                              setfile(file);
+                              if (file) previewFiles(file);
                             }}
                           />
                         </FormControl>
                         <FormDescription>
-                          Upload a high-quality image — most image formats are accepted (JPG, PNG,
-                          WEBP, HEIC, etc.).
+                          Upload a high-quality image (JPG, PNG, WEBP, HEIC, etc.). File size must
+                          be under 10MB.
                         </FormDescription>
                       </FormItem>
                     )}

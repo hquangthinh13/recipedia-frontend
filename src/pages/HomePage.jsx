@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import api from '@/lib/api';
 import Pattern from '@/components/pattern';
-import Spinner from '@/components/spinner';
+import { Spinner } from '@/components/spinner';
 import { Flame, RotateCcw } from 'lucide-react';
 import RecipeCard from '@/components/recipe-card';
 import UserCard from '@/components/user-card';
@@ -194,7 +194,7 @@ const HomePage = () => {
       </div>
     );
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen mb-24">
       <div className="px-0 pt-0 max-w-6xl mx-auto">
         <div className="overflow-hidden relative flex w-auto h-fit px-4 items-center text-center">
           <div className="rounded-b-md relative container mx-auto p-4 max-w-6xl z-10 bg-primary">

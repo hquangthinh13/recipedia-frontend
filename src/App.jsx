@@ -51,16 +51,18 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/recipes" element={<FeedPage />} />
         <Route path="/recipes/:id" element={<RecipeDetailPage />} />
-        <Route path="/recipes/:id/remix" element={<CreateRemixPage />} />
+        {/* <Route path="/recipes/:id/remix" element={<CreateRemixPage />} /> */}
+        <Route path="/create" element={<CreateRecipePage />} />
+        <Route path="/remix/:id" element={<CreateRemixPage />} />
 
         <Route path="/login" element={<LogInPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/create" element={<CreateRecipePage />} />
         <Route path="/verify/:token" element={<EmailVerificationPage />} />
         <Route path="/change-password" element={<ForgotPasswordPage />} />
         <Route path="/verify-reset-code" element={<VerifyResetCodePage />} />
         <Route path="/reset-password" element={<NewPasswordPage />} />
         <Route path="/verify-code" element={<VerifyCodePage />} />
+
         <Route path="/customize-avatar" element={<AvatarCustomizerPage />} />
         <Route path="/profile/:id" element={<ProfilePage />} />
         <Route path="/analytics" element={<UserDashboard />} />

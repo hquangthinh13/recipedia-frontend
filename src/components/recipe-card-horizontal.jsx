@@ -69,7 +69,8 @@ const RecipeCardHorizontal = ({ recipe, isOwner = false, onDelete, onEdit }) => 
       return;
     }
 
-    navigate(`/recipes/${recipe._id}/remix`);
+    // navigate(`/recipes/${recipe._id}/remix`);
+    navigate(`/remix/${recipe._id}`);
   };
   const handleLike = async () => {
     // Only block when we definitively know the user isn't logged in

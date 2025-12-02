@@ -12,7 +12,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 import { Badge } from '@/components/ui/badge';
 import { removeBackgroundColor, replaceFaceParams } from '@/lib/avatarModifier';
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-const RecipeCardRemix = ({ recipe }) => {
+const RecipeCardRemix = ({ recipe, isChild = false }) => {
   const navigate = useNavigate();
   const avatarUrl = recipe?.author?.avatar || FallBackAvatar;
   const avatarNoBg = removeBackgroundColor(avatarUrl);
@@ -40,7 +39,8 @@ const RecipeCardRemix = ({ recipe }) => {
       return;
     }
 
-    navigate(`/recipes/${recipe._id}/remix`);
+    // navigate(`/recipes/${recipe._id}/remix`);
+    navigate(`/remix/${recipe._id}`);
   };
   useEffect(() => {
     if (!userId || !recipe?.likes) {
@@ -100,8 +100,10 @@ const RecipeCardRemix = ({ recipe }) => {
         {/* Author + Date */}
         <div className="flex justify-between items-start">
           <div className="flex justify-start flex-col">
-            <span className="uppercase text-primary font-normal tracking-widest text-sm">
-              {!recipe.parentRecipe ? 'Parent recipe' : 'Remixed from this recipe'}
+            <span
+              className={`${!isChild ? 'text-primary' : 'text-accent-foreground'} uppercase font-normal tracking-widest text-sm`}
+            >
+              {!isChild ? 'Parent recipe' : 'Remixed from this recipe'}
             </span>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -125,7 +127,7 @@ const RecipeCardRemix = ({ recipe }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem onClick={handleFavorite} className="cursor-pointer">
-                Save
+                {favorite ? 'Unsave' : 'Save'}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleRemixClick} className="cursor-pointer">
                 {' '}

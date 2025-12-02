@@ -6,7 +6,7 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar';
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import Spinner from '@/components/spinner';
+import { Spinner } from '@/components/spinner';
 import { toast } from 'sonner';
 import { UserPlus, UserMinus } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';

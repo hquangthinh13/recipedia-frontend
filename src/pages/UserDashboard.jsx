@@ -16,7 +16,7 @@ import {
 import { ArrowLeft } from 'lucide-react';
 import UserCard from '@/components/user-card';
 import api from '@/lib/api';
-import Spinner from '@/components/spinner';
+import { Spinner } from '@/components/spinner';
 import { getTotalLikes } from '@/lib/getTotalLikes';
 import { Loader2 } from 'lucide-react';
 

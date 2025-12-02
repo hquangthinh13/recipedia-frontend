@@ -7,9 +7,8 @@ import { dishTypeLabels, cookingTimeLabels } from '@/lib/enumDisplayMap';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import Navbar from '@/components/navbar';
-
+import RecipeCardSmall from '@/components/recipe-card-small';
 import RecipeCardRemix from '@/components/recipe-card-remix';
-
 import {
   Table,
   TableHeader,
@@ -36,6 +35,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import logo from '@/assets/images/Recipedia-logo-square.svg';
+import { Spinner, SmallSpinner } from '@/components/spinner';
+
 import {
   Check,
   Clock,
@@ -49,11 +50,12 @@ import {
   MessageSquareText,
   MessageSquarePlus,
   X,
-  ImageDown,
   FileDown,
   SquareCheckBig,
   Repeat,
   CircleStar,
+  NotebookPen,
+  Wheat,
 } from 'lucide-react';
 import {
   Pagination,
@@ -68,14 +70,11 @@ import { ArrowLeft } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import api from '@/lib/api';
 import UserComment from '@/components/user-comment';
-import Spinner from '@/components/spinner';
-import { MusicPlayer } from '@/components/music-player';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatDate } from '@/lib/formatDate';
 import { exportCardToPng, exportCardToPdf, exportIngredientsPdf } from '@/lib/recipeExport';
-
 const FallBackAvatar = `https://api.dicebear.com/9.x/micah/svg?randomizeIds=false&flip=true&baseColor=f9c9b6&hair=turban&hairColor=ffeba4&&mouth=frown&shirt=collared&shirtColor=77311d&backgroundColor=ffdfbf`;
 
 const RecipeDetailPage = () => {
@@ -83,8 +82,10 @@ const RecipeDetailPage = () => {
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
   const [parentRecipe, setParentRecipe] = useState(null);
+  const [childRecipes, setChildRecipes] = useState([]);
 
   const [loading, setLoading] = useState(true);
+  const [loadingChild, setLoadingChild] = useState(false);
   const [commenting, setCommenting] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [exportingPDF, setExportingPDF] = useState(false);
@@ -104,16 +105,23 @@ const RecipeDetailPage = () => {
   const cardRef = useRef(null);
   const isRemix = recipe?.parentRecipe;
 
-  // Add these to your component state (near other useState hooks)
+  // Comments pagination
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(5); // page size
+  const [limit, setLimit] = useState(3); // page size
   const [totalPages, setTotalPages] = useState(1);
+
+  // Child recipes pagination
+  const [childPage, setChildPage] = useState(1);
+  const [childLimit, setChildLimit] = useState(3); // child recipes per page
+  const [childTotalPages, setChildTotalPages] = useState(1);
+
   // Helper to compute which page numbers to show (with ellipses)
-  const getPageNumbers = () => {
-    const max = totalPages;
-    const current = page;
+
+  const getPageNumbers = (current, max) => {
     const delta = 1; // how many neighbors to show around current
+
+    if (!max || max <= 1) return [1];
     if (max <= 7) return Array.from({ length: max }, (_, i) => i + 1);
 
     const pages = [1];
@@ -124,8 +132,10 @@ const RecipeDetailPage = () => {
     for (let p = left; p <= right; p++) pages.push(p);
     if (right < max - 1) pages.push('ellipsis-right');
     pages.push(max);
+
     return pages;
   };
+
   const handleCommentDeleted = async (deletedId) => {
     // reload current page; if it becomes empty and not first page, go to previous
     await fetchComments(page);
@@ -136,17 +146,17 @@ const RecipeDetailPage = () => {
   const handleRemixClick = () => {
     if (!user) {
       toast.error('Please log in to remix this recipe');
-      // navigate('/login', { state: { from: `/recipes/${id}` } });
       return;
     }
 
-    navigate(`/recipes/${id}/remix`);
+    // navigate(`/recipes/${id}/remix`);
+    navigate(`/remix/${id}`);
   };
 
   // Fetch *paginated* comments (call this after the recipe loads)
   const fetchComments = async (pageToFetch = 1) => {
-    setCommentsLoading(true);
     try {
+      setCommentsLoading(true);
       const res = await api.get(`/recipes/${id}/comments`, {
         params: { page: pageToFetch, limit },
       });
@@ -274,25 +284,52 @@ const RecipeDetailPage = () => {
     setNewComment('');
     setIsCommentFocused(false);
   };
+  const fetchRecipe = async () => {
+    try {
+      setLoading(true);
+      const { data } = await api.get(`/recipes/${id}`);
+      console.log('Fetched recipe:', data);
+      setRecipe(data);
+      setParentRecipe(data.parentRecipe);
+      setComments(data.comments || []);
+      document.title = `Recipedia | ${data.title}`;
+    } catch (err) {
+      console.error('Error fetching recipe:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchChildRecipes = async (pageToFetch = 1) => {
+    try {
+      setLoadingChild(true);
+      const { data } = await api.get(`/recipes/${id}/remixes`, {
+        params: { page: pageToFetch, limit: childLimit },
+      });
+      console.log('Fetched child recipe:', data);
+
+      const list = data.recipes || [];
+      const totalCount = typeof data.total === 'number' ? data.total : list.length;
+
+      const serverTotalPages =
+        typeof data.totalPages === 'number'
+          ? data.totalPages
+          : Math.max(1, Math.ceil(totalCount / childLimit));
+
+      setChildRecipes(list);
+      setChildTotalPages(serverTotalPages);
+      setChildPage(pageToFetch);
+    } catch (err) {
+      console.error('Error fetching child recipe:', err);
+    } finally {
+      setLoadingChild(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchRecipe = async () => {
-      try {
-        const { data } = await api.get(`/recipes/${id}`);
-        console.log('Fetched recipe:', data);
-        setRecipe(data);
-        setParentRecipe(data.parentRecipe);
-        setComments(data.comments || []);
-        document.title = `Recipedia | ${data.title}`;
-      } catch (err) {
-        console.error('Error fetching recipe:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchRecipe();
-  }, [id]);
+    fetchChildRecipes(1);
+  }, [id, childLimit]);
+
   // Keep favorite state in sync when user or recipe changes
   useEffect(() => {
     if (user?.favorites && recipe?._id) {
@@ -370,7 +407,7 @@ const RecipeDetailPage = () => {
   return (
     <div className="min-h-screen">
       <Navbar needTimer={true} />
-      <div className="mx-auto max-w-6xl mt-2 p-4">
+      <div className="mx-auto max-w-6xl mt-2 mb-24 p-4">
         <div className="flex flex-row justify-between items-center mb-4">
           <Link to={'/'}>
             <Button variant="ghost" className="cursor-pointer">
@@ -455,7 +492,6 @@ const RecipeDetailPage = () => {
             </Button>
           </div>
         </div>
-
         <div className="flex flex-col lg:flex-row gap-4">
           <Card ref={cardRef} className="flex-1 mt-0 overflow-hidden h-fit">
             {/* Cover image */}
@@ -566,7 +602,7 @@ const RecipeDetailPage = () => {
                   <h2 className="text-2xl font-bold text-card-foreground antialiased">
                     Ingredients
                   </h2>
-                  <Utensils className="text-accent" />
+                  <Wheat className="text-accent" />
                 </div>
                 {/* Switch Buttons */}
                 <div className="flex w-fit flex-row overflow-hidden rounded-none border-2 border-accent">
@@ -645,9 +681,32 @@ const RecipeDetailPage = () => {
           </Card>
           <div className="flex flex-col gap-4">
             {isRemix && (
-              <div className="lg:w-sm space-y-2">
-                <RecipeCardRemix isTrending={false} recipe={parentRecipe} />{' '}
-              </div>
+              <>
+                {' '}
+                {recipe.remixNote && (
+                  <Card className="lg:w-sm mt-0 h-fit">
+                    <CardContent className="space-y-6 p-6">
+                      {/* Comments Section */}
+                      <div className="space-y-2">
+                        {/* Title */}
+                        <div className="flex justify-start items-center gap-2">
+                          <h2 className="text-2xl font-bold text-card-foreground antialiased">
+                            Remix Note
+                          </h2>
+                          <NotebookPen className="text-accent" />
+                        </div>
+
+                        <div>
+                          <p className="text-muted-foreground">{recipe.remixNote}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                <div className="lg:w-sm">
+                  <RecipeCardRemix isTrending={false} recipe={parentRecipe} />{' '}
+                </div>
+              </>
             )}
             <Card className="lg:w-sm mt-0 h-fit">
               <CardContent className="space-y-6 p-6">
@@ -718,7 +777,9 @@ const RecipeDetailPage = () => {
 
                 <div className="mt-6">
                   {commentsLoading ? (
-                    <Spinner />
+                    <div className="flex justify-center items-center h-76">
+                      <SmallSpinner />{' '}
+                    </div>
                   ) : comments.length > 0 ? (
                     <>
                       {comments.map((comment) => (
@@ -735,7 +796,8 @@ const RecipeDetailPage = () => {
                         <div className="mt-4">
                           <Pagination>
                             <PaginationContent className="flex-wrap">
-                              {getPageNumbers().map((p, idx) => {
+                              {/* {getPageNumbers().map((p, idx) => { */}
+                              {getPageNumbers(page, totalPages).map((p, idx) => {
                                 if (p === 'ellipsis-left' || p === 'ellipsis-right') {
                                   return (
                                     <PaginationItem key={`${p}-${idx}`}>
@@ -770,7 +832,80 @@ const RecipeDetailPage = () => {
                   )}
                 </div>
               </CardContent>
-            </Card>{' '}
+            </Card>
+
+            <Card className="lg:w-sm mt-0 h-fit">
+              <CardContent className="space-y-6 p-6">
+                {/* Comments Section */}
+                <div className="space-y-2">
+                  {/* Title */}
+                  <div className="flex justify-start items-center gap-2">
+                    <h2 className="text-2xl font-bold text-card-foreground antialiased">
+                      Child Recipes
+                    </h2>
+                    <Utensils className="text-accent" />
+                  </div>
+                </div>{' '}
+                <Separator className="mt-2 mb-0 z-100" />
+                {/* Recipes List */}
+                <div className="">
+                  {loadingChild ? (
+                    <div className="flex justify-center items-center h-76">
+                      <SmallSpinner />{' '}
+                    </div>
+                  ) : childRecipes.length > 0 ? (
+                    <>
+                      {childRecipes.map((child) => (
+                        <RecipeCardSmall key={child._id} recipe={child} isChild={true} />
+                      ))}
+                      {/* Pagination */}
+                      {childTotalPages > 1 && (
+                        <div className="mt-4">
+                          <Pagination>
+                            <PaginationContent className="flex-wrap">
+                              {getPageNumbers(childPage, childTotalPages).map((p, idx) => {
+                                if (p === 'ellipsis-left' || p === 'ellipsis-right') {
+                                  return (
+                                    <PaginationItem key={`${p}-${idx}`}>
+                                      <PaginationEllipsis />
+                                    </PaginationItem>
+                                  );
+                                }
+                                return (
+                                  <PaginationItem key={p}>
+                                    <PaginationLink
+                                      href="#"
+                                      isActive={p === childPage}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        if (p !== childPage) fetchChildRecipes(p);
+                                      }}
+                                    >
+                                      {p}
+                                    </PaginationLink>
+                                  </PaginationItem>
+                                );
+                              })}
+                            </PaginationContent>
+                          </Pagination>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground mt-6">
+                      No recipes remixed yet. Be the first to remix this recipe!
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            {/* {childRecipes.length > 0 && (
+              <div className="hidden lg:grid lg:w-sm space-y-4 grid-cols-1">
+                {childRecipes.map((child) => (
+                  <RecipeCardSmall recipe={child} isChild={true} />
+                ))}
+              </div>
+            )} */}
           </div>
         </div>
       </div>
