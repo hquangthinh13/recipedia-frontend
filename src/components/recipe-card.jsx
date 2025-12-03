@@ -189,7 +189,7 @@ const RecipeCard = ({ isTrending, recipe }) => {
                   {recipe.title}
                 </h2>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent className="max-w-xs text-xs">
                 <p> {recipe.title}</p>
               </TooltipContent>
             </Tooltip>
