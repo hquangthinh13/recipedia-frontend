@@ -356,17 +356,44 @@ const CreateRecipePage = () => {
                         <FormControl className="cursor-pointer">
                           <Input
                             type="file"
-                            accept="image/*"
+                            accept=".jpg,.jpeg,.png,.webp,.heic,.avif,.tiff,.svg"
                             className="text-muted-foreground"
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               field.onChange(file ?? null);
                               // Validate MIME type
-                              if (!file.type.startsWith('image/')) {
-                                toast.error('Please upload a valid image file');
-                                e.target.value = ''; // reset input
+                              const allowedTypes = [
+                                'image/jpeg',
+                                'image/png',
+                                'image/webp',
+                                'image/avif',
+                                'image/tiff',
+                                'image/svg+xml',
+                                'image/heic',
+                                'image/heif',
+                              ];
+
+                              const allowedExt = [
+                                'jpg',
+                                'jpeg',
+                                'png',
+                                'webp',
+                                'heic',
+                                'avif',
+                                'tiff',
+                                'svg',
+                              ];
+
+                              const ext = file.name.split('.').pop().toLowerCase();
+
+                              if (!allowedTypes.includes(file.type) || !allowedExt.includes(ext)) {
+                                toast.error(
+                                  'Please upload a valid image: JPG, PNG, WEBP, HEIC, AVIF, TIFF, or SVG',
+                                );
+                                e.target.value = '';
                                 return;
                               }
+
                               // Validate file size (example: 10 MB max)
                               const MAX_SIZE = 10 * 1024 * 1024; // 10MB
                               if (file.size > MAX_SIZE) {
@@ -381,8 +408,8 @@ const CreateRecipePage = () => {
                         </FormControl>
                         {/* <FormMessage /> */}
                         <FormDescription>
-                          Upload a high-quality image (JPG, PNG, WEBP, HEIC, etc.). File size must
-                          be under 10MB.
+                          Upload a high-quality image (JPG, JPEG, PNG, WEBP, HEIC, AVIF, TIFF, SVG).
+                          File size must be under 10MB.
                         </FormDescription>
                       </FormItem>
                     )}

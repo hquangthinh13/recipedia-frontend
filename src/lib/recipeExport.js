@@ -1,4 +1,3 @@
-// src/utils/recipeExport.js
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import { saveAs } from 'file-saver';
