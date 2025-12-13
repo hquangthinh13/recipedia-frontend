@@ -498,7 +498,7 @@ const CreateRemixPage = () => {
                                 e.target.value = ''; // reset input
                                 return;
                               }
-                              setfile(file);
+                              setFile(file);
                               if (file) previewFiles(file);
                             }}
                           />
