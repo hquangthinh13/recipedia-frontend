@@ -1,6 +1,10 @@
+![Decoration](./src/assets/images/Recipedia_Pattern.svg)
+
 # Recipedia Frontend
 
 The modern user interface for Recipedia, built with the latest web technologies to ensure a smooth, accessible, and beautiful user experience.
+
+![Logo](./src/assets/images/Recipedia-logo-square.svg)
 
 ## Key Features
 
@@ -51,6 +55,11 @@ The modern user interface for Recipedia, built with the latest web technologies 
 
 ![DiceBear](https://img.shields.io/badge/DiceBear-3284c8?style=for-the-badge&logo=dicebear&logoColor=white)
 
+## Use Case Diagram
+
+![Use Case 01](./docs/usecase-01.png)
+![Use Case 02](./docs/usecase-02.png)
+
 ## Installation
 
 ### Clone repo
@@ -98,3 +107,5 @@ npm start
 ## Deployment
 
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+
+![Decoration](./src/assets/images/Recipedia_Pattern.svg)
